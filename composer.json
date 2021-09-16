@@ -1,0 +1,28 @@
+{
+    "name": "jasperweyne/unwasm",
+    "type": "library",
+    "description": "Transpile WebAssembly to PHP and run it",
+    "keywords": ["wasm","webassembly"],
+    "homepage": "https://github.com/jasperweyne/unwasm",
+    "license": "Apache-v2.0",
+    "authors": [
+        {
+            "name": "Jasper Weyne",
+            "email": "jasperweyne@gmail.com"
+        }
+    ],
+    "scripts": {
+        "fix": [
+            "php-cs-fixer fix src"
+        ]
+    },
+    "autoload": {
+        "psr-4": {"UnWasm\\": "src/"}
+    },
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.1"
+    }
+}
