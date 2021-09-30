@@ -62,8 +62,8 @@ class DatasBuilder implements BuilderInterface
             $expr = FuncsBuilder::expression($parser);  
         }
         
-        // since a vector of bytes is given, we represent it as a string
-        $init = $parser->expectString();
+        // since a vector of bytes is given, we represent it as a string but don't validate it as UTF-8
+        $init = $parser->expectString('//', false);
 
         return new Data($memIdx, $expr, $init);
     }

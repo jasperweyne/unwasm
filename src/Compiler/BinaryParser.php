@@ -161,14 +161,22 @@ class BinaryParser
         return $children;
     }
 
-    public function expectString(string $regex = '//'): string
+    public function expectString(string $regex = '//', bool $validate = true): string
     {
         // technically, expectVector could be wrapped, but this is more efficient
         // obtain raw string from stream
         $pos = ftell($this->stream);
         $size = $this->expectInt(true);
         $value = fread($this->stream, $size);
-        // todo: validate utf8 encoding
+
+        if ($value === false) {
+            throw new \UnexpectedValueException();
+        }
+
+        // validate utf8 encoding
+        if ($validate && !mb_check_encoding($value, 'UTF-8')) {
+            throw new \UnexpectedValueException('Invalid utf8 string');
+        }
 
         // parse and validate result value
         $result = Token::parse(Token::STRING_TYPE, $value, $pos);
