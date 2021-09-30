@@ -35,7 +35,7 @@ fully supported.
 | Memories       | Supported   |
 | Globals        | Supported   |
 | Element segs.  | Unsupported |
-| Data segs.     | Unsupported |
+| Data segs.     | Supported   |
 | Start          | Supported   |
 | Exports        | Supported   |
 | Imports        | Supported   |

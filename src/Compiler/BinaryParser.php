@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler;
 
 use UnWasm\Compiler\Binary\BuilderInterface;
+use UnWasm\Compiler\Binary\DatasBuilder;
 use UnWasm\Compiler\Binary\ExportsBuilder;
 use UnWasm\Compiler\Binary\FuncsBuilder;
 use UnWasm\Compiler\Binary\GlobalsBuilder;
@@ -54,6 +55,7 @@ class BinaryParser
             new GlobalsBuilder(),
             new ExportsBuilder(),
             new StartBuilder(),
+            new DatasBuilder(),
         ];
     }
 
