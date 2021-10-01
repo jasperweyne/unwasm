@@ -35,15 +35,19 @@ class Wasm
 
     /** @var Environment The global data store */
     private $env;
+    
+    /** @var string The namespace where module classes are registered */
+    private $namespace;
 
     public function __construct(
         CacheInterface $cache,
-        Environment $env
+        Environment $env,
+        $namespace = 'WasmModule'
     ) {
         $this->cache = $cache;
         $this->env = $env;
+        $this->namespace = $namespace;
     }
-
 
     public function loadBinaryFile(string $location, string $module, bool $forceCompile = false)
     {
@@ -61,7 +65,7 @@ class Wasm
         if (!$timestamp || !$cacheTs || $timestamp > $cacheTs) {
             $parser = new BinaryParser($stream);
             $compiler = $parser->scan();
-            $this->cache->write($module, $compiler->compile($module)->read());
+            $this->cache->write($module, $compiler->compile($this->namespace.'\\'.$module)->read());
         }
 
         return $this->load($module);
@@ -76,7 +80,7 @@ class Wasm
         }
 
         // Instantiate module
-        $classname = "WasmModule_$module";
+        $classname = "$this->namespace\\$module";
         return new $classname($this->env);
     }
 

@@ -126,7 +126,7 @@ class ModuleCompiler
         return $idx < $importCnt ? $tableImports[$idx] : $this->tables[$idx - $importCnt];
     }
 
-    public function compile(string $name): Source
+    public function compile(string $fqcn): Source
     {
         // prepare import references
         foreach ($this->imports as $import) {
@@ -139,7 +139,7 @@ class ModuleCompiler
 
         $source = new Source();
 
-        $this->compileHeader($source, $name);
+        $this->compileHeader($source, $fqcn);
 
         $this->compileVars($source);
 
@@ -156,12 +156,26 @@ class ModuleCompiler
         return $source;
     }
 
-    private function compileHeader(Source $src, string $name): void
+    private function compileHeader(Source $src, string $fqcn): void
     {
+        // Top
+        $src->write('<?php')->write('');
+
+        // Strip leading backslash from fqcn
+        if (strpos($fqcn, '\\') === 0) {
+            $fqcn = substr($fqcn, 1);
+        }
+
+        // Include namespace if present
+        if ($pos = strrpos($fqcn, '\\')) {
+            $namespace = substr($fqcn, 0, $pos);
+            $src->write("namespace $namespace;")->write();
+            $fqcn = substr($fqcn, $pos + 1);
+        }
+
+        // Class start
         $src
-            ->write('<?php')
-            ->write('')
-            ->write("class WasmModule_$name")
+            ->write("class $fqcn")
             ->write('{')
             ->indent()
         ;
