@@ -39,7 +39,7 @@ class DatasBuilder implements BuilderInterface
         echo "Started DatasBuilder\n";
 
         // parse section contents
-        $compiler->globals = $parser->expectVector(function (BinaryParser $parser) {
+        $compiler->datas = $parser->expectVector(function (BinaryParser $parser) {
             return $this->data($parser);
         });
 
