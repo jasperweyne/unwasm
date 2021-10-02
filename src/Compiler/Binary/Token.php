@@ -71,8 +71,10 @@ class Token
                 $result = $raw;
                 break;
             case self::FLOAT_TYPE:
+                list(, $result) = unpack("g", $raw);
+                break;
             case self::FLOAT_64_TYPE:
-                list(, $result) = unpack("g", $raw); // todo: differ between 32/64 bits
+                list(, $result) = unpack("e", $raw);
                 break;
             case self::INT_TYPE:
             case self::INT_64_TYPE:

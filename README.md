@@ -60,9 +60,9 @@ fully supported.
 Note: runtime funcs are managed by PHP and therefore implicitly supported.
 
 ### Known caveats
-* PHP numbers are encoded with a bit length dependent upon the platform. This
+* PHP integers are encoded with a bit length dependent upon the platform. This
   means that if you're running a 32-bit PHP installation, UnWasm currently won't
-  support 64-bit integers and floats.
+  support 64-bit integers.
 * Integers are always encoded signed in PHP. When using large unsigned
   integers, this might currently result in unexpected behaviour.
 
