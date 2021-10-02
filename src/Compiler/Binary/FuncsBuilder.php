@@ -116,14 +116,17 @@ class FuncsBuilder implements BuilderInterface
                     $instructions[] = new Nop();
                     break;
                 case 0x02:
+                    $bt = $parser->expectInt();
                     $inner = self::expression($parser, $constExpr, $termOpcode);
                     $instructions[] = new Block($inner);
                     break;
                 case 0x03:
+                    $bt = $parser->expectInt();
                     $inner = self::expression($parser, $constExpr, $termOpcode);
                     $instructions[] = new Loop($inner);
                     break;
                 case 0x04:
+                    $bt = $parser->expectInt();
                     $inner = self::expression($parser, $constExpr, $termOpcode);
                     $instructions[] = new IfElse($inner);
                     break;
