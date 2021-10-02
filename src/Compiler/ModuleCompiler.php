@@ -28,6 +28,7 @@ use UnWasm\Compiler\Node\External\Import\Import;
 use UnWasm\Compiler\Node\External\Import\MemImport;
 use UnWasm\Compiler\Node\External\Import\TableImport;
 use UnWasm\Compiler\Node\Store\Data;
+use UnWasm\Compiler\Node\Store\Element;
 use UnWasm\Compiler\Node\Store\Table;
 use UnWasm\Compiler\Node\Store\Memory;
 use UnWasm\Compiler\Node\Store\GlobalData;
@@ -54,7 +55,7 @@ class ModuleCompiler
     /** @var GlobalData[] Globals */
     public $globals = array();
 
-    /** @var array Elements */
+    /** @var Element[] Elements */
     public $elems = array();
 
     /** @var Data[] Datas */

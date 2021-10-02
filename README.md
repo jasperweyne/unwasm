@@ -22,23 +22,10 @@ supported language features. UnWasm will reach 1.0.0 when the binary form for
 [WebAssembly 1.1](https://webassembly.github.io/spec/core/binary/index.html) is
 fully supported. 
 
-| Code Format    | Status      |
+| Code Parsing   | Status      |
 | -------------- | ----------- |
-| .wasm          | Partial     |
+| .wasm          | Supported   |
 | .wast          | Unsupported |
-
-| Binary Parsing | Status      |
-| -------------- | ----------- |
-| Types          | Supported   |
-| Functions      | Supported   |
-| Tables         | Supported   |
-| Memories       | Supported   |
-| Globals        | Supported   |
-| Element segs.  | Unsupported |
-| Data segs.     | Supported   |
-| Start          | Supported   |
-| Exports        | Supported   |
-| Imports        | Supported   |
 
 | Compilation    | Status      |
 | -------------- | ----------- |
