@@ -49,8 +49,12 @@ use UnWasm\Compiler\Node\Code\Numeric\Lt;
 use UnWasm\Compiler\Node\Code\Numeric\Mul;
 use UnWasm\Compiler\Node\Code\Numeric\Neq;
 use UnWasm\Compiler\Node\Code\Numeric\Sub;
+use UnWasm\Compiler\Node\Code\Reference\Func as RefFunc;
+use UnWasm\Compiler\Node\Code\Reference\IsNull;
+use UnWasm\Compiler\Node\Code\Reference\NullRef;
 use UnWasm\Compiler\Node\Code\Variable\LocalGet;
 use UnWasm\Compiler\Node\Code\Variable\LocalSet;
+use UnWasm\Compiler\Node\Type\RefType;
 use UnWasm\Compiler\Node\Type\ValueType;
 
 /**
@@ -133,6 +137,17 @@ class FuncsBuilder implements BuilderInterface
                 case 0x0D:
                     $depth = $parser->expectInt(true);
                     $instructions[] = new BranchCond($depth);
+                    break;
+                case 0xD0:
+                    $value = $parser->expectByte();
+                    $instructions[] = new NullRef(new RefType($value));
+                    break;
+                case 0xD1:
+                    $instructions[] = new IsNull();
+                    break;
+                case 0xD2:
+                    $value = $parser->expectInt(true);
+                    $instructions[] = new RefFunc($value);
                     break;
                 case 0x10:
                     $funcidx = $parser->expectInt(true);

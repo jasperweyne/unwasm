@@ -18,13 +18,29 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Type;
+namespace UnWasm\Compiler\Node\Code\Reference;
+
+use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Code\Instruction;
+use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Source;
 
 /**
- * Describes a reference type constraint.
+ * Adds a null reference to the stack.
  */
-class RefType extends ValueType
+class NullRef extends Instruction
 {
-    const FUNCREF = 0x70;
-    const EXTREF = 0x6F;
+    /** @var RefType The reference type */
+    private $type;
+
+    public function __construct(RefType $type)
+    {
+        $this->type = $type;
+    }
+
+    public function compile(ExpressionCompiler $state, Source $src): void
+    {
+        // update stack
+        $state->const(null, $this->type);
+    }
 }

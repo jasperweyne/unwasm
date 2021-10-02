@@ -54,7 +54,7 @@ fully supported.
 | Instructions   | Status      |
 | -------------- | ----------- |
 | Numeric        | Partial     |
-| Reference      | Unsupported |
+| Reference      | Supported   |
 | Parametric     | Unsupported |
 | Variable       | Partial     |
 | Table          | Unsupported |
