@@ -41,12 +41,7 @@ class Func extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // update stack
-        $funcref = new RefType(RefType::FUNCREF);
-        list($var) = $state->push($funcref);
-
-        // export code
         $func = $this->funcIdx;
-        $src->write("$var = 'fn_$func';");
-
+        $state->const("'fn_$func'", new RefType(RefType::FUNCREF));
     }
 }
