@@ -145,7 +145,7 @@ class ModuleCompiler
 
         $this->compileVars($source);
 
-        $this->compileConstruct($source);
+        $this->compileConstruct($source, $fqcn);
 
         $this->compileExports($source);
 
@@ -185,8 +185,6 @@ class ModuleCompiler
 
     private function compileVars(Source $src): void
     {
-        // todo: respect imports
-
         // register imported modules
         if (count($this->importRefs) > 0) {
             $src->write('// imported module refs');
@@ -220,10 +218,15 @@ class ModuleCompiler
         }
     }
 
-    private function compileConstruct(Source $src): void
+    private function compileConstruct(Source $src, string $module): void
     {
+        // strip namespace from module name
+        if ($pos = strrpos($module, '\\')) {
+            $module = substr($module, $pos + 1);
+        }
+
         $hasEnv = count($this->imports) + count($this->exports) > 0;
-        $param = $hasEnv ? '?\UnWasm\Runtime\Environment $env = null' : '';
+        $param = $hasEnv ? "?\UnWasm\Runtime\Environment \$env = null, string \$module = '$module'" : '';
 
         // write constructor header
         $src
@@ -287,11 +290,10 @@ class ModuleCompiler
                 ->write('// exports')
                 ->write('if ($env) {')
                 ->indent()
-                ->write('// todo')
             ;
 
             foreach ($this->exports as $i => $export) {
-                // todo
+                $export->compileSetup($i, $this, $src);
             }
 
             $src

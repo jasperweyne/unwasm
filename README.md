@@ -35,7 +35,7 @@ fully supported.
 | Tables         | Unsupported |
 | Mems           | Supported   |
 | Globals        | Unsupported |
-| Exports        | Unsupported |
+| Exports        | Partial     |
 | Start          | Supported   |
 
 | Instructions   | Status      |

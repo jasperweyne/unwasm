@@ -38,6 +38,11 @@ class MemExport extends Export
         $this->memIdx = $memIdx;
     }
 
+    public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
+    {
+        // todo
+    }
+
     public function compile(ModuleCompiler $module, Source $src)
     {
         // todo

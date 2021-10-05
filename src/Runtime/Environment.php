@@ -26,8 +26,20 @@ namespace UnWasm\Runtime;
  */
 class Environment
 {
-    /** @var array The lowest registered func index */
+    /** @var array The dictionary of module instances and their names. */
     private $modules = array();
+
+    /** @var string[] Dictionary of exported func names and their type strings. */
+    private $funcs = array();
+    
+    /** @var string[] Dictionary of exported table names and their instances. */
+    private $tables = array();
+    
+    /** @var string[] Dictionary of exported memory names and their instances. */
+    private $mems = array();
+    
+    /** @var string[] Dictionary of exported global names and their instances. */
+    private $globals = array();
 
     public function import(string $module): object
     {
@@ -38,8 +50,17 @@ class Environment
         return $this->modules[$module];
     }
 
-    public function export(string $module, object $inst): void
+    public function exportFunc(string $func, string $type)
     {
-        $this->modules[$module] = $inst;
+        $this->funcTypes[$func] = $type;
+    }
+
+    public function assertFunc(string $module, string $func, string $type): bool
+    {
+        if (!isset($this->funcTypes[$module]) || $this->funcTypes[$module][$func] !== $type) {
+            throw new \RuntimeException("Unexpected func type for ($module, $func)");
+        }
+
+        return true;
     }
 }

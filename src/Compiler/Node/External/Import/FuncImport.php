@@ -46,9 +46,7 @@ class FuncImport extends Import implements FuncInterface
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        // todo: validate types
-        $ref = $module->importRefs[$this->module];
-        $source->write("\$this->ref_$ref"."->func('$this->name');");
+        $source->write("\$env->assertFunc('$this->module', '$this->name', 'todo');");
     }
 
     public function compile(int $index, ModuleCompiler $module, Source $src): void

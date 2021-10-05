@@ -35,6 +35,8 @@ abstract class Export
     {
         $this->name = $name;
     }
+    
+    abstract public function compileSetup(int $index, ModuleCompiler $module, Source $src): void;
 
     abstract public function compile(ModuleCompiler $module, Source $src);
 }

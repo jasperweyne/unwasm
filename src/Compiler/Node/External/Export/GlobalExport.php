@@ -38,6 +38,11 @@ class GlobalExport extends Export
         $this->globalIdx = $globalIdx;
     }
 
+    public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
+    {
+        // todo
+    }
+
     public function compile(ModuleCompiler $module, Source $src)
     {
         // todo

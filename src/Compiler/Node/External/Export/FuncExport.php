@@ -38,6 +38,11 @@ class FuncExport extends Export
         $this->funcIdx = $funcIdx;
     }
 
+    public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
+    {
+        $source->write("\$env->exportFunc(\$module, '$this->name', 'todo');");
+    }
+
     public function compile(ModuleCompiler $module, Source $src)
     {
         $func = $module->func($this->funcIdx);
