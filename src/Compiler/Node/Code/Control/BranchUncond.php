@@ -39,6 +39,16 @@ class BranchUncond extends Instruction
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // write return values
+        $return = $state->return($this->depth);
+        $stackVars = $state->pop(count($return));
+        foreach ($return as $to => $type) {
+            // todo: validate types
+            $from = array_shift($stackVars);
+            $src->write("$to = $from;");
+        }
+
+        // branch
         $src->write('continue ', $this->depth + 1, ';');
     }
 }

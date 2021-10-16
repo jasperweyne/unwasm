@@ -44,6 +44,14 @@ class Block extends Instruction
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
+        
+        // write returnvars
+        $stackVars = $state->pop(count($state->return()));
+        foreach ($state->return() as $to => $type) {
+            // todo: validate types
+            $from = array_shift($stackVars);
+            $src->write("$to = $from;");
+        }
 
         $src
             ->outdent()

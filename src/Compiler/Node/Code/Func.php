@@ -54,13 +54,14 @@ class Func implements FuncInterface
 
     public function compile(int $index, ModuleCompiler $module, Source $src): void
     {
-        $expr = new ExpressionCompiler($module);
-
-        // prepare input parameters
+        // prepare input/output parameters
         /** @var FuncType */
         $functype = $module->types[$this->typeIdx];
         $input = implode(", ", $functype->compileInput('local_', true));
+        $output = array_combine($functype->compileOutput('ret_'), $functype->getOutput());
 
+        // setup expression compiler
+        $expr = new ExpressionCompiler($module, $output, null);
         foreach ($functype->getInput() as $i => $local) {
             $expr->set($i, $local);
         }
@@ -70,6 +71,8 @@ class Func implements FuncInterface
             ->write("private function fn_$index($input): array") // always return an array
             ->write('{')
             ->indent()
+            ->write('do {')
+            ->indent()
         ;
 
         // write function body
@@ -77,11 +80,20 @@ class Func implements FuncInterface
             $instr->compile($expr, $src);
         }
 
-        // prepare final return type
-        $output = implode(", ", $expr->pop(count($functype->getOutput())));
+        // write returnvars
+        $stackVars = $expr->pop(count($expr->return()));
+        foreach ($expr->return() as $to => $type) {
+            // todo: validate types
+            $from = array_shift($stackVars);
+            $src->write("$to = $from;");
+        }
 
         // write function footer
+        $output = implode(", ", array_keys($output));
         $src
+            ->outdent()
+            ->write('} while (0);')
+            ->write()
             ->write("return array($output);")
             ->outdent()
             ->write('}')

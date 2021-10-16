@@ -23,35 +23,58 @@ namespace UnWasm\Compiler;
 use UnWasm\Compiler\Node\Type\ValueType;
 
 /**
- * Represents the stack used during webassembly execution
+ * Represents the stack used during webassembly execution for a single context
  */
 class ExpressionCompiler
 {
     /** @var ModuleCompiler Module representation */
     public $module;
 
+    /** @var ?ExpressionCompiler Parent expression context */
+    private $parent;
+
+    /** @var array<string, ValueType> Dictionary that maps variable names to return types */
+    private $returns;
+
     private $stack = [];
     private $names = [];
     private $nameCnt = 1;
     private $locals = [];
 
-    public function __construct(ModuleCompiler $module)
+    public function __construct(ModuleCompiler $module, array $returns, ?ExpressionCompiler $parent)
     {
         $this->module = $module;
+        $this->parent = $parent;
+        $this->returns = $returns;
     }
 
+    /**
+     * Pull a local variable value and put it on the stack. This equates to:
+     * `$stack_top = $local_m; // m: $local`
+     */
     public function get(int $local): void
     {
         array_push($this->names, "\$local_$local");
         array_push($this->stack, $this->locals[$local]);
     }
 
+    /**
+     * Set a value to a local variable with a given type. This equates to:
+     * `$local_m = ...; // m: $local`
+     * 
+     * @return string The variable name of the local.
+     */
     public function set(int $local, ValueType $type): string
     {
         $this->locals[$local] = $type;
         return "\$local_$local";
     }
 
+    /**
+     * Push a expression constant to the stack. This is similar to push(), but
+     * avoids the need for a compiled variable assigment, and instead defers it
+     * to a later point.
+     */
     public function const($value, ValueType $type): void
     {
         array_push($this->names, strval($value));
@@ -128,5 +151,19 @@ class ExpressionCompiler
     public function count(): int
     {
         return count($this->stack);
+    }
+
+    /**
+     * Return the expected stack names and types as a dictionary
+     *
+     * @return array<string, ValueType>
+     */
+    public function return(int $depth = 0): array
+    {
+        if ($depth > 0) {
+            return $this->parent->return($depth - 1);
+        }
+        
+        return $this->returns;
     }
 }
