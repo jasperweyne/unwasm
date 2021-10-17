@@ -42,11 +42,7 @@ class BranchUncond extends Instruction
         // write return values
         $return = $state->return($this->depth);
         $stackVars = $state->pop(count($return));
-        foreach ($return as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        Block::compileReturn($src, $return, $stackVars);
 
         // branch
         $src->write('continue ', $this->depth + 1, ';');

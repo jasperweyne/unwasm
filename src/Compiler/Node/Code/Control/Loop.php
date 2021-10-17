@@ -37,15 +37,21 @@ class Loop extends Instruction
         $this->instructions = $inner;
     }
 
-    public function compile(ExpressionCompiler $state, Source $src): void
+    public function compile(ExpressionCompiler $outerState, Source $src): void
     {
         $src->write('while (1) {')->indent();
 
+        $state = new ExpressionCompiler($outerState->module, [], $outerState);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
+        
+        // write returnvars
+        $stackVars = $state->pop(count($state->return()));
+        Block::compileReturn($src, $state->return(), $stackVars);
 
         $src
+            ->write('break;')
             ->outdent()
             ->write('}')
             ->write()

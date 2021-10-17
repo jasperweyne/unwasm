@@ -55,12 +55,13 @@ class ExpressionCompiler
     public function get(int $local): void
     {
         // if local has not been assigned, zero initialise
-        if (!isset($this->locals[$local])) {
-            throw new \UnexpectedValueException("Invalid local variable index $local in total of ".count($this->locals));
+        $rootLocals = $this->root()->locals;
+        if (!isset($rootLocals[$local])) {
+            throw new \UnexpectedValueException("Invalid local variable index $local in total of ".count($rootLocals));
         }
 
         array_push($this->names, "\$local_$local");
-        array_push($this->stack, $this->locals[$local]);
+        array_push($this->stack, $rootLocals[$local]);
     }
 
     /**
@@ -71,7 +72,7 @@ class ExpressionCompiler
      */
     public function set(int $local, ValueType $type): string
     {
-        $this->locals[$local] = $type;
+        $this->root()->locals[$local] = $type;
         return "\$local_$local";
     }
 
@@ -95,7 +96,7 @@ class ExpressionCompiler
     {
         $newVars = [];
         for ($i = 0; $i < count($type); $i++) {
-            $newVars[] = '$stack_'.$this->nameCnt++;
+            $newVars[] = '$stack_'.$this->root()->nameCnt++;
         }
 
         array_push($this->names, ...$newVars);
@@ -122,7 +123,7 @@ class ExpressionCompiler
      */
     public function type($cnt): ?array
     {
-        return array_slice($this->stack, -$cnt);
+        return array_slice($this->stack(), -$cnt);
     }
 
     /**
@@ -132,7 +133,7 @@ class ExpressionCompiler
      */
     public function peek($cnt): ?array
     {
-        return array_slice($this->names, -$cnt);
+        return array_slice($this->names(), -$cnt);
     }
 
     /**
@@ -155,7 +156,7 @@ class ExpressionCompiler
      */
     public function count(): int
     {
-        return count($this->stack);
+        return count($this->stack());
     }
 
     /**
@@ -170,5 +171,22 @@ class ExpressionCompiler
         }
         
         return $this->returns;
+    }
+
+    private function root(): self
+    {
+        return $this->parent ? $this->parent->root() : $this;
+    }
+
+    private function stack(): array
+    {
+        $top = $this->parent ? $this->parent->stack() : [];
+        return [...$top, ...$this->stack];
+    }
+
+    private function names(): array
+    {
+        $top = $this->parent ? $this->parent->names() : [];
+        return [...$top, ...$this->names];
     }
 }

@@ -37,21 +37,18 @@ class Block extends Instruction
         $this->instructions = $inner;
     }
 
-    public function compile(ExpressionCompiler $state, Source $src): void
+    public function compile(ExpressionCompiler $outerState, Source $src): void
     {
         $src->write('do {')->indent();
 
+        $state = new ExpressionCompiler($outerState->module, [], $outerState);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
         
         // write returnvars
         $stackVars = $state->pop(count($state->return()));
-        foreach ($state->return() as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        self::compileReturn($src, $state->return(), $stackVars);
 
         $src
             ->outdent()
@@ -59,4 +56,13 @@ class Block extends Instruction
             ->write()
         ;
     }
+
+    public static function compileReturn(Source $src, array $return, array $stack): void
+    {
+        foreach ($return as $to => $type) {
+            // todo: validate types
+            $from = array_shift($stack);
+            $src->write("$to = $from;");
+        }
+    } 
 }

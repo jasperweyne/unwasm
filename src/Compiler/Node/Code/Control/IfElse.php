@@ -37,9 +37,9 @@ class IfElse extends Instruction
         $this->instructions = $inner; // else is encoded as an independent instruction
     }
 
-    public function compile(ExpressionCompiler $state, Source $src): void
+    public function compile(ExpressionCompiler $outerState, Source $src): void
     {
-        list($condition) = $state->pop();
+        list($condition) = $outerState->pop();
 
         // Write the block top source
         // The if/else is wrapped in a do-while block for branching purposes
@@ -49,18 +49,15 @@ class IfElse extends Instruction
             ->write("if ($condition) {")
             ->indent()
         ;
-
+        
+        $state = new ExpressionCompiler($outerState->module, [], $outerState);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
         
         // write returnvars
         $stackVars = $state->pop(count($state->return()));
-        foreach ($state->return() as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        Block::compileReturn($src, $state->return(), $stackVars);
 
         // Close the block
         $src

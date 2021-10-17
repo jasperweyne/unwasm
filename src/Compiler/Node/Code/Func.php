@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Code;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\Code\Control\Block;
 use UnWasm\Compiler\Node\External\FuncInterface;
 use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Source;
@@ -90,11 +91,7 @@ class Func implements FuncInterface
 
         // write returnvars
         $stackVars = $expr->pop(count($expr->return()));
-        foreach ($expr->return() as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        Block::compileReturn($src, $expr->return(), $stackVars);
 
         // write function footer
         $output = implode(", ", array_keys($output));

@@ -50,11 +50,7 @@ class BranchCond extends Instruction
         // write return values
         $return = $state->return($this->depth);
         $stackVars = $state->peek(count($return));
-        foreach ($return as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        Block::compileReturn($src, $return, $stackVars);
 
         // close branch
         $src
