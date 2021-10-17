@@ -34,7 +34,7 @@ class Func implements FuncInterface
     /** @var int Function type index */
     public $typeIdx;
 
-    /** @var int[] Local variable value types */
+    /** @var ValueType[] Local variable value types */
     public $locals;
 
     /** @var Instruction[] The representation of the func component */
@@ -60,21 +60,28 @@ class Func implements FuncInterface
         $input = implode(", ", $functype->compileInput('local_', true));
         $output = array_combine($functype->compileOutput('ret_'), $functype->getOutput());
 
-        // setup expression compiler
-        $expr = new ExpressionCompiler($module, $output, null);
-        $localVars = [...$functype->getInput(), ...$this->locals];
-        foreach ($localVars as $i => $local) {
-            $expr->set($i, $local);
-        }
-
         // write function header
         $src
             ->write("private function fn_$index($input): array") // always return an array
             ->write('{')
             ->indent()
-            ->write('do {')
-            ->indent()
         ;
+
+        // setup expression compiler
+        $expr = new ExpressionCompiler($module, $output, null);
+        $localVars = [...$functype->getInput(), ...$this->locals];
+        foreach ($localVars as $i => $local) {
+            $local = $expr->set($i, $local);
+
+            // zero initialise locals
+            if ($i >= count($functype->getInput())) {
+                $src->write("$local = 0;");
+            }
+
+        }
+
+        // start function content
+        $src->write('do {')->indent();
 
         // write function body
         foreach ($this->body as $instr) {
