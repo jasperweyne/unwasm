@@ -53,8 +53,9 @@ class BranchCond extends Instruction
         Block::compileReturn($src, $return, $stackVars);
 
         // close branch
+        $depthStr = $this->depth ? ' '.strval($this->depth + 1) : '';
         $src
-            ->write('continue ', $this->depth + 1, ';')
+            ->write('continue', $depthStr, ';')
             ->outdent()
             ->write('}')
         ;

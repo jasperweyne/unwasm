@@ -44,9 +44,7 @@ class IfElse extends Instruction
         // Write the block top source
         // The if/else is wrapped in a do-while block for branching purposes
         $src
-            ->write('do {')
-            ->indent()
-            ->write("if ($condition) {")
+            ->write("do { if ($condition) {")
             ->indent()
         ;
         
@@ -62,9 +60,7 @@ class IfElse extends Instruction
         // Close the block
         $src
             ->outdent()
-            ->write('}')
-            ->outdent()
-            ->write('} while (0);')
+            ->write('}} while (0);')
             ->write()
         ;
     }

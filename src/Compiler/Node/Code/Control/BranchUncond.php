@@ -45,6 +45,7 @@ class BranchUncond extends Instruction
         Block::compileReturn($src, $return, $stackVars);
 
         // branch
-        $src->write('continue ', $this->depth + 1, ';');
+        $depthStr = $this->depth ? ' '.strval($this->depth + 1) : '';
+        $src->write('continue', $depthStr, ';');
     }
 }
