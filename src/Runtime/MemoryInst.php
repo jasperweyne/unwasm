@@ -97,13 +97,19 @@ class MemoryInst
 
     public function fill(int $n, int $value, int $offset)
     {
-        // validate offset+n is inside memory bounds
-        if ($offset + $n > $this->size() * self::PAGE_SIZE) {
-            throw new \OutOfBoundsException();
-        }
-
         // create the block of data (note that $value is truncated to a single byte)
         $data = str_repeat(chr($value % 256), $n);
+
+        // write the data
+        $this->write($data, $offset);
+    }
+
+    public function write(string $data, int $offset)
+    {
+        // validate offset+length(value) is inside memory bounds
+        if ($offset + strlen($data) > $this->size() * self::PAGE_SIZE) {
+            throw new \OutOfBoundsException();
+        }
 
         // move the pointer to the offset
         fseek($this->stream, $offset);
