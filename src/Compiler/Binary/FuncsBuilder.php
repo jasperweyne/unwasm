@@ -83,14 +83,16 @@ class FuncsBuilder implements BuilderInterface
             // assume code section
             $compiler->funcs = $parser->expectVector(function (BinaryParser $parser, int $index) {
                 return $parser->assertSize(function (BinaryParser $parser) use ($index) {
+                    // create array of arrays of local variables
                     $locals = $parser->expectVector(function (BinaryParser $parser) {
                         $n = $parser->expectInt(true);
-                        return $parser->expectByte();
+                        $type = new ValueType($parser->expectByte());
+                        return array_fill(0, $n, $type);
                     });
 
                     $expr = self::expression($parser);
 
-                    return new Func($this->funcTypes[$index], $locals, $expr);
+                    return new Func($this->funcTypes[$index], array_merge([], ...$locals), $expr);
                 });
             });
             echo 'Scanned '.count($compiler->funcs)." funcs\n";

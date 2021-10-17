@@ -54,6 +54,11 @@ class ExpressionCompiler
      */
     public function get(int $local): void
     {
+        // if local has not been assigned, zero initialise
+        if (!isset($this->locals[$local])) {
+            throw new \UnexpectedValueException("Invalid local variable index $local in total of ".count($this->locals));
+        }
+
         array_push($this->names, "\$local_$local");
         array_push($this->stack, $this->locals[$local]);
     }
