@@ -41,18 +41,23 @@ class BranchCond extends Instruction
     {
         list($condition) = $state->pop();
         
+        // start branch
+        $src
+            ->write("if ($condition) {")
+            ->indent()
+        ;
+        
         // write return values
         $return = $state->return($this->depth);
         $stackVars = $state->peek(count($return));
-        foreach ($return as $to) {
+        foreach ($return as $to => $type) {
             // todo: validate types
             $from = array_shift($stackVars);
             $src->write("$to = $from;");
         }
 
+        // close branch
         $src
-            ->write("if ($condition) {")
-            ->indent()
             ->write('continue ', $this->depth + 1, ';')
             ->outdent()
             ->write('}')
