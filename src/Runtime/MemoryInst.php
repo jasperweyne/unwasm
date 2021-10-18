@@ -117,9 +117,24 @@ class MemoryInst
         // overwrite the data
         fwrite($this->stream, $data);
     }
-
-    public function copy()
+    
+    public function read(int $offset, int $n): string
     {
-        // todo
+        // move the pointer to the offset
+        fseek($this->stream, $offset);
+
+        // return the data directly from the stream
+        return fread($this->stream, $n);
+    }
+
+    public function copy(int $sourceOffset, int $destOffset, int $n)
+    {
+        // validate offset+length(value) is inside memory bounds
+        if ($sourceOffset + $n > $this->size() * self::PAGE_SIZE || $destOffset + $n > $this->size()) {
+            throw new \OutOfBoundsException();
+        }
+
+        // read the data at source and write it to dest
+        $this->write($this->read($sourceOffset, $n), $destOffset);
     }
 }
