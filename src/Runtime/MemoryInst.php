@@ -43,13 +43,16 @@ class MemoryInst
     /** @var int The number of currently allocated pages */
     private $size;
 
+    /** @var bool Endianness of the current machine */
+    private $bigEndian;
+
     public function __construct(int $minimum, ?int $maximum = null)
     {
         $this->maximum = $maximum;
         $this->stream = fopen('php://temp', 'r+b');
         $this->size = 0;
+        $this->bigEndian = pack('L', 1) === pack('N', 1);
 
-        // todo: create methods for store/load/data
         // todo: respect datas/elems?
 
         // zero initialise memory
@@ -120,6 +123,11 @@ class MemoryInst
     
     public function read(int $offset, int $n): string
     {
+        // validate offset+length(value) is inside memory bounds
+        if ($offset + $n > $this->size() * self::PAGE_SIZE) {
+            throw new \OutOfBoundsException();
+        }
+
         // move the pointer to the offset
         fseek($this->stream, $offset);
 
@@ -129,12 +137,80 @@ class MemoryInst
 
     public function copy(int $sourceOffset, int $destOffset, int $n)
     {
-        // validate offset+length(value) is inside memory bounds
-        if ($sourceOffset + $n > $this->size() * self::PAGE_SIZE || $destOffset + $n > $this->size()) {
-            throw new \OutOfBoundsException();
-        }
-
+        // defer memory bounds check to read()/write()
         // read the data at source and write it to dest
         $this->write($this->read($sourceOffset, $n), $destOffset);
+    }
+
+    public function loadInt(int $offset, int $bits = 32, bool $signed = true): int
+    {
+        // defer memory bounds check to read(), read data as bytes
+        $bytes = $this->read($offset, $bits / 8);
+
+        // if system is big endian, reverse bytes from little to big endian
+        if ($this->bigEndian) {
+            $bytes = strrev($bytes);
+        }
+
+        // convert the bytes to data and return it
+        return unpack(self::intFlag($bits, $signed), $bytes)[1];
+    }
+    
+    public function loadFloat(int $offset, int $bits = 32): float
+    {
+        // defer memory bounds check to read(), read data as bytes
+        $bytes = $this->read($offset, $bits / 8);
+        
+        // if system is big endian, reverse bytes from little to big endian
+        if ($this->bigEndian) {
+            $bytes = strrev($bytes);
+        }
+
+        // convert the bytes to data and return it
+        return unpack($bits == 32 ? 'f' : 'd', $bytes)[1];
+    }
+
+    public function storeInt(int $value, int $offset, int $bits = 32): void
+    {
+        // convert the value to bytes
+        $bytes = pack(self::intFlag($bits, true), $value);
+        
+        // if system is big endian, reverse bytes from big to little endian
+        if ($this->bigEndian) {
+            $bytes = strrev($bytes);
+        }
+
+        // defer memory bounds check to write(), write data as bytes 
+        $this->write($bytes, $offset);
+    }
+
+    public function storeFloat(float $value, int $offset, int $bits = 32): void
+    {
+        // convert the value to bytes
+        $bytes = pack($bits == 32 ? 'f' : 'd', $value);
+        
+        // if system is big endian, reverse bytes from big to little endian
+        if ($this->bigEndian) {
+            $bytes = strrev($bytes);
+        }
+
+        // defer memory bounds check to write(), write data as bytes 
+        $this->write($bytes, $offset);
+    }
+
+    private static function intFlag(int $bits, bool $signed): string
+    {
+        switch ($bits) {
+            case 8:
+                return $signed ? 'c' : 'C';
+            case 16:
+                return $signed ? 's' : 'S';
+            case 32:
+                return $signed ? 'l' : 'L';
+            case 64:
+                return $signed ? 'q' : 'Q';
+            default:
+                throw new \InvalidArgumentException('Unsupported bit width');
+        }
     }
 }
