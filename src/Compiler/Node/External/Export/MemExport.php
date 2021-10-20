@@ -40,7 +40,7 @@ class MemExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        // todo
+        $source->write("\$this->mems['$this->name'] = \$this->mem_$this->memIdx;");
     }
 
     public function compile(ModuleCompiler $module, Source $src)

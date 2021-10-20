@@ -49,6 +49,6 @@ class MemImport extends Import implements MemInterface
     {
         // todo: validate types
         $ref = $module->importRefs[$this->module];
-        $source->write("\$this->mem_$index = \$this->ref_$ref"."->mem('$this->name');");
+        $source->write("\$this->mem_$index = \$this->ref_$ref"."->mems['$this->name'];");
     }
 }

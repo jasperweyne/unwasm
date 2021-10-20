@@ -49,6 +49,6 @@ class GlobalImport extends Import implements GlobalInterface
     {
         // todo: validate types
         $ref = $module->importRefs[$this->module];
-        $source->write("\$this->global_$index = \$this->ref_$ref"."->global('$this->name');");
+        $source->write("\$this->global_$index = \$this->ref_$ref"."->globals['$this->name'];");
     }
 }

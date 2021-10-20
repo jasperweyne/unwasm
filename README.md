@@ -55,7 +55,7 @@ fully supported.
 | Tables         | Unsupported |
 | Datas          | Unsupported |
 | Elems          | Unsupported |
-| Import/Export  | Unsupported |
+| Import/Export  | Partial     |
 
 Note: runtime funcs are managed by PHP and therefore implicitly supported.
 

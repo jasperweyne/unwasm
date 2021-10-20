@@ -40,7 +40,7 @@ class GlobalExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        // todo
+        $source->write("\$this->globals['$this->name'] = \$this->global_$this->globalIdx;");
     }
 
     public function compile(ModuleCompiler $module, Source $src)

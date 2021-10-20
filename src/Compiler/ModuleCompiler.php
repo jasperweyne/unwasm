@@ -195,44 +195,58 @@ class ModuleCompiler
 
     private function compileVars(Source $src): void
     {
+        // compile exports
+        $src
+            ->write('// exports')
+            ->write("/** @var \UnWasm\Store\MemoryInst[] */ public \$mems = array();")
+            ->write("/** @var array */ public \$tables = array();")
+            ->write("/** @var array */ public \$globals = array();")
+            ->write()
+        ;
+
         // register local funcs
         if (count($this->func()) > 0) {
             $src->write('// funcs');
             foreach ($this->func() as $i => $func) {
-                $src->write("/** @var callable */ private \$fn_$i;")->write();
+                $src->write("/** @var callable */ private \$fn_$i;");
             }
+            $src->write();
         }
 
         // register imported modules
         if (count($this->importRefs) > 0) {
             $src->write('// imported module refs');
             foreach ($this->importRefs as $module => $i) {
-                $src->write("/** @var mixed Module '$module' */ private \$ref_$i;")->write();
+                $src->write("/** @var mixed Module '$module' */ private \$ref_$i;");
             }
+            $src->write();
         }
 
         // register memories
         if (count($this->mem()) > 0) {
             $src->write('// memories');
             foreach ($this->mem() as $i => $mem) {
-                $src->write("/** @var \UnWasm\Store\MemoryInst */ private \$mem_$i;")->write();
+                $src->write("/** @var \UnWasm\Store\MemoryInst */ private \$mem_$i;");
             }
+            $src->write();
         }
 
         // register memories
         if (count($this->global()) > 0) {
             $src->write('// globals');
             foreach ($this->global() as $i => $global) {
-                $src->write("/** @var mixed */ private \$global_$i;")->write();
+                $src->write("/** @var mixed */ private \$global_$i;");
             }
+            $src->write();
         }
 
         // register tables
         if (count($this->table()) > 0) {
             $src->write('// tables');
             foreach ($this->table() as $i => $tables) {
-                $src->write("/** @var mixed */ private \$tables_$i;")->write();
+                $src->write("/** @var mixed */ private \$tables_$i;");
             }
+            $src->write();
         }
     }
 
@@ -309,26 +323,15 @@ class ModuleCompiler
             foreach ($allFuncs as $i => $func) {
                 $func->compile($i, $this, $src);
             }
-            $src->write();
         }
         
         // perform exports
         if (count($this->exports) > 0) {
-            $src
-                ->write('// exports')
-                ->write('if ($env) {')
-                ->indent()
-            ;
-
+            $src->write('// exports');
             foreach ($this->exports as $i => $export) {
                 $export->compileSetup($i, $this, $src);
             }
-
-            $src
-                ->outdent()
-                ->write('}')
-                ->write()
-            ;
+            $src->write();
         }
 
         // execute start function

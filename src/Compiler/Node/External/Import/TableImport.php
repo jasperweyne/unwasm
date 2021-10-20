@@ -49,6 +49,6 @@ class TableImport extends Import implements TableInterface
     {
         // todo: validate types
         $ref = $module->importRefs[$this->module];
-        $source->write("\$this->table_$index = \$this->ref_$ref"."->table('$this->name');");
+        $source->write("\$this->table_$index = \$this->ref_$ref"."->tables['$this->name'];");
     }
 }
