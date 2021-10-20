@@ -37,7 +37,7 @@ class Copy extends Instruction
         $state->typed(new ValueType(Token::INT_TYPE), 3);
 
         // update stack
-        list($n, $srcOffset, $destOffset) = $state->pop(3);
+        list($destOffset, $srcOffset, $n) = $state->pop(3);
 
         // export code
         $src->write("\$this->mem_0->copy($destOffset, $srcOffset, $n);");

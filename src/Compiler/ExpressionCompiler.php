@@ -106,7 +106,7 @@ class ExpressionCompiler
     }
 
     /**
-     * Pop one or more elements from the stack
+     * Pop one or more elements from the stack, where the top is the last element in the returned array
      *
      * @return string[] The variable names
      */
@@ -117,7 +117,7 @@ class ExpressionCompiler
     }
 
     /**
-     * Peek at type of one or more elements from the stack
+     * Peek at type of one or more elements from the stack, where the top is the last element in the returned array
      *
      * @return ?ValueType[]
      */
@@ -127,7 +127,7 @@ class ExpressionCompiler
     }
 
     /**
-     * Peek at one or more elements from the stack
+     * Peek at one or more elements from the stack, where the top is the last element in the returned array
      *
      * @return string[]
      */

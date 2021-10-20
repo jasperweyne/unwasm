@@ -37,7 +37,7 @@ class Fill extends Instruction
         $state->typed(new ValueType(Token::INT_TYPE), 3);
 
         // update stack
-        list($n, $value, $destOffset) = $state->pop(3);
+        list($destOffset, $value, $n) = $state->pop(3);
 
         // export code
         $src->write("\$this->mem_0->fill($n, $value, $destOffset);");
