@@ -56,7 +56,7 @@ class FuncExport extends Export
             ->write("public function $this->name($params): array")
             ->write('{')
             ->indent()
-            ->write("return \$this->fn_$this->funcIdx($vars);")
+            ->write("return (\$this->fn_$this->funcIdx)($vars);")
             ->outdent()
             ->write('}')
             ->write('')

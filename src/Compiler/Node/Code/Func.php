@@ -63,8 +63,7 @@ class Func implements FuncInterface
 
         // write function header
         $src
-            ->write("private function fn_$index($input): array") // always return an array
-            ->write('{')
+            ->write("\$this->fn_$index = function ($input) {")
             ->indent()
         ;
 
@@ -101,7 +100,7 @@ class Func implements FuncInterface
             ->write()
             ->write("return array($output);")
             ->outdent()
-            ->write('}')
+            ->write('};')
             ->write()
         ;
     }

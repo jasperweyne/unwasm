@@ -60,12 +60,11 @@ class FuncImport extends Import implements FuncInterface
 
         // write function header
         $src
-            ->write("private function fn_$index($params): array") // always return an array
-            ->write('{')
+            ->write("\$this->fn_$index = function ($params) {")
             ->indent()
             ->write("return \$this->ref_$ref->$this->name($vars);")
             ->outdent()
-            ->write('}')
+            ->write('};')
             ->write()
         ;
     }

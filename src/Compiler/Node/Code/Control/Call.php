@@ -55,6 +55,6 @@ class Call extends Instruction
         // Write the function call to the source
         $func = $this->funcIdx;
         $assign = $output ? "list($output) = " : '';
-        $src->write($assign."\$this->fn_$func($input);");
+        $src->write($assign."(\$this->fn_$func)($input);");
     }
 }

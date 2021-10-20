@@ -149,8 +149,6 @@ class ModuleCompiler
 
         $this->compileExports($source);
 
-        $this->compileFuncs($source);
-
         $this->compileFooter($source);
 
         echo "Finished compiling PHP\n";
@@ -185,6 +183,14 @@ class ModuleCompiler
 
     private function compileVars(Source $src): void
     {
+        // register local funcs
+        if (count($this->func()) > 0) {
+            $src->write('// funcs');
+            foreach ($this->func() as $i => $func) {
+                $src->write("/** @var callable */ private \$fn_$i;")->write();
+            }
+        }
+
         // register imported modules
         if (count($this->importRefs) > 0) {
             $src->write('// imported module refs');
@@ -247,7 +253,7 @@ class ModuleCompiler
         // write func intialisation
         $allFuncs = $this->func();
         if (count($allFuncs) > 0) {
-            $src->write('// functions');
+            $src->write('// function import asserts');
             foreach ($allFuncs as $i => $func) {
                 $func->compileSetup($i, $this, $src);
             }
@@ -284,6 +290,16 @@ class ModuleCompiler
             $src->write();
         }
 
+        // write func declaration
+        $allFuncs = $this->func();
+        if (count($allFuncs) > 0) {
+            $src->write('// function declarations');
+            foreach ($allFuncs as $i => $func) {
+                $func->compile($i, $this, $src);
+            }
+            $src->write();
+        }
+        
         // perform exports
         if (count($this->exports) > 0) {
             $src
@@ -315,7 +331,7 @@ class ModuleCompiler
 
             $src
                 ->write('// start code')
-                ->write("\$this->fn_$this->start();")
+                ->write("(\$this->fn_$this->start)();")
                 ->write()
             ;
         }
@@ -333,14 +349,6 @@ class ModuleCompiler
         // compile every export
         foreach ($this->exports as $export) {
             $export->compile($this, $src);
-        }
-    }
-
-    private function compileFuncs(Source $src): void
-    {
-        // compile every func
-        foreach ($this->func() as $i => $func) {
-            $func->compile($i, $this, $src);
         }
     }
 
