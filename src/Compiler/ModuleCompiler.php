@@ -72,6 +72,9 @@ class ModuleCompiler
 
     public $importRefs = array();
 
+    /**
+     * @return FuncInterface[]|FuncInterface All available functions
+     */
     public function func(?int $idx = null)
     {
         $funcImports = array_filter($this->imports, function ($import) {
@@ -79,13 +82,16 @@ class ModuleCompiler
         });
 
         if ($idx === null) {
-            return [...$funcImports, ...$this->funcs];
+            return array_merge($funcImports, $this->funcs);
         }
 
         $importCnt = count($funcImports);
         return $idx < $importCnt ? $funcImports[$idx] : $this->funcs[$idx - $importCnt];
     }
 
+    /**
+     * @return GlobalInterface[]|GlobalInterface All available globals
+     */
     public function global(int $idx = null)
     {
         $globalImports = array_filter($this->imports, function ($import) {
@@ -93,13 +99,16 @@ class ModuleCompiler
         });
 
         if ($idx === null) {
-            return [...$globalImports, ...$this->globals];
+            return array_merge($globalImports, $this->globals);
         }
 
         $importCnt = count($globalImports);
         return $idx < $importCnt ? $globalImports[$idx] : $this->globals[$idx - $importCnt];
     }
 
+    /**
+     * @return MemInterface[]|MemInterface All available memories
+     */
     public function mem(int $idx = null)
     {
         $memImports = array_filter($this->imports, function ($import) {
@@ -107,13 +116,16 @@ class ModuleCompiler
         });
 
         if ($idx === null) {
-            return [...$memImports, ...$this->mems];
+            return array_merge($memImports, $this->mems);
         }
 
         $importCnt = count($memImports);
         return $idx < $importCnt ? $memImports[$idx] : $this->mems[$idx - $importCnt];
     }
 
+    /**
+     * @return TableInterface[]|TableInterface All available tables
+     */
     public function table(int $idx = null)
     {
         $tableImports = array_filter($this->imports, function ($import) {
@@ -121,7 +133,7 @@ class ModuleCompiler
         });
 
         if ($idx === null) {
-            return [...$tableImports, ...$this->tables];
+            return array_merge($tableImports, $this->tables);
         }
 
         $importCnt = count($tableImports);

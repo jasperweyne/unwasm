@@ -41,7 +41,7 @@ class Environment
     /** @var string[] Dictionary of exported global names and their instances. */
     private $globals = array();
 
-    public function import(string $module): object
+    public function import(string $module)
     {
         if (!isset($this->modules[$module])) {
             throw new \RuntimeException("Tried to import unregistered module '$module', make sure you've exported it to the environment.");

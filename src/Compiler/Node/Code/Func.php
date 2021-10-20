@@ -69,7 +69,7 @@ class Func implements FuncInterface
 
         // setup expression compiler
         $expr = new ExpressionCompiler($module, $output, null);
-        $localVars = [...$functype->getInput(), ...$this->locals];
+        $localVars = array_merge($functype->getInput(), $this->locals);
         foreach ($localVars as $i => $local) {
             $local = $expr->set($i, $local);
 

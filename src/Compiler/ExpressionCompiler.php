@@ -181,12 +181,12 @@ class ExpressionCompiler
     private function stack(): array
     {
         $top = $this->parent ? $this->parent->stack() : [];
-        return [...$top, ...$this->stack];
+        return array_merge($top, $this->stack);
     }
 
     private function names(): array
     {
         $top = $this->parent ? $this->parent->names() : [];
-        return [...$top, ...$this->names];
+        return array_merge($top, $this->names);
     }
 }
