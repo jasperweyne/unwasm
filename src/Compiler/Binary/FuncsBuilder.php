@@ -32,6 +32,12 @@ use UnWasm\Compiler\Node\Code\Control\Loop;
 use UnWasm\Compiler\Node\Code\Control\Nop;
 use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\Code\Func;
+use UnWasm\Compiler\Node\Code\Memory\Copy;
+use UnWasm\Compiler\Node\Code\Memory\Fill;
+use UnWasm\Compiler\Node\Code\Memory\Grow;
+use UnWasm\Compiler\Node\Code\Memory\Load;
+use UnWasm\Compiler\Node\Code\Memory\Size;
+use UnWasm\Compiler\Node\Code\Memory\Store;
 use UnWasm\Compiler\Node\Code\Numeric\Add;
 use UnWasm\Compiler\Node\Code\Numeric\BitAnd;
 use UnWasm\Compiler\Node\Code\Numeric\BitOr;
@@ -143,17 +149,6 @@ class FuncsBuilder implements BuilderInterface
                     $depth = $parser->expectInt(true);
                     $instructions[] = new BranchCond($depth);
                     break;
-                case 0xD0:
-                    $value = $parser->expectByte();
-                    $instructions[] = new NullRef(new RefType($value));
-                    break;
-                case 0xD1:
-                    $instructions[] = new IsNull();
-                    break;
-                case 0xD2:
-                    $value = $parser->expectInt(true);
-                    $instructions[] = new RefFunc($value);
-                    break;
                 case 0x10:
                     $funcidx = $parser->expectInt(true);
                     $instructions[] = new Call($funcidx);
@@ -169,6 +164,129 @@ class FuncsBuilder implements BuilderInterface
                 case 0x22:
                     $local = $parser->expectInt(true);
                     $instructions[] = new LocalSet($local, true);
+                    break;
+                case 0x28:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i32, $offset);
+                    break;
+                case 0x29:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset);
+                    break;
+                case 0x2A:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($f32, $offset);
+                    break;
+                case 0x2B:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($f64, $offset);
+                    break;
+                case 0x2C:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i32, $offset, 8, true);
+                    break;
+                case 0x2D:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i32, $offset, 8, false);
+                    break;
+                case 0x2E:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i32, $offset, 16, true);
+                    break;
+                case 0x2F:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i32, $offset, 16, false);
+                    break;
+                case 0x30:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 8, true);
+                    break;
+                case 0x31:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 8, false);
+                    break;
+                case 0x32:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 16, true);
+                    break;
+                case 0x33:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 16, false);
+                    break;
+                case 0x34:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 32, true);
+                    break;
+                case 0x35:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Load($i64, $offset, 32, false);
+                    break;
+                case 0x36:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i32, $offset);
+                    break;
+                case 0x37:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i64, $offset);
+                    break;
+                case 0x38:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($f32, $offset);
+                    break;
+                case 0x39:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($f64, $offset);
+                    break;
+                case 0x3A:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i32, $offset, 8);
+                    break;
+                case 0x3B:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i32, $offset, 16);
+                    break;
+                case 0x3C:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i64, $offset, 8);
+                    break;
+                case 0x3D:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i64, $offset, 16);
+                    break;
+                case 0x3E:
+                    /* $align = */ $parser->expectInt(true);
+                    $offset = $parser->expectInt(true);
+                    $instructions[] = new Store($i64, $offset, 32);
+                    break;
+                case 0x3F:
+                    $parser->expectByte(0x00);
+                    $instructions[] = new Size();
+                    break;
+                case 0x40:
+                    $parser->expectByte(0x00);
+                    $instructions[] = new Grow();
                     break;
                 case 0x41:
                     $value = $parser->expectInt();
@@ -353,6 +471,33 @@ class FuncsBuilder implements BuilderInterface
                     break;
                 case 0xA3:
                     $instructions[] = new Div($f64);
+                    break;
+                case 0xD0:
+                    $value = $parser->expectByte();
+                    $instructions[] = new NullRef(new RefType($value));
+                    break;
+                case 0xD1:
+                    $instructions[] = new IsNull();
+                    break;
+                case 0xD2:
+                    $value = $parser->expectInt(true);
+                    $instructions[] = new RefFunc($value);
+                    break;
+                case 0xFC: // subswitch
+                    $secondary = $parser->expectInt(true);
+                    switch ($secondary) {
+                        case 10:
+                            $parser->expectByte(0x00);
+                            $parser->expectByte(0x00);
+                            $instructions[] = new Copy();
+                            break;
+                        case 11:
+                            $parser->expectByte(0x00);
+                            $instructions[] = new Fill();
+                            break;
+                        default:
+                            throw new \RuntimeException('Unknown secondary opcode ' . strval($secondary));
+                    }
                     break;
                 case $termOpcode:
                     echo "Expression terminated\n";

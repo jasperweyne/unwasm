@@ -45,7 +45,7 @@ fully supported.
 | Parametric     | Unsupported |
 | Variable       | Partial     |
 | Table          | Unsupported |
-| Memory         | Unsupported |
+| Memory         | Partial     |
 | Control        | Partial     |
 
 | Runtime        | Status      |
