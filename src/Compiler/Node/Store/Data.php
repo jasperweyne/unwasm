@@ -44,7 +44,7 @@ class Data
         $this->initExpr = $initExpr;
         $this->initData = $initData;
     }
-    
+
     public function compileSetup(int $index, ModuleCompiler $module, Source $src): void
     {
         $encoded = base64_encode($this->initData);

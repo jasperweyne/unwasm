@@ -331,7 +331,7 @@ class ModuleCompiler
                 $func->compile($i, $this, $src);
             }
         }
-        
+
         // perform exports
         if (count($this->exports) > 0) {
             $src->write('// exports');

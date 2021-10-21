@@ -86,6 +86,5 @@ class Store extends Instruction
             default:
                 throw new \InvalidArgumentException('Invalid value type provided');
         }
-
     }
 }

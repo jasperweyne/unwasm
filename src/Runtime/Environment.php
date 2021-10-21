@@ -31,13 +31,13 @@ class Environment
 
     /** @var string[] Dictionary of exported func names and their type strings. */
     private $funcs = array();
-    
+
     /** @var string[] Dictionary of exported table names and their instances. */
     private $tables = array();
-    
+
     /** @var string[] Dictionary of exported memory names and their instances. */
     private $mems = array();
-    
+
     /** @var string[] Dictionary of exported global names and their instances. */
     private $globals = array();
 

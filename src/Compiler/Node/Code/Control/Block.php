@@ -45,7 +45,7 @@ class Block extends Instruction
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
-        
+
         // write returnvars
         $stackVars = $state->pop(count($state->return()));
         self::compileReturn($src, $state->return(), $stackVars);
@@ -64,5 +64,5 @@ class Block extends Instruction
             $from = array_shift($stack);
             $src->write("$to = $from;");
         }
-    } 
+    }
 }

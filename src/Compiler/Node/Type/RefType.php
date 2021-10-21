@@ -25,6 +25,6 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class RefType extends ValueType
 {
-    const FUNCREF = 0x70;
-    const EXTREF = 0x6F;
+    public const FUNCREF = 0x70;
+    public const EXTREF = 0x6F;
 }

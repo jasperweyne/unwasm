@@ -45,7 +45,7 @@ class Loop extends Instruction
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
-        
+
         // write returnvars
         $stackVars = $state->pop(count($state->return()));
         Block::compileReturn($src, $state->return(), $stackVars);

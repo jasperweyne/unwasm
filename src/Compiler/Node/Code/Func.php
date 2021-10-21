@@ -77,7 +77,6 @@ class Func implements FuncInterface
             if ($i >= count($functype->getInput())) {
                 $src->write("$local = 0;");
             }
-
         }
 
         // start function content

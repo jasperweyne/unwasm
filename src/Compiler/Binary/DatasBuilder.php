@@ -53,15 +53,15 @@ class DatasBuilder implements BuilderInterface
         $memIdx = 0;
 
         // if memory index explicit, populate
-        if (!$bitfield & 0x02) { 
-            $memIdx = $parser->expectInt(true);  
+        if (!$bitfield & 0x02) {
+            $memIdx = $parser->expectInt(true);
         }
 
         // if not passive, populate expression
-        if (!($bitfield & 0x01)) { 
-            $expr = FuncsBuilder::expression($parser);  
+        if (!($bitfield & 0x01)) {
+            $expr = FuncsBuilder::expression($parser);
         }
-        
+
         // since a vector of bytes is given, we represent it as a string but don't validate it as UTF-8
         $init = $parser->expectString('//', false);
 

@@ -44,15 +44,18 @@ class Element
         $this->initExpressions = $initExpressions;
     }
 
-    public static function active(array $initExpr, int $tableIdx = null, array $offsetExpr = null) {
+    public static function active(array $initExpr, int $tableIdx = null, array $offsetExpr = null)
+    {
         return new self(0, $initExpr, $tableIdx, $offsetExpr);
     }
-    
-    public static function passive(array $initExpr) {
+
+    public static function passive(array $initExpr)
+    {
         return new self(1, $initExpr);
     }
-    
-    public static function declarative(array $initExpr) {
+
+    public static function declarative(array $initExpr)
+    {
         return new self(2, $initExpr);
     }
 }

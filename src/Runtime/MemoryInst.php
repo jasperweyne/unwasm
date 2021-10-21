@@ -120,7 +120,7 @@ class MemoryInst
         // overwrite the data
         fwrite($this->stream, $data);
     }
-    
+
     public function read(int $offset, int $n): string
     {
         // validate offset+length(value) is inside memory bounds
@@ -155,12 +155,12 @@ class MemoryInst
         // convert the bytes to data and return it
         return unpack(self::intFlag($bits, $signed), $bytes)[1];
     }
-    
+
     public function loadFloat(int $offset, int $bits = 32): float
     {
         // defer memory bounds check to read(), read data as bytes
         $bytes = $this->read($offset, $bits / 8);
-        
+
         // if system is big endian, reverse bytes from little to big endian
         if ($this->bigEndian) {
             $bytes = strrev($bytes);
@@ -174,13 +174,13 @@ class MemoryInst
     {
         // convert the value to bytes
         $bytes = pack(self::intFlag($bits, true), $value);
-        
+
         // if system is big endian, reverse bytes from big to little endian
         if ($this->bigEndian) {
             $bytes = strrev($bytes);
         }
 
-        // defer memory bounds check to write(), write data as bytes 
+        // defer memory bounds check to write(), write data as bytes
         $this->write($bytes, $offset);
     }
 
@@ -188,13 +188,13 @@ class MemoryInst
     {
         // convert the value to bytes
         $bytes = pack($bits == 32 ? 'f' : 'd', $value);
-        
+
         // if system is big endian, reverse bytes from big to little endian
         if ($this->bigEndian) {
             $bytes = strrev($bytes);
         }
 
-        // defer memory bounds check to write(), write data as bytes 
+        // defer memory bounds check to write(), write data as bytes
         $this->write($bytes, $offset);
     }
 

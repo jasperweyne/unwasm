@@ -40,13 +40,13 @@ class BranchCond extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         list($condition) = $state->pop();
-        
+
         // start branch
         $src
             ->write("if ($condition) {")
             ->indent()
         ;
-        
+
         // write return values
         $return = $state->return($this->depth);
         $stackVars = $state->peek(count($return));

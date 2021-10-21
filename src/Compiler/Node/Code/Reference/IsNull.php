@@ -44,6 +44,5 @@ class IsNull extends Instruction
 
         // export code
         $src->write("$var = (int)($x === null);");
-
     }
 }

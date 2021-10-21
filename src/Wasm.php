@@ -35,7 +35,7 @@ class Wasm
 
     /** @var Environment The global data store */
     private $env;
-    
+
     /** @var string The namespace where module classes are registered */
     private $namespace;
 

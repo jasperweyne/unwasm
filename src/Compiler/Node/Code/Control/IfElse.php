@@ -47,12 +47,12 @@ class IfElse extends Instruction
             ->write("do { if ($condition) {")
             ->indent()
         ;
-        
+
         $state = new ExpressionCompiler($outerState->module, [], $outerState);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
-        
+
         // write returnvars
         $stackVars = $state->pop(count($state->return()));
         Block::compileReturn($src, $state->return(), $stackVars);

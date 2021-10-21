@@ -60,8 +60,8 @@ class ElemsBuilder implements BuilderInterface
         $hasExpression = $bitfield & 0x04;
 
         // if active and has explicit table index, populate it
-        if ($isActive && $indexExplicit) { 
-            $tableIdx = $parser->expectInt(true);  
+        if ($isActive && $indexExplicit) {
+            $tableIdx = $parser->expectInt(true);
         }
 
         // if active, populate offset expression
@@ -73,9 +73,9 @@ class ElemsBuilder implements BuilderInterface
         if (!$isActive && !$indexExplicit) {
             $parser->expectByte(0x00); // wasm 1.1: always funcref
         }
-        
+
         // populate initialization expression array
-        if ($hasExpression) { 
+        if ($hasExpression) {
             $initExpr = $parser->expectVector(function (BinaryParser $parser) {
                 return FuncsBuilder::expression($parser);
             });
@@ -88,7 +88,7 @@ class ElemsBuilder implements BuilderInterface
         // differ modes
         if ($isActive) {
             return Element::active($initExpr, $tableIdx, $offsetExpr);
-        } else if ($indexExplicit) {
+        } elseif ($indexExplicit) {
             return Element::declarative($initExpr);
         } else {
             return Element::passive($initExpr);

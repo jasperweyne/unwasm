@@ -71,7 +71,7 @@ class ExpressionCompiler
     /**
      * Set a value to a local variable with a given type. This equates to:
      * `$local_m = ...; // m: $local`
-     * 
+     *
      * @return string The variable name of the local.
      */
     public function set(int $local, ValueType $type): string
@@ -101,7 +101,7 @@ class ExpressionCompiler
         if ($this->const) {
             throw new \LogicException("Can't call push() when in constant expression mode");
         }
-        
+
         $newVars = [];
         for ($i = 0; $i < count($type); $i++) {
             $newVars[] = '$stack_'.$this->root()->nameCnt++;
@@ -177,7 +177,7 @@ class ExpressionCompiler
         if ($depth > 0) {
             return $this->parent->return($depth - 1);
         }
-        
+
         return $this->returns;
     }
 
