@@ -23,6 +23,8 @@ namespace UnWasm;
 use UnWasm\Cache\CacheInterface;
 use UnWasm\Cache\MemoryCache;
 use UnWasm\Compiler\BinaryParser;
+use UnWasm\Compiler\ParserInterface;
+use UnWasm\Compiler\TextParser;
 use UnWasm\Runtime\Environment;
 
 /**
@@ -49,29 +51,39 @@ class Wasm
         $this->namespace = $namespace;
     }
 
-    public function loadBinaryFile(string $location, string $module, bool $forceCompile = false)
+    public function loadBinary(string $location, string $module, bool $forceCompile = false)
     {
         $stream = fopen($location, 'rb');
         $timestamp = $forceCompile ? null : (@filemtime($location) ?: null);
-        $result = $this->loadBinary($stream, $module, $timestamp);
+        $parser = new BinaryParser($stream);
+        $result = $this->load($parser, $module, $timestamp);
         fclose($stream);
         return $result;
     }
 
-    public function loadBinary($stream, string $module, ?int $timestamp)
+    public function loadText(string $location, string $module, bool $forceCompile = false)
+    {
+        $stream = fopen($location, 'rt');
+        $timestamp = $forceCompile ? null : (@filemtime($location) ?: null);
+        $parser = new TextParser($stream);
+        $result = $this->load($parser, $module, $timestamp);
+        fclose($stream);
+        return $result;
+    }
+
+    public function load(ParserInterface $parser, string $module, ?int $timestamp)
     {
         // Check whether cache is up-to-date
         $cacheTs = $this->cache->getTimestamp($module);
         if (!$timestamp || !$cacheTs || $timestamp > $cacheTs) {
-            $parser = new BinaryParser($stream);
             $compiler = $parser->scan();
             $this->cache->write($module, $compiler->compile($this->namespace.'\\'.$module)->read());
         }
 
-        return $this->load($module);
+        return $this->instantiate($module);
     }
 
-    public function load(string $module)
+    public function instantiate(string $module)
     {
         // Load the module from cache
         $loaded = $this->cache->load($module);

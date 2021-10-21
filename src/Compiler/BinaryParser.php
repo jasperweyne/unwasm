@@ -37,7 +37,7 @@ use UnWasm\Compiler\Binary\TypesBuilder;
  * Parses webassembly binary format and generates an internal
  * representation for compilation.
  */
-class BinaryParser
+class BinaryParser implements ParserInterface
 {
     protected $stream;
 

@@ -25,7 +25,7 @@ fully supported.
 | Code Parsing   | Status      |
 | -------------- | ----------- |
 | .wasm          | Supported   |
-| .wast          | Unsupported |
+| .wast          | Partial     |
 
 | Compilation    | Status      |
 | -------------- | ----------- |
