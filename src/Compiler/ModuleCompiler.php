@@ -198,9 +198,16 @@ class ModuleCompiler
         // compile exports
         $src
             ->write('// exports')
-            ->write("/** @var \UnWasm\Store\MemoryInst[] */ public \$mems = array();")
-            ->write("/** @var array */ public \$tables = array();")
-            ->write("/** @var array */ public \$globals = array();")
+            ->write('/** @var \UnWasm\Store\MemoryInst[] */ public $mems = array();')
+            ->write('/** @var array */ public $tables = array();')
+            ->write('/** @var array */ public $globals = array();')
+            ->write()
+        ;
+
+        // register datas/tables
+        $src
+            ->write('// datas/elems')
+            ->write('/** @var string[] */ private $datas = array();')
             ->write()
         ;
 
@@ -330,6 +337,15 @@ class ModuleCompiler
             $src->write('// exports');
             foreach ($this->exports as $i => $export) {
                 $export->compileSetup($i, $this, $src);
+            }
+            $src->write();
+        }
+
+        // write data intialisation
+        if (count($this->datas) > 0) {
+            $src->write('// datas');
+            foreach ($this->datas as $i => $data) {
+                $data->compileSetup($i, $this, $src);
             }
             $src->write();
         }

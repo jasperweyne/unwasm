@@ -36,16 +36,20 @@ class ExpressionCompiler
     /** @var array<string, ValueType> Dictionary that maps variable names to return types */
     private $returns;
 
+    /** @var bool Whether this expression compiler should only compile constant expressions (disabling push) */
+    private $const;
+
     private $stack = [];
     private $names = [];
     private $nameCnt = 1;
     private $locals = [];
 
-    public function __construct(ModuleCompiler $module, array $returns, ?ExpressionCompiler $parent)
+    public function __construct(ModuleCompiler $module, array $returns, ?ExpressionCompiler $parent, bool $constExpr = false)
     {
         $this->module = $module;
         $this->parent = $parent;
         $this->returns = $returns;
+        $this->const = $constExpr;
     }
 
     /**
@@ -94,6 +98,10 @@ class ExpressionCompiler
      */
     public function push(ValueType ...$type): array
     {
+        if ($this->const) {
+            throw new \LogicException("Can't call push() when in constant expression mode");
+        }
+        
         $newVars = [];
         for ($i = 0; $i < count($type); $i++) {
             $newVars[] = '$stack_'.$this->root()->nameCnt++;

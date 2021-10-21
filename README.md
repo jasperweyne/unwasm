@@ -45,15 +45,15 @@ fully supported.
 | Parametric     | Unsupported |
 | Variable       | Partial     |
 | Table          | Unsupported |
-| Memory         | Partial     |
+| Memory         | Supported   |
 | Control        | Partial     |
 
 | Runtime        | Status      |
 | -------------- | ----------- |
-| Memory         | Partial     |
+| Memory         | Supported   |
 | Globals        | Unsupported |
 | Tables         | Unsupported |
-| Datas          | Unsupported |
+| Datas          | Supported   |
 | Elems          | Unsupported |
 | Import/Export  | Partial     |
 

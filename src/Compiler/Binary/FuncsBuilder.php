@@ -33,8 +33,10 @@ use UnWasm\Compiler\Node\Code\Control\Nop;
 use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\Code\Func;
 use UnWasm\Compiler\Node\Code\Memory\Copy;
+use UnWasm\Compiler\Node\Code\Memory\Drop;
 use UnWasm\Compiler\Node\Code\Memory\Fill;
 use UnWasm\Compiler\Node\Code\Memory\Grow;
+use UnWasm\Compiler\Node\Code\Memory\Init;
 use UnWasm\Compiler\Node\Code\Memory\Load;
 use UnWasm\Compiler\Node\Code\Memory\Size;
 use UnWasm\Compiler\Node\Code\Memory\Store;
@@ -486,6 +488,15 @@ class FuncsBuilder implements BuilderInterface
                 case 0xFC: // subswitch
                     $secondary = $parser->expectInt(true);
                     switch ($secondary) {
+                        case 8:
+                            $dataIdx = $parser->expectInt(true);
+                            $parser->expectByte(0x00);
+                            $instructions[] = new Init($dataIdx);
+                            break;
+                        case 9:
+                            $dataIdx = $parser->expectInt(true);
+                            $instructions[] = new Drop($dataIdx);
+                            break;
                         case 10:
                             $parser->expectByte(0x00);
                             $parser->expectByte(0x00);
