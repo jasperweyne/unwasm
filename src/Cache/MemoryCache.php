@@ -32,7 +32,7 @@ class MemoryCache implements CacheInterface
     public function load(string $key): bool
     {
         if (isset($this->cache[$key])) {
-            eval('?>'.$this->cache[$key]['content']);
+            eval($this->cache[$key]['content']);
             return true;
         }
 

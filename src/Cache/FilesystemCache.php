@@ -56,7 +56,7 @@ class FilesystemCache implements CacheInterface
         }
 
         $tmpFile = tempnam($dir, basename($location));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $location)) {
+        if (false !== @file_put_contents($tmpFile, '<?php'.PHP_EOL.PHP_EOL.$content) && @rename($tmpFile, $location)) {
             @chmod($location, 0666 & ~umask());
             return;
         }

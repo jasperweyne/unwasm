@@ -171,7 +171,7 @@ class ModuleCompiler
     private function compileHeader(Source $src, string $fqcn): void
     {
         // Top
-        $src->write('<?php')->write('');
+        $src->write('declare(strict_types=1);')->write('');
 
         // Strip leading backslash from fqcn
         if (strpos($fqcn, '\\') === 0) {
