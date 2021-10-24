@@ -33,7 +33,7 @@ use UnWasm\Compiler\Node\Code\Control\Nop;
 use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\Code\Func;
 use UnWasm\Compiler\Node\Code\Memory\Copy;
-use UnWasm\Compiler\Node\Code\Memory\Drop;
+use UnWasm\Compiler\Node\Code\Memory\Drop as DataDrop;
 use UnWasm\Compiler\Node\Code\Memory\Fill;
 use UnWasm\Compiler\Node\Code\Memory\Grow;
 use UnWasm\Compiler\Node\Code\Memory\Init;
@@ -57,6 +57,8 @@ use UnWasm\Compiler\Node\Code\Numeric\Lt;
 use UnWasm\Compiler\Node\Code\Numeric\Mul;
 use UnWasm\Compiler\Node\Code\Numeric\Neq;
 use UnWasm\Compiler\Node\Code\Numeric\Sub;
+use UnWasm\Compiler\Node\Code\Parametric\Drop;
+use UnWasm\Compiler\Node\Code\Parametric\Select;
 use UnWasm\Compiler\Node\Code\Reference\Func as RefFunc;
 use UnWasm\Compiler\Node\Code\Reference\IsNull;
 use UnWasm\Compiler\Node\Code\Reference\NullRef;
@@ -156,6 +158,18 @@ class FuncsBuilder implements BuilderInterface
                 case 0x10:
                     $funcidx = $parser->expectInt(true);
                     $instructions[] = new Call($funcidx);
+                    break;
+                case 0x1A:
+                    $instructions[] = new Drop();
+                    break;
+                case 0x1B:
+                    $instructions[] = new Select();
+                    break;
+                case 0x1C:
+                    $type = $parser->expectVector(function (BinaryParser $parser) {
+                        return new ValueType($parser->expectByte());
+                    });
+                    $instructions[] = new Select($type);
                     break;
                 case 0x20:
                     $local = $parser->expectInt(true);
@@ -505,7 +519,7 @@ class FuncsBuilder implements BuilderInterface
                             break;
                         case 9:
                             $dataIdx = $parser->expectInt(true);
-                            $instructions[] = new Drop($dataIdx);
+                            $instructions[] = new DataDrop($dataIdx);
                             break;
                         case 10:
                             $parser->expectByte(0x00);

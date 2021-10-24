@@ -42,7 +42,7 @@ fully supported.
 | -------------- | ----------- |
 | Numeric        | Partial     |
 | Reference      | Supported   |
-| Parametric     | Unsupported |
+| Parametric     | Supported   |
 | Variable       | Supported   |
 | Table          | Unsupported |
 | Memory         | Supported   |
