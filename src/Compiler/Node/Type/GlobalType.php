@@ -25,9 +25,9 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class GlobalType
 {
-    private $valueType;
+    public $valueType;
 
-    private $mutable;
+    public $mutable;
 
     public function __construct(ValueType $valueType, bool $mutable)
     {

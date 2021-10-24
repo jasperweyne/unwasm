@@ -34,7 +34,7 @@ fully supported.
 | Funcs          | Supported   |
 | Tables         | Unsupported |
 | Mems           | Supported   |
-| Globals        | Unsupported |
+| Globals        | Supported   |
 | Exports        | Partial     |
 | Start          | Supported   |
 
@@ -43,7 +43,7 @@ fully supported.
 | Numeric        | Partial     |
 | Reference      | Supported   |
 | Parametric     | Unsupported |
-| Variable       | Partial     |
+| Variable       | Supported   |
 | Table          | Unsupported |
 | Memory         | Supported   |
 | Control        | Partial     |
@@ -51,7 +51,7 @@ fully supported.
 | Runtime        | Status      |
 | -------------- | ----------- |
 | Memory         | Supported   |
-| Globals        | Unsupported |
+| Globals        | Supported   |
 | Tables         | Unsupported |
 | Datas          | Supported   |
 | Elems          | Unsupported |

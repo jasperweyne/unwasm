@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Store;
 
+use UnWasm\Compiler\Binary\Token;
+use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\External\GlobalInterface;
 use UnWasm\Compiler\Node\Type\GlobalType;
@@ -49,7 +51,38 @@ class GlobalData implements GlobalInterface
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $src): void
     {
-        // todo
-        $src->write("\$this->global_$index = array(); // todo");
+        // compile init expression
+        $expr = new ExpressionCompiler($module, [], null, true);
+        foreach ($this->initExpr as $instr) {
+            $instr->compile($expr, new Source());
+        }
+        // todo: verify stack
+        list($initValue) = $expr->pop();
+
+        // setup correct types
+        $mutable = $this->globalType->mutable ? 'true' : 'false';
+        switch ($this->globalType->valueType) {
+            case Token::INT_TYPE:
+                $compileType = 'i';
+                $compileInit = 'setInt';
+                break;
+            case Token::INT_64_TYPE:
+                $compileType = 'I';
+                $compileInit = 'setInt';
+                break;
+            case Token::FLOAT_TYPE:
+                $compileType = 'f';
+                $compileInit = 'setFloat';
+                break;
+            case Token::FLOAT_64_TYPE:
+                $compileType = 'F';
+                $compileInit = 'setFloat';
+                break;
+        }
+            
+        $src
+            ->write("\$this->global_$index = new \UnWasm\Store\GlobalInst('$compileType', $mutable);")
+            ->write("\$this->global_$index->$compileInit($initValue);")
+        ;
     }
 }

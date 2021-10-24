@@ -200,7 +200,7 @@ class ModuleCompiler
             ->write('// exports')
             ->write('/** @var \UnWasm\Store\MemoryInst[] */ public $mems = array();')
             ->write('/** @var array */ public $tables = array();')
-            ->write('/** @var array */ public $globals = array();')
+            ->write('/** @var \UnWasm\Store\GlobalInst[] */ public $globals = array();')
             ->write()
         ;
 
@@ -242,7 +242,7 @@ class ModuleCompiler
         if (count($this->global()) > 0) {
             $src->write('// globals');
             foreach ($this->global() as $i => $global) {
-                $src->write("/** @var mixed */ private \$global_$i;");
+                $src->write("/** @var \UnWasm\Store\GlobalInst */ private \$global_$i;");
             }
             $src->write();
         }

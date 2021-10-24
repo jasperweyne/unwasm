@@ -60,6 +60,8 @@ use UnWasm\Compiler\Node\Code\Numeric\Sub;
 use UnWasm\Compiler\Node\Code\Reference\Func as RefFunc;
 use UnWasm\Compiler\Node\Code\Reference\IsNull;
 use UnWasm\Compiler\Node\Code\Reference\NullRef;
+use UnWasm\Compiler\Node\Code\Variable\GlobalGet;
+use UnWasm\Compiler\Node\Code\Variable\GlobalSet;
 use UnWasm\Compiler\Node\Code\Variable\LocalGet;
 use UnWasm\Compiler\Node\Code\Variable\LocalSet;
 use UnWasm\Compiler\Node\Type\RefType;
@@ -166,6 +168,14 @@ class FuncsBuilder implements BuilderInterface
                 case 0x22:
                     $local = $parser->expectInt(true);
                     $instructions[] = new LocalSet($local, true);
+                    break;
+                case 0x23:
+                    $global = $parser->expectInt(true);
+                    $instructions[] = new GlobalGet($global);
+                    break;
+                case 0x24:
+                    $global = $parser->expectInt(true);
+                    $instructions[] = new GlobalSet($global);
                     break;
                 case 0x28:
                     /* $align = */ $parser->expectInt(true);
