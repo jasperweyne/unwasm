@@ -20,26 +20,12 @@ declare(strict_types=1);
 
 namespace UnWasm\Runtime;
 
-/**
- * Represents the WebAssembly execution context.
- * Handles imports and exports for modules.
- */
-class Environment
+class Module
 {
-    /** @var array The dictionary of module instances and their names. */
-    private $modules = array();
-
-    public function import(string $module)
-    {
-        if (!isset($this->modules[$module])) {
-            throw new \RuntimeException("Tried to import unregistered module '$module', make sure you've exported it to the environment.");
-        }
-
-        return $this->modules[$module];
-    }
-
-    public function export($object, string $module): void
-    {
-        $this->modules[$module] = $object;
-    }
+    /** @var \UnWasm\Runtime\MemoryInst[] */ public $mems = array();
+    /** @var \UnWasm\Runtime\TableInst[] */ public $tables = array();
+    /** @var \UnWasm\Runtime\GlobalInst[] */ public $globals = array();
+    /** @var string[] */ public $funcs = array();
+    /** @var string[] */ protected $datas = array();
+    /** @var ?callable[] */ protected $elems = array();
 }

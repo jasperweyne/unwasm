@@ -40,7 +40,7 @@ class FuncExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        $source->write("if (\$env) \$env->exportFunc(\$module, '$this->name', 'todo');");
+        $source->write("\$this->funcs['$this->name'] = 'todo';");
     }
 
     public function compile(ModuleCompiler $module, Source $src)

@@ -187,7 +187,7 @@ class ModuleCompiler
 
         // Class start
         $src
-            ->write("class $fqcn")
+            ->write("class $fqcn extends \UnWasm\Runtime\Module")
             ->write('{')
             ->indent()
         ;
@@ -195,23 +195,6 @@ class ModuleCompiler
 
     private function compileVars(Source $src): void
     {
-        // compile exports
-        $src
-            ->write('// exports')
-            ->write('/** @var \UnWasm\Runtime\MemoryInst[] */ public $mems = array();')
-            ->write('/** @var \UnWasm\Runtime\TableInst[] */ public $tables = array();')
-            ->write('/** @var \UnWasm\Runtime\GlobalInst[] */ public $globals = array();')
-            ->write()
-        ;
-
-        // register datas/tables
-        $src
-            ->write('// datas/elems')
-            ->write('/** @var string[] */ private $datas = array();')
-            ->write('/** @var ?callable[] */ private $elems = array();')
-            ->write()
-        ;
-
         // register local funcs
         if (count($this->func()) > 0) {
             $src->write('// funcs');
@@ -265,12 +248,9 @@ class ModuleCompiler
             $module = substr($module, $pos + 1);
         }
 
-        $hasEnv = count($this->imports) + count($this->exports) > 0;
-        $param = $hasEnv ? "?\UnWasm\Runtime\Environment \$env = null, string \$module = '$module'" : '';
-
         // write constructor header
         $src
-            ->write("public function __construct($param)")
+            ->write("public function __construct(?\UnWasm\Runtime\Environment \$env = null, string \$module = '$module')")
             ->write('{')
             ->indent()
         ;
@@ -339,8 +319,13 @@ class ModuleCompiler
             foreach ($this->exports as $i => $export) {
                 $export->compileSetup($i, $this, $src);
             }
-            $src->write();
         }
+
+        // export self
+        $src
+            ->write('if ($env) $env->export($this, $module);')
+            ->write()
+        ;
 
         // write data intialisation
         if (count($this->datas) > 0) {
