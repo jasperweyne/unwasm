@@ -48,6 +48,6 @@ class Memory implements MemInterface
         $limits = $this->memType->limits;
         $min = strval($limits->minimum);
         $max = $limits->maximum !== null ? strval($limits->maximum) : 'null';
-        $src->write("\$this->mem_$index = new \UnWasm\Store\MemoryInst($min, $max);");
+        $src->write("\$this->mem_$index = new \UnWasm\Runtime\MemoryInst($min, $max);");
     }
 }

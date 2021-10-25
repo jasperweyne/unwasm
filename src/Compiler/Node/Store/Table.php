@@ -48,6 +48,6 @@ class Table implements TableInterface
         $limits = $this->tableType->limits;
         $min = strval($limits->minimum);
         $max = $limits->maximum !== null ? strval($limits->maximum) : 'null';
-        $src->write("\$this->table_$index = new \UnWasm\Store\TableInst($min, $max);");
+        $src->write("\$this->table_$index = new \UnWasm\Runtime\TableInst($min, $max);");
     }
 }

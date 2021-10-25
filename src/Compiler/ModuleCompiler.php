@@ -198,9 +198,9 @@ class ModuleCompiler
         // compile exports
         $src
             ->write('// exports')
-            ->write('/** @var \UnWasm\Store\MemoryInst[] */ public $mems = array();')
-            ->write('/** @var \UnWasm\Store\TableInst[] */ public $tables = array();')
-            ->write('/** @var \UnWasm\Store\GlobalInst[] */ public $globals = array();')
+            ->write('/** @var \UnWasm\Runtime\MemoryInst[] */ public $mems = array();')
+            ->write('/** @var \UnWasm\Runtime\TableInst[] */ public $tables = array();')
+            ->write('/** @var \UnWasm\Runtime\GlobalInst[] */ public $globals = array();')
             ->write()
         ;
 
@@ -234,7 +234,7 @@ class ModuleCompiler
         if (count($this->mem()) > 0) {
             $src->write('// memories');
             foreach ($this->mem() as $i => $mem) {
-                $src->write("/** @var \UnWasm\Store\MemoryInst */ private \$mem_$i;");
+                $src->write("/** @var \UnWasm\Runtime\MemoryInst */ private \$mem_$i;");
             }
             $src->write();
         }
@@ -243,7 +243,7 @@ class ModuleCompiler
         if (count($this->global()) > 0) {
             $src->write('// globals');
             foreach ($this->global() as $i => $global) {
-                $src->write("/** @var \UnWasm\Store\GlobalInst */ private \$global_$i;");
+                $src->write("/** @var \UnWasm\Runtime\GlobalInst */ private \$global_$i;");
             }
             $src->write();
         }
@@ -252,7 +252,7 @@ class ModuleCompiler
         if (count($this->table()) > 0) {
             $src->write('// tables');
             foreach ($this->table() as $i => $tables) {
-                $src->write("/** @var \UnWasm\Store\TableInst */ private \$table_$i;");
+                $src->write("/** @var \UnWasm\Runtime\TableInst */ private \$table_$i;");
             }
             $src->write();
         }

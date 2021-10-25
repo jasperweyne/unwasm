@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Store;
+namespace UnWasm\Runtime;
 
 /**
  * A runtime table instance for a module
