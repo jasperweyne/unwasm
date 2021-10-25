@@ -18,30 +18,38 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Reference;
+namespace UnWasm\Compiler\Node\Code\Table;
 
+use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
- * Add a function reference to the top of the stack.
+ * Store a reference in a table.
  */
-class Func extends Instruction
+class Set extends Instruction
 {
-    /** @var int The referenced function index */
-    private $funcIdx;
+    /** @var int The table index */
+    protected $tableIdx;
 
-    public function __construct(int $funcIdx)
+    public function __construct(int $tableIdx)
     {
-        $this->funcIdx = $funcIdx;
+        $this->tableIdx = $tableIdx;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
-        // update stack
-        $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        // assert type/update stack of value
+        // todo: assert reftype
+        list($value) = $state->pop();
+
+        // assert type/update stack of dynamic offset
+        $state->typed(new ValueType(Token::INT_TYPE));
+        list($offset) = $state->pop();
+
+        // export code
+        $src->write("\$this->table_$this->tableIdx->set($value, $offset);");
     }
 }

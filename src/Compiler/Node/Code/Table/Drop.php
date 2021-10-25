@@ -18,19 +18,28 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Type;
+namespace UnWasm\Compiler\Node\Code\Table;
+
+use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Code\Instruction;
+use UnWasm\Compiler\Source;
 
 /**
- * Describes the constraints of a table.
+ * Drop a data instance from memory.
  */
-class TableType
+class Drop extends Instruction
 {
-    public $encoding;
-    public $limits;
+    /** @var int The element index */
+    protected $elemIdx;
 
-    public function __construct(RefType $encoding, Limits $limits)
+    public function __construct(int $elemIdx)
     {
-        $this->encoding = $encoding;
-        $this->limits = $limits;
+        $this->elemIdx = $elemIdx;
+    }
+
+    public function compile(ExpressionCompiler $state, Source $src): void
+    {
+        // export code
+        $src->write("unset(\$this->elems[$this->elemIdx]);");
     }
 }

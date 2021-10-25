@@ -18,30 +18,40 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Reference;
+namespace UnWasm\Compiler\Node\Code\Table;
 
+use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
- * Add a function reference to the top of the stack.
+ * Initialise a region of a table with elements.
  */
-class Func extends Instruction
+class Init extends Instruction
 {
-    /** @var int The referenced function index */
-    private $funcIdx;
+    /** @var int The table index */
+    private $tableIdx;
 
-    public function __construct(int $funcIdx)
+    /** @var int The element index */
+    private $elemIdx;
+
+    public function __construct(int $tableIdx, int $elemIdx)
     {
-        $this->funcIdx = $funcIdx;
+        $this->tableIdx = $tableIdx;
+        $this->dataIdx = $elemIdx;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // assert type
+        $state->typed(new ValueType(Token::INT_TYPE), 3);
+
         // update stack
-        $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        list($destOffset, $srcOffset, $n) = $state->pop(3);
+
+        // export code
+        $src->write("\$this->table_$this->tableIdx->overwrite(array_slice(\$this->elems[$this->elemIdx], $srcOffset, $n), $destOffset);");
     }
 }

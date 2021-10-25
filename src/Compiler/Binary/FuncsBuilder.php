@@ -62,6 +62,14 @@ use UnWasm\Compiler\Node\Code\Parametric\Select;
 use UnWasm\Compiler\Node\Code\Reference\Func as RefFunc;
 use UnWasm\Compiler\Node\Code\Reference\IsNull;
 use UnWasm\Compiler\Node\Code\Reference\NullRef;
+use UnWasm\Compiler\Node\Code\Table\Copy as TableCopy;
+use UnWasm\Compiler\Node\Code\Table\Drop as ElemDrop;
+use UnWasm\Compiler\Node\Code\Table\Fill as TableFill;
+use UnWasm\Compiler\Node\Code\Table\Get as TableGet;
+use UnWasm\Compiler\Node\Code\Table\Grow as TableGrow;
+use UnWasm\Compiler\Node\Code\Table\Init as TableInit;
+use UnWasm\Compiler\Node\Code\Table\Set as TableSet;
+use UnWasm\Compiler\Node\Code\Table\Size as TableSize;
 use UnWasm\Compiler\Node\Code\Variable\GlobalGet;
 use UnWasm\Compiler\Node\Code\Variable\GlobalSet;
 use UnWasm\Compiler\Node\Code\Variable\LocalGet;
@@ -190,6 +198,14 @@ class FuncsBuilder implements BuilderInterface
                 case 0x24:
                     $global = $parser->expectInt(true);
                     $instructions[] = new GlobalSet($global);
+                    break;
+                case 0x25:
+                    $table = $parser->expectInt(true);
+                    $instructions[] = new TableGet($table);
+                    break;
+                case 0x26:
+                    $table = $parser->expectInt(true);
+                    $instructions[] = new TableSet($table);
                     break;
                 case 0x28:
                     /* $align = */ $parser->expectInt(true);
@@ -529,6 +545,32 @@ class FuncsBuilder implements BuilderInterface
                         case 11:
                             $parser->expectByte(0x00);
                             $instructions[] = new Fill();
+                            break;
+                        case 12:
+                            $elemIdx = $parser->expectInt(true);
+                            $tableIdx = $parser->expectInt(true);
+                            $instructions[] = new TableInit($tableIdx, $elemIdx);
+                            break;
+                        case 13:
+                            $dataIdx = $parser->expectInt(true);
+                            $instructions[] = new ElemDrop($dataIdx);
+                            break;
+                        case 14:
+                            $x = $parser->expectInt(true);
+                            $y = $parser->expectInt(true);
+                            $instructions[] = new TableCopy($x, $y);
+                            break;
+                        case 15:
+                            $tableIdx = $parser->expectInt(true);
+                            $instructions[] = new TableGrow($tableIdx);
+                            break;
+                        case 16:
+                            $tableIdx = $parser->expectInt(true);
+                            $instructions[] = new TableSize($tableIdx);
+                            break;
+                        case 17:
+                            $tableIdx = $parser->expectInt(true);
+                            $instructions[] = new TableFill($tableIdx);
                             break;
                         default:
                             throw new \RuntimeException('Unknown secondary opcode ' . strval($secondary));

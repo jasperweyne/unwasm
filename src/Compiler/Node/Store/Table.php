@@ -45,7 +45,9 @@ class Table implements TableInterface
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $src): void
     {
-        // todo
-        $src->write("\$this->table_$index = array(); // todo");
+        $limits = $this->tableType->limits;
+        $min = strval($limits->minimum);
+        $max = $limits->maximum !== null ? strval($limits->maximum) : 'null';
+        $src->write("\$this->table_$index = new \UnWasm\Store\TableInst($min, $max);");
     }
 }

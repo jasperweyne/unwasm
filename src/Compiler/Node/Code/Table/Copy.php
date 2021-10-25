@@ -18,30 +18,40 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Reference;
+namespace UnWasm\Compiler\Node\Code\Table;
 
+use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
- * Add a function reference to the top of the stack.
+ * Copy a region of table data to a different region.
  */
-class Func extends Instruction
+class Copy extends Instruction
 {
-    /** @var int The referenced function index */
-    private $funcIdx;
+    /** @var int The destination table index */
+    private $x;
 
-    public function __construct(int $funcIdx)
+    /** @var int The source table index */
+    private $y;
+
+    public function __construct(int $x, int $y)
     {
-        $this->funcIdx = $funcIdx;
+        $this->x = $x;
+        $this->y = $y;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // assert type
+        $state->typed(new ValueType(Token::INT_TYPE), 3);
+
         // update stack
-        $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        list($destOffset, $srcOffset, $n) = $state->pop(3);
+
+        // export code
+        $src->write("\$this->table_$this->y->copy(\$this->table_$this->x, $srcOffset, $destOffset, $n);");
     }
 }

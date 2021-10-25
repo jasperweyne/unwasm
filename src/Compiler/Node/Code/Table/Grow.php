@@ -18,30 +18,37 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Reference;
+namespace UnWasm\Compiler\Node\Code\Table;
 
+use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
- * Add a function reference to the top of the stack.
+ * Grow the table by a given amount of element.
  */
-class Func extends Instruction
+class Grow extends Instruction
 {
-    /** @var int The referenced function index */
-    private $funcIdx;
+    /** @var int The table index */
+    private $tableIdx;
 
-    public function __construct(int $funcIdx)
+    public function __construct(int $tableIdx)
     {
-        $this->funcIdx = $funcIdx;
+        $this->tableIdx = $tableIdx;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // assert type
+        $state->typed(new ValueType(Token::INT_TYPE));
+
         // update stack
-        $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        list($n) = $state->pop();
+        list($result) = $state->push(new ValueType(Token::INT_TYPE));
+
+        // export code
+        $src->write("$result = \$this->table_$this->tableIdx->grow($n);");
     }
 }

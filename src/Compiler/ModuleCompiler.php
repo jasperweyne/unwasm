@@ -199,7 +199,7 @@ class ModuleCompiler
         $src
             ->write('// exports')
             ->write('/** @var \UnWasm\Store\MemoryInst[] */ public $mems = array();')
-            ->write('/** @var array */ public $tables = array();')
+            ->write('/** @var \UnWasm\Store\TableInst[] */ public $tables = array();')
             ->write('/** @var \UnWasm\Store\GlobalInst[] */ public $globals = array();')
             ->write()
         ;
@@ -208,6 +208,7 @@ class ModuleCompiler
         $src
             ->write('// datas/elems')
             ->write('/** @var string[] */ private $datas = array();')
+            ->write('/** @var ?callable[] */ private $elems = array();')
             ->write()
         ;
 
@@ -238,7 +239,7 @@ class ModuleCompiler
             $src->write();
         }
 
-        // register memories
+        // register globals
         if (count($this->global()) > 0) {
             $src->write('// globals');
             foreach ($this->global() as $i => $global) {
@@ -251,7 +252,7 @@ class ModuleCompiler
         if (count($this->table()) > 0) {
             $src->write('// tables');
             foreach ($this->table() as $i => $tables) {
-                $src->write("/** @var mixed */ private \$tables_$i;");
+                $src->write("/** @var \UnWasm\Store\TableInst */ private \$table_$i;");
             }
             $src->write();
         }
@@ -346,6 +347,15 @@ class ModuleCompiler
             $src->write('// datas');
             foreach ($this->datas as $i => $data) {
                 $data->compileSetup($i, $this, $src);
+            }
+            $src->write();
+        }
+
+        // write elems intialisation
+        if (count($this->elems) > 0) {
+            $src->write('// elems');
+            foreach ($this->elems as $i => $elem) {
+                $elem->compileSetup($i, $this, $src);
             }
             $src->write();
         }

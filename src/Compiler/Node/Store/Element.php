@@ -20,6 +20,12 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Store;
 
+use UnWasm\Compiler\Binary\Token;
+use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\Type\ValueType;
+use UnWasm\Compiler\Source;
+
 /**
  * Represents an element segment for table initialization.
  */
@@ -42,6 +48,36 @@ class Element
         $this->tableIdx = $tableIdx;
         $this->offsetExpr = $offsetExpr;
         $this->initExpressions = $initExpressions;
+    }
+
+    public function compileSetup(int $index, ModuleCompiler $module, Source $src): void
+    {
+        // compile initExpressions data
+        $data = [];
+        foreach ($this->initExpressions as $initExpr) {
+            $expr = new ExpressionCompiler($module, [], null, true);
+            foreach ($initExpr as $instr) {
+                $instr->compile($expr, new Source());
+            }
+            // todo: verify stack
+            list($const) = $expr->pop();
+            $data[] = $const;
+        }
+        $compiledData = '['.implode(', ', $data).']';
+
+        // compile source
+        if ($this->tableIdx !== null) {
+            // get offset constant
+            $expr = new ExpressionCompiler($module, [], null, true);
+            foreach ($this->offsetExpr as $instr) {
+                $instr->compile($expr, new Source());
+            }
+            $expr->typed(new ValueType(Token::INT_TYPE));
+            list($offset) = $expr->pop();
+            $src->write("\$this->table_$this->tableIdx->overwrite($compiledData, $offset); // elems[$index]");
+        } else {
+            $src->write("\$this->elems[$index] = $compiledData;");
+        }
     }
 
     public static function active(array $initExpr, int $tableIdx = null, array $offsetExpr = null)

@@ -18,30 +18,37 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Reference;
+namespace UnWasm\Compiler\Node\Code\Table;
 
+use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Type\RefType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
- * Add a function reference to the top of the stack.
+ * Retrieve a reference from a table.
  */
-class Func extends Instruction
+class Get extends Instruction
 {
-    /** @var int The referenced function index */
-    private $funcIdx;
+    /** @var int The table index */
+    protected $tableIdx;
 
-    public function __construct(int $funcIdx)
+    public function __construct(int $tableIdx)
     {
-        $this->funcIdx = $funcIdx;
+        $this->tableIdx = $tableIdx;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // assert type
+        $state->typed(new ValueType(Token::INT_TYPE));
+
         // update stack
-        $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        list($offset) = $state->pop();
+        list($value) = $state->push(new ValueType(ord('r'))); // todo: replace with reftype
+
+        // export code
+        $src->write("$value = \$this->table_$this->tableIdx->get($offset);");
     }
 }

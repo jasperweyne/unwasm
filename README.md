@@ -30,12 +30,12 @@ fully supported.
 | Compilation    | Status      |
 | -------------- | ----------- |
 | Types          | Unsupported |
-| Imports        | Partial     |
+| Imports        | Supported   |
 | Funcs          | Supported   |
-| Tables         | Unsupported |
+| Tables         | Supported   |
 | Mems           | Supported   |
 | Globals        | Supported   |
-| Exports        | Partial     |
+| Exports        | Supported   |
 | Start          | Supported   |
 
 | Instructions   | Status      |
@@ -44,7 +44,7 @@ fully supported.
 | Reference      | Supported   |
 | Parametric     | Supported   |
 | Variable       | Supported   |
-| Table          | Unsupported |
+| Table          | Supported   |
 | Memory         | Supported   |
 | Control        | Partial     |
 
@@ -52,10 +52,10 @@ fully supported.
 | -------------- | ----------- |
 | Memory         | Supported   |
 | Globals        | Supported   |
-| Tables         | Unsupported |
+| Tables         | Supported   |
 | Datas          | Supported   |
-| Elems          | Unsupported |
-| Import/Export  | Partial     |
+| Elems          | Supported   |
+| Import/Export  | Supported   |
 
 Note: runtime funcs are managed by PHP and therefore implicitly supported.
 
