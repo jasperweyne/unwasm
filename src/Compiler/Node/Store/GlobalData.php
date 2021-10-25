@@ -79,7 +79,7 @@ class GlobalData implements GlobalInterface
                 $compileInit = 'setFloat';
                 break;
         }
-            
+
         $src
             ->write("\$this->global_$index = new \UnWasm\Store\GlobalInst('$compileType', $mutable);")
             ->write("\$this->global_$index->$compileInit($initValue);")

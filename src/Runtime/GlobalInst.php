@@ -27,16 +27,16 @@ class GlobalInst
 {
     /** @var int The current value of this global instance, in case the type is an int */
     private $intValue;
-    
+
     /** @var int The current value of this global instance, in case the type is a float */
     private $floatValue;
-    
+
     /** @var ?callable The current value of this global instance, in case the type is a callable */
     private $refValue;
 
     /** @var string The type of value this global holds */
     private $type;
-    
+
     /** @var ?int The amount of times the value may be mutated */
     private $mutateCnt;
 
@@ -57,7 +57,7 @@ class GlobalInst
 
         return $this->intValue;
     }
-    
+
     public function getFloat(): float
     {
         if ($this->type !== 'f' && $this->type !== 'F') {
@@ -66,7 +66,7 @@ class GlobalInst
 
         return $this->floatValue;
     }
-    
+
     public function getRef(): ?callable
     {
         if ($this->type !== 'r') {
@@ -75,13 +75,13 @@ class GlobalInst
 
         return $this->refValue;
     }
-    
+
     public function setInt(int $value): void
     {
         if ($this->type !== 'i' && $this->type !== 'I') {
             throw new \LogicException('The type of this global is not an integer');
         }
-        
+
         if ($this->mutateCnt === 0) {
             throw new \LogicException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
@@ -90,13 +90,13 @@ class GlobalInst
 
         $this->intValue = $value;
     }
-    
+
     public function setFloat(float $value): void
     {
         if ($this->type !== 'f' && $this->type !== 'F') {
             throw new \LogicException('The type of this global is not a float');
         }
-        
+
         if ($this->mutateCnt === 0) {
             throw new \LogicException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
@@ -105,13 +105,13 @@ class GlobalInst
 
         $this->floatValue = $value;
     }
-    
+
     public function setRef(?callable $value): void
     {
         if ($this->type !== 'r') {
             throw new \LogicException('The type of this global is not a callable reference');
         }
-        
+
         if ($this->mutateCnt === 0) {
             throw new \LogicException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
