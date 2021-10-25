@@ -70,7 +70,7 @@ class MemoryInst
         $prev = $this->size();
 
         // validate limits
-        if ($prev + $pages > $this->maximum) {
+        if ($this->maximum !== null && $prev + $pages > $this->maximum) {
             return -1;
         }
 

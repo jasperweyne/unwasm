@@ -40,6 +40,6 @@ class Copy extends Instruction
         list($destOffset, $srcOffset, $n) = $state->pop(3);
 
         // export code
-        $src->write("\$this->mem_0->copy($destOffset, $srcOffset, $n);");
+        $src->write("\$this->mem_0->copy($srcOffset, $destOffset, $n);");
     }
 }
