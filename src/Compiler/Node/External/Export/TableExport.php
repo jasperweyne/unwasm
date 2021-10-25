@@ -40,7 +40,7 @@ class TableExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        $source->write("\$this->tables['$this->name'] = \$this->table_$this->globalIdx;");
+        $source->write("\$this->tables['$this->name'] = \$this->table_$this->tableIdx;");
     }
 
     public function compile(ModuleCompiler $module, Source $src)
