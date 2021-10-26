@@ -210,7 +210,11 @@ class BinaryParser implements ParserInterface
 
         // lex LEB128
         $value = "";
-        for ($i = 0; $i < $width; $i++) {
+        for ($i = 0;; $i++) {
+            if ($i >= ceil($bits / 7.0)) {
+                throw new \RuntimeException("An int larger than $bits bits was provided");
+            }
+
             $char = fread($this->stream, 1);
             if (!is_string($char)) {
                 throw new \RuntimeException("Unexpected read error");
@@ -225,7 +229,9 @@ class BinaryParser implements ParserInterface
 
         // validate integer by checking last character
         if ((ord(substr($value, -1)) & 0x80) != 0) {
-            throw new \RuntimeException("Invalid integer provided");
+            $str = bin2hex($value);
+            $posstr = str_pad(dechex(ftell($this->stream)), 8, '0', STR_PAD_LEFT);
+            throw new \RuntimeException("Invalid integer provided $str@0x$posstr");
         }
 
         // set type
