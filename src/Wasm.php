@@ -71,7 +71,7 @@ class Wasm
         return $result;
     }
 
-    public function load(ParserInterface $parser, string $module, ?int $timestamp)
+    public function compile(ParserInterface $parser, string $module, ?int $timestamp)
     {
         // Check whether cache is up-to-date
         $cacheTs = $this->cache->getTimestamp($module);
@@ -79,7 +79,11 @@ class Wasm
             $compiler = $parser->scan();
             $this->cache->write($module, $compiler->compile($this->namespace.'\\'.$module)->read());
         }
+    }
 
+    public function load(ParserInterface $parser, string $module, ?int $timestamp)
+    {
+        $this->compile($parser, $module, $timestamp);
         return $this->instantiate($module);
     }
 
