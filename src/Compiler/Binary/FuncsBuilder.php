@@ -580,7 +580,8 @@ class FuncsBuilder implements BuilderInterface
                     echo "Expression terminated\n";
                     return $instructions;
                 default:
-                    throw new \RuntimeException('Unknown opcode 0x' . dechex($current));
+                    $pos = str_pad(dechex($parser->position() - 1), 8, '0', STR_PAD_LEFT);
+                    throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($current), 2, '0', STR_PAD_LEFT) . '@0x' . $pos);
             }
         }
     }
