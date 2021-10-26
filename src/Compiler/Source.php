@@ -23,11 +23,16 @@ namespace UnWasm\Compiler;
  */
 class Source
 {
-    /** @var string */
+    /** @var resource A handle for php://temp */
     private $source = '';
 
     /** @var int */
     private $indentation = 0;
+
+    public function __construct()
+    {
+        $this->source = fopen('php://temp', 'r+t');
+    }
 
     /**
      * Returns the compiled code.
@@ -36,7 +41,8 @@ class Source
      */
     public function read(): string
     {
-        return $this->source;
+        fseek($this->source, 0);
+        return stream_get_contents($this->source);
     }
 
     /**
@@ -48,7 +54,7 @@ class Source
      */
     public function raw($string)
     {
-        $this->source .= $string;
+        fwrite($this->source, $string);
 
         return $this;
     }
@@ -60,7 +66,7 @@ class Source
      */
     public function start(): self
     {
-        $this->source .= str_repeat(' ', $this->indentation * 4);
+        $this->raw(str_repeat(' ', $this->indentation * 4));
 
         return $this;
     }
@@ -72,6 +78,11 @@ class Source
      */
     public function write(...$strings): self
     {
+        if (count($strings) === 0) {
+            $this->raw(PHP_EOL);
+            return $this;
+        }
+
         $content = implode($strings).PHP_EOL;
 
         $this->start();
@@ -87,13 +98,15 @@ class Source
      */
     public function revert(): self
     {
-        // find last end-of-line character
-        $lastLine = strrpos($this->source, PHP_EOL) ?: 0;
-
-        // find second to last end-of-line character and remove up to that point
-        $length = strrpos($this->source, PHP_EOL, $lastLine - strlen($this->source) - 1) ?: 0;
-        $this->source = substr($this->source, 0, $length + strlen(PHP_EOL));
-
+        $eol = 1;
+        while ($eol) {
+            fseek($this->source, ftell($this->source) - 2);
+            $char = fread($this->source, 1);
+            if ($char === "\n") { // assumed that PHP_EOL always ends with \n
+                $eol--;
+            }
+        } 
+        
         return $this;
     }
 
