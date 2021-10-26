@@ -46,7 +46,7 @@ fully supported.
 | Variable       | Supported   |
 | Table          | Supported   |
 | Memory         | Supported   |
-| Control        | Partial     |
+| Control        | Supported   |
 
 | Runtime        | Status      |
 | -------------- | ----------- |

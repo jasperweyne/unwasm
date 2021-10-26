@@ -26,6 +26,7 @@ use UnWasm\Compiler\Node\Code\Control\Block;
 use UnWasm\Compiler\Node\Code\Control\BranchCond;
 use UnWasm\Compiler\Node\Code\Control\BranchUncond;
 use UnWasm\Compiler\Node\Code\Control\Call;
+use UnWasm\Compiler\Node\Code\Control\CallIndirect;
 use UnWasm\Compiler\Node\Code\Control\ElseStmt;
 use UnWasm\Compiler\Node\Code\Control\IfElse;
 use UnWasm\Compiler\Node\Code\Control\Loop;
@@ -167,8 +168,13 @@ class FuncsBuilder implements BuilderInterface
                     $instructions[] = new BranchUncond();
                     break;
                 case 0x10:
-                    $funcidx = $parser->expectInt(true);
-                    $instructions[] = new Call($funcidx);
+                    $funcIdx = $parser->expectInt(true);
+                    $instructions[] = new Call($funcIdx);
+                    break;
+                case 0x11:
+                    $typeIdx = $parser->expectInt(true);
+                    $tableIdx = $parser->expectInt(true);
+                    $instructions[] = new CallIndirect($tableIdx, $typeIdx);
                     break;
                 case 0x1A:
                     $instructions[] = new Drop();
@@ -584,7 +590,8 @@ class FuncsBuilder implements BuilderInterface
                     return $instructions;
                 default:
                     $pos = str_pad(dechex($parser->position() - 1), 8, '0', STR_PAD_LEFT);
-                    throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($current), 2, '0', STR_PAD_LEFT) . '@0x' . $pos);
+                    $mem = strval(memory_get_usage());
+                    throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($current), 2, '0', STR_PAD_LEFT) . '@0x' . $pos . " ($mem)");
             }
         }
     }
