@@ -24,16 +24,16 @@ class Token
     private $type;
     private $pos;
 
+    public const INT_TYPE = -1; // 0x7F
+    public const INT_64_TYPE = -2; // 0x7E
+    public const FLOAT_TYPE = -3; // 0x7D
+    public const FLOAT_64_TYPE = -4; // 0x7C
+    public const FUNCREF_TYPE = -16; // 0x70
+    public const EXTREF_TYPE = -17; // 0x6F
     public const BYTE_TYPE = 0;
     public const STRING_TYPE = 1;
-    public const FLOAT_TYPE = 0x7D;
-    public const FLOAT_64_TYPE = 0x7C;
-    public const INT_TYPE = 0x7F;
-    public const INT_64_TYPE = 0x7E;
     public const UINT_TYPE = 6;
     public const UINT_64_TYPE = 7;
-    public const FUNCREF_TYPE = 0x70;
-    public const EXTREF_TYPE = 0x6F;
 
     public function __construct(int $type, $value, int $pos = null)
     {

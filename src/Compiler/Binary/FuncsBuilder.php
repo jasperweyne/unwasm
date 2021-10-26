@@ -77,6 +77,7 @@ use UnWasm\Compiler\Node\Code\Variable\GlobalGet;
 use UnWasm\Compiler\Node\Code\Variable\GlobalSet;
 use UnWasm\Compiler\Node\Code\Variable\LocalGet;
 use UnWasm\Compiler\Node\Code\Variable\LocalSet;
+use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Node\Type\ValueType;
 
 /**
@@ -144,6 +145,18 @@ class FuncsBuilder implements BuilderInterface
         }
     }
 
+    private static function parseBlocktype(BinaryParser $parser): array
+    {
+        $raw = $parser->expectInt(false, 33);
+        if ($raw === -64) { // 0x40
+            return [new FuncType([], []), null];
+        } elseif ($type = TypesBuilder::valuetype($parser, $raw)) {
+            return [new FuncType([], [$type]), null];
+        } elseif ($raw >= 0) {
+            return [null, $raw];
+        }
+    }
+
     private static function controlInstr(int $opcode, BinaryParser $parser, bool $constExpr, int $termOpcode): ?Instruction
     {
         $instruction = null;
@@ -155,19 +168,19 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Nop();
                 break;
             case 0x02:
-                $bt = $parser->expectInt();
+                list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new Block($inner);
+                $instruction = new Block($inner, $functype, $typeIdx);
                 break;
             case 0x03:
-                $bt = $parser->expectInt();
+                list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new Loop($inner);
+                $instruction = new Loop($inner, $functype, $typeIdx);
                 break;
             case 0x04:
-                $bt = $parser->expectInt();
+                list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new IfElse($inner);
+                $instruction = new IfElse($inner, $functype, $typeIdx);
                 break;
             case 0x05:
                 $instruction = new ElseStmt();

@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Code\Control;
 
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -32,16 +33,27 @@ class Block extends Instruction
     /** @var Instruction[] The nested instructions */
     private $instructions;
 
-    public function __construct(array $inner)
+    /** @var ?FuncType The specified functype for this context */
+    private $funcType;
+
+    /** @var ?int The type index of this context, when funcType is null */
+    private $typeIdx;
+
+    public function __construct(array $inner, ?FuncType $funcType, ?int $typeIdx)
     {
         $this->instructions = $inner;
+        $this->funcType = $funcType;
+        $this->typeIdx = $typeIdx;
     }
 
     public function compile(ExpressionCompiler $outerState, Source $src): void
     {
         $src->write('do {')->indent();
 
-        $state = new ExpressionCompiler($outerState->module, [], $outerState);
+        $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
+        $state = new ExpressionCompiler($outerState->module, $this->funcType->getOutput(), $outerState);
+        $state->transfer(...$this->funcType->getInput());
+
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }

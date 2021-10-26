@@ -71,9 +71,9 @@ class TypesBuilder implements BuilderInterface
         });
     }
 
-    public static function valuetype(BinaryParser $parser): ValueType
+    public static function valuetype(BinaryParser $parser, ?int $type = null): ?ValueType
     {
-        $type = $parser->expectByte();
+        $type = $type ?? $parser->expectInt(false, 7);
         $mapping = [
             Token::INT_TYPE => ExpressionCompiler::I32,
             Token::INT_64_TYPE => ExpressionCompiler::I64,
@@ -83,7 +83,7 @@ class TypesBuilder implements BuilderInterface
             Token::EXTREF_TYPE => ExpressionCompiler::EXTREF,
         ];
 
-        $mapped = $mapping[$type]; // todo: this ought to be expectInt
+        $mapped = $mapping[$type];
         switch ($mapped) {
             case ExpressionCompiler::I32:
             case ExpressionCompiler::I64:
@@ -93,6 +93,8 @@ class TypesBuilder implements BuilderInterface
             case ExpressionCompiler::EXTREF:
             case ExpressionCompiler::FUNCREF:
                 return new RefType($mapped);
+            default:
+                return null;
         }
     }
 
@@ -103,7 +105,7 @@ class TypesBuilder implements BuilderInterface
             Token::FUNCREF_TYPE => ExpressionCompiler::FUNCREF,
         ];
 
-        $type = $mapping[$parser->expectByte()];
+        $type = $mapping[$parser->expectInt(false, 8)];
         return new RefType($type);
     }
 
