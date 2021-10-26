@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Text;
 
-use UnWasm\Compiler\Binary\Token;
+use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\TextParser;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Type\FuncType;
@@ -81,13 +81,13 @@ class TypesBuilder implements BuilderInterface
         $type = $parser->expectKeyword('i32', 'i64', 'f32', 'f64');
         switch ($type) {
             case 'i32':
-                return new ValueType(Token::INT_TYPE);
+                return new ValueType(ExpressionCompiler::I32);
             case 'i64':
-                return new ValueType(Token::INT_64_TYPE);
+                return new ValueType(ExpressionCompiler::I64);
             case 'f32':
-                return new ValueType(Token::FLOAT_TYPE);
+                return new ValueType(ExpressionCompiler::F32);
             case 'f64':
-                return new ValueType(Token::FLOAT_64_TYPE);
+                return new ValueType(ExpressionCompiler::F64);
             default:
                 throw new \UnexpectedValueException('Unknown value type given');
         }

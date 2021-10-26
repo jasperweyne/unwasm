@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Memory;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
@@ -34,7 +33,7 @@ class Fill extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // assert type
-        $state->typed(new ValueType(Token::INT_TYPE), 3);
+        $state->typed(new ValueType(ExpressionCompiler::I32), 3);
 
         // update stack
         list($destOffset, $value, $n) = $state->pop(3);

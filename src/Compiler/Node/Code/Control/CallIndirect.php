@@ -49,7 +49,7 @@ class CallIndirect extends Instruction
         $type = $state->module->types[$this->typeIdx];
 
         // get offset
-        $state->typed(new ValueType(Token::INT_TYPE));
+        $state->typed(new ValueType(ExpressionCompiler::I32));
         list($offset) = $state->pop();
 
         // Replace the stack input with output

@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Variable;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Source;
@@ -43,12 +42,12 @@ class GlobalSet extends Instruction
         // set type
         list($type) = $state->type(1);
         switch ($type) {
-            case Token::INT_TYPE:
-            case Token::INT_64_TYPE:
+            case ExpressionCompiler::I32:
+            case ExpressionCompiler::I64:
                 $compileFn = 'setInt';
                 break;
-            case Token::FLOAT_TYPE:
-            case Token::FLOAT_64_TYPE:
+            case ExpressionCompiler::F32:
+            case ExpressionCompiler::F64:
                 $compileFn = 'setFloat';
                 break;
         }

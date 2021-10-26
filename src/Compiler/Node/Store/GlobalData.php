@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Store;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\External\GlobalInterface;
@@ -61,27 +60,20 @@ class GlobalData implements GlobalInterface
 
         // setup correct types
         $mutable = $this->globalType->mutable ? 'true' : 'false';
-        switch ($this->globalType->valueType) {
-            case Token::INT_TYPE:
-                $compileType = 'i';
+        $type = $this->globalType->valueType;
+        switch ($type) {
+            case ExpressionCompiler::I32:
+            case ExpressionCompiler::I64:
                 $compileInit = 'setInt';
                 break;
-            case Token::INT_64_TYPE:
-                $compileType = 'I';
-                $compileInit = 'setInt';
-                break;
-            case Token::FLOAT_TYPE:
-                $compileType = 'f';
-                $compileInit = 'setFloat';
-                break;
-            case Token::FLOAT_64_TYPE:
-                $compileType = 'F';
+            case ExpressionCompiler::F32:
+            case ExpressionCompiler::F64:
                 $compileInit = 'setFloat';
                 break;
         }
 
         $src
-            ->write("\$this->global_$index = new \UnWasm\Runtime\GlobalInst('$compileType', $mutable);")
+            ->write("\$this->global_$index = new \UnWasm\Runtime\GlobalInst('$type', $mutable);")
             ->write("\$this->global_$index->$compileInit($initValue);")
         ;
     }

@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Reference;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\RefType;
@@ -35,10 +34,10 @@ class IsNull extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // assert type
-        $state->typed(new RefType(RefType::FUNCREF));
+        $state->typed(new RefType(ExpressionCompiler::FUNCREF));
 
         // update stack
-        $i32 = new ValueType(Token::INT_TYPE);
+        $i32 = new ValueType(ExpressionCompiler::I32);
         list($x) = $state->pop();
         list($var) = $state->push($i32);
 

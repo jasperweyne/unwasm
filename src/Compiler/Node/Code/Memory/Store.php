@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Memory;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
@@ -49,12 +48,12 @@ class Store extends Instruction
             $this->memBits = $memBits;
         } else {
             switch ($type->type) {
-                case Token::INT_TYPE:
-                case Token::FLOAT_TYPE:
+                case ExpressionCompiler::I32:
+                case ExpressionCompiler::F32:
                     $this->memBits = 32;
                     break;
-                case Token::INT_64_TYPE:
-                case Token::FLOAT_64_TYPE:
+                case ExpressionCompiler::I64:
+                case ExpressionCompiler::F64:
                     $this->memBits = 64;
                     break;
                 default:
@@ -70,17 +69,17 @@ class Store extends Instruction
         list($value) = $state->pop();
 
         // assert type/update stack of dynamic offset
-        $state->typed(new ValueType(Token::INT_TYPE));
+        $state->typed(new ValueType(ExpressionCompiler::I32));
         list($dynOffset) = $state->pop();
 
         // export code
         switch ($this->type) {
-            case Token::INT_TYPE:
-            case Token::INT_64_TYPE:
+            case ExpressionCompiler::I32:
+            case ExpressionCompiler::I64:
                 $src->write("\$this->mem_0->storeInt($value, $this->offset + $dynOffset, $this->memBits);");
                 break;
-            case Token::FLOAT_TYPE:
-            case Token::FLOAT_64_TYPE:
+            case ExpressionCompiler::F32:
+            case ExpressionCompiler::F64:
                 $src->write("\$this->mem_0->storeFloat($value, $this->offset + $dynOffset, $this->memBits);");
                 break;
             default:

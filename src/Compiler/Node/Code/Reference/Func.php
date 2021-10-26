@@ -42,6 +42,6 @@ class Func extends Instruction
     {
         // update stack
         $func = $this->funcIdx;
-        $state->const("[\$this, 'fn_$func']", new RefType(RefType::FUNCREF));
+        $state->const("[\$this, 'fn_$func']", new RefType(ExpressionCompiler::FUNCREF));
     }
 }

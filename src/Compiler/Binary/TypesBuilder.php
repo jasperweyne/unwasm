@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler\Binary;
 
 use UnWasm\Compiler\BinaryParser;
+use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Node\Type\GlobalType;
@@ -66,14 +67,49 @@ class TypesBuilder implements BuilderInterface
     public static function resulttype(BinaryParser $parser): array
     {
         return $parser->expectVector(function (BinaryParser $parser) {
-            return new ValueType($parser->expectByte()); // todo: this ought to be expectInt
+            return self::valuetype($parser);
         });
+    }
+
+    public static function valuetype(BinaryParser $parser): ValueType
+    {
+        $type = $parser->expectByte();
+        $mapping = [
+            Token::INT_TYPE => ExpressionCompiler::I32,
+            Token::INT_64_TYPE => ExpressionCompiler::I64,
+            Token::FLOAT_TYPE => ExpressionCompiler::F32,
+            Token::FLOAT_64_TYPE => ExpressionCompiler::F64,
+            Token::FUNCREF_TYPE => ExpressionCompiler::FUNCREF,
+            Token::EXTREF_TYPE => ExpressionCompiler::EXTREF,
+        ];
+
+        $mapped = $mapping[$type]; // todo: this ought to be expectInt
+        switch ($mapped) {
+            case ExpressionCompiler::I32:
+            case ExpressionCompiler::I64:
+            case ExpressionCompiler::F32:
+            case ExpressionCompiler::F64:
+                return new ValueType($mapped);
+            case ExpressionCompiler::EXTREF:
+            case ExpressionCompiler::FUNCREF:
+                return new RefType($mapped);
+        }
+    }
+
+    public static function reftype(BinaryParser $parser): RefType
+    {
+        $mapping = [
+            Token::EXTREF_TYPE => ExpressionCompiler::EXTREF,
+            Token::FUNCREF_TYPE => ExpressionCompiler::FUNCREF,
+        ];
+
+        $type = $mapping[$parser->expectByte()];
+        return new RefType($type);
     }
 
     public static function tabletype(BinaryParser $parser): TableType
     {
-        $type = $parser->expectByte();
-        $encoding = new RefType($type);
+        $encoding = self::reftype($parser);
         return new TableType($encoding, self::limits($parser));
     }
 
@@ -84,9 +120,8 @@ class TypesBuilder implements BuilderInterface
 
     public static function globaltype(BinaryParser $parser): GlobalType
     {
-        $type = $parser->expectByte();
+        $valType = self::valuetype($parser);
         $mut = $parser->expectByte(0x00, 0x01) === 0x01;
-        $valType = new ValueType($type);
         return new GlobalType($valType, $mut);
     }
 

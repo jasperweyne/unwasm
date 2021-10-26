@@ -25,10 +25,10 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class ValueType
 {
-    /** @var int The specific number type */
+    /** @var string The specific value type */
     public $type;
 
-    public function __construct(int $type)
+    public function __construct(string $type)
     {
         $this->type = $type;
     }

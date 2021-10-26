@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Table;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
+use UnWasm\Compiler\Node\Type\RefType;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
@@ -42,11 +42,11 @@ class Get extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // assert type
-        $state->typed(new ValueType(Token::INT_TYPE));
+        $state->typed(new ValueType(ExpressionCompiler::I32));
 
         // update stack
         list($offset) = $state->pop();
-        list($value) = $state->push(new ValueType(ord('r'))); // todo: replace with reftype
+        list($value) = $state->push(new RefType(ExpressionCompiler::FUNCREF));
 
         // export code
         $src->write("$value = \$this->table_$this->tableIdx->get($offset);");

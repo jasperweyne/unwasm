@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Table;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
@@ -42,7 +41,7 @@ class Size extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // update stack
-        list($result) = $state->push(new ValueType(Token::INT_TYPE));
+        list($result) = $state->push(new ValueType(ExpressionCompiler::I32));
 
         // export code
         $src->write("$result = \$this->table_$this->tableIdx->size();");

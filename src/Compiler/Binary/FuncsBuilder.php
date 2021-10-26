@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler\Binary;
 
 use UnWasm\Compiler\BinaryParser;
+use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Code\Control\Block;
 use UnWasm\Compiler\Node\Code\Control\BranchCond;
@@ -75,7 +76,6 @@ use UnWasm\Compiler\Node\Code\Variable\GlobalGet;
 use UnWasm\Compiler\Node\Code\Variable\GlobalSet;
 use UnWasm\Compiler\Node\Code\Variable\LocalGet;
 use UnWasm\Compiler\Node\Code\Variable\LocalSet;
-use UnWasm\Compiler\Node\Type\RefType;
 use UnWasm\Compiler\Node\Type\ValueType;
 
 /**
@@ -107,7 +107,7 @@ class FuncsBuilder implements BuilderInterface
                     // create array of arrays of local variables
                     $locals = $parser->expectVector(function (BinaryParser $parser) {
                         $n = $parser->expectInt(true);
-                        $type = new ValueType($parser->expectByte());
+                        $type = TypesBuilder::valuetype($parser);
                         return array_fill(0, $n, $type);
                     });
 
@@ -122,10 +122,10 @@ class FuncsBuilder implements BuilderInterface
 
     public static function expression(BinaryParser $parser, bool $constExpr = false, $termOpcode = 0x0B): array
     {
-        $i32 = new ValueType(Token::INT_TYPE);
-        $i64 = new ValueType(Token::INT_64_TYPE);
-        $f32 = new ValueType(Token::FLOAT_TYPE);
-        $f64 = new ValueType(Token::FLOAT_64_TYPE);
+        $i32 = new ValueType(ExpressionCompiler::I32);
+        $i64 = new ValueType(ExpressionCompiler::I64);
+        $f32 = new ValueType(ExpressionCompiler::F32);
+        $f64 = new ValueType(ExpressionCompiler::F64);
 
         $instructions = [];
         echo "Expression started\n";
@@ -184,7 +184,7 @@ class FuncsBuilder implements BuilderInterface
                     break;
                 case 0x1C:
                     $type = $parser->expectVector(function (BinaryParser $parser) {
-                        return new ValueType($parser->expectByte());
+                        return TypesBuilder::valuetype($parser);
                     });
                     $instructions[] = new Select($type);
                     break;
@@ -524,8 +524,8 @@ class FuncsBuilder implements BuilderInterface
                     $instructions[] = new Div($f64);
                     break;
                 case 0xD0:
-                    $value = $parser->expectByte();
-                    $instructions[] = new NullRef(new RefType($value));
+                    $type = TypesBuilder::reftype($parser);
+                    $instructions[] = new NullRef($type);
                     break;
                 case 0xD1:
                     $instructions[] = new IsNull();
@@ -590,8 +590,7 @@ class FuncsBuilder implements BuilderInterface
                     return $instructions;
                 default:
                     $pos = str_pad(dechex($parser->position() - 1), 8, '0', STR_PAD_LEFT);
-                    $mem = strval(memory_get_usage());
-                    throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($current), 2, '0', STR_PAD_LEFT) . '@0x' . $pos . " ($mem)");
+                    throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($current), 2, '0', STR_PAD_LEFT) . '@0x' . $pos);
             }
         }
     }

@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Store;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Type\ValueType;
@@ -72,7 +71,7 @@ class Element
             foreach ($this->offsetExpr as $instr) {
                 $instr->compile($expr, new Source());
             }
-            $expr->typed(new ValueType(Token::INT_TYPE));
+            $expr->typed(new ValueType(ExpressionCompiler::I32));
             list($offset) = $expr->pop();
             $src->write("\$this->table_$this->tableIdx->overwrite($compiledData, $offset); // elems[$index]");
         } else {

@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace UnWasm\Compiler\Node\Code\Table;
 
-use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
@@ -46,7 +45,7 @@ class Set extends Instruction
         list($value) = $state->pop();
 
         // assert type/update stack of dynamic offset
-        $state->typed(new ValueType(Token::INT_TYPE));
+        $state->typed(new ValueType(ExpressionCompiler::I32));
         list($offset) = $state->pop();
 
         // export code

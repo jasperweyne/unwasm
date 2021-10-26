@@ -32,6 +32,8 @@ class Token
     public const INT_64_TYPE = 0x7E;
     public const UINT_TYPE = 6;
     public const UINT_64_TYPE = 7;
+    public const FUNCREF_TYPE = 0x70;
+    public const EXTREF_TYPE = 0x6F;
 
     public function __construct(int $type, $value, int $pos = null)
     {
