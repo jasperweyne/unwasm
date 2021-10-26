@@ -163,6 +163,9 @@ class FuncsBuilder implements BuilderInterface
                     $depth = $parser->expectInt(true);
                     $instructions[] = new BranchCond($depth);
                     break;
+                case 0x0F:
+                    $instructions[] = new BranchUncond();
+                    break;
                 case 0x10:
                     $funcidx = $parser->expectInt(true);
                     $instructions[] = new Call($funcidx);
