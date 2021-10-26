@@ -92,6 +92,20 @@ class Source
     }
 
     /**
+     * Writes a number of strings as multiple indented lines to the compiled code.
+     *
+     * @return $this
+     */
+    public function lines(...$strings): self
+    {
+        foreach ($strings as $line) {
+            $this->write($line);
+        }
+
+        return $this;
+    }
+
+    /**
      * Removes the last complete line written.
      *
      * @return $this

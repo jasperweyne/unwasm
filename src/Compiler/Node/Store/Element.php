@@ -60,9 +60,8 @@ class Element
             }
             // todo: verify stack
             list($const) = $expr->pop();
-            $data[] = $const;
+            $data[] = $const.',';
         }
-        $compiledData = '['.implode(', ', $data).']';
 
         // compile source
         if ($this->tableIdx !== null) {
@@ -73,9 +72,20 @@ class Element
             }
             $expr->typed(new ValueType(ExpressionCompiler::I32));
             list($offset) = $expr->pop();
-            $src->write("\$this->table_$this->tableIdx->overwrite($compiledData, $offset); // elems[$index]");
+            $src
+                ->write("\$this->table_$this->tableIdx->overwrite([")
+                ->indent()
+                ->lines(...$data)
+                ->outdent()
+                ->write("], $offset); // elems[$index]");
         } else {
-            $src->write("\$this->elems[$index] = $compiledData;");
+            $src
+                ->write("\$this->elems[$index] = [")
+                ->indent()
+                ->lines(...$data)
+                ->outdent()
+                ->write(";")
+            ;
         }
     }
 
