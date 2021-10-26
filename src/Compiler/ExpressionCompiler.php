@@ -28,11 +28,11 @@ use UnWasm\Compiler\Node\Type\ValueType;
 class ExpressionCompiler
 {
     public const I32 = 'i';
-    public const I64 = 'I';
+    public const I64 = 'j';
     public const F32 = 'f';
-    public const F64 = 'F';
+    public const F64 = 'd';
     public const FUNCREF = 'r';
-    public const EXTREF = 'R';
+    public const EXTREF = 'e';
 
     /** @var ModuleCompiler Module representation */
     public $module;
