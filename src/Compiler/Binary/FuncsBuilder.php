@@ -44,17 +44,17 @@ use UnWasm\Compiler\Node\Code\Memory\Load;
 use UnWasm\Compiler\Node\Code\Memory\Size;
 use UnWasm\Compiler\Node\Code\Memory\Store;
 use UnWasm\Compiler\Node\Code\Numeric\Add;
-use UnWasm\Compiler\Node\Code\Numeric\BitAnd;
-use UnWasm\Compiler\Node\Code\Numeric\BitOr;
-use UnWasm\Compiler\Node\Code\Numeric\BitShl;
-use UnWasm\Compiler\Node\Code\Numeric\BitShr;
-use UnWasm\Compiler\Node\Code\Numeric\BitXor;
 use UnWasm\Compiler\Node\Code\Numeric\ConstStmt;
 use UnWasm\Compiler\Node\Code\Numeric\Div;
 use UnWasm\Compiler\Node\Code\Numeric\Eq;
 use UnWasm\Compiler\Node\Code\Numeric\Eqz;
 use UnWasm\Compiler\Node\Code\Numeric\Ge;
 use UnWasm\Compiler\Node\Code\Numeric\Gt;
+use UnWasm\Compiler\Node\Code\Numeric\Int\BitAnd;
+use UnWasm\Compiler\Node\Code\Numeric\Int\BitOr;
+use UnWasm\Compiler\Node\Code\Numeric\Int\BitShl;
+use UnWasm\Compiler\Node\Code\Numeric\Int\BitShr;
+use UnWasm\Compiler\Node\Code\Numeric\Int\BitXor;
 use UnWasm\Compiler\Node\Code\Numeric\Le;
 use UnWasm\Compiler\Node\Code\Numeric\Lt;
 use UnWasm\Compiler\Node\Code\Numeric\Mul;
@@ -535,6 +535,15 @@ class FuncsBuilder implements BuilderInterface
 
         $instruction = null;
         switch ($opcode) {
+            case 0x67:
+                // todo: i32.clz (count leading zero bits)
+                break;
+            case 0x68:
+                // todo: i32.ctz (count trailing zero bits)
+                break;
+            case 0x69:
+                // todo: i32.popcnt (count bits set to one)
+                break;
             case 0x6A:
                 $instruction = new Add($i32);
                 break;
@@ -547,6 +556,12 @@ class FuncsBuilder implements BuilderInterface
             case 0x6D:
             case 0x6E: // todo: differ signed/unsigned
                 $instruction = new Div($i32);
+                break;
+            case 0x6F:
+                // todo: i32.rem_s (signed division remainder)
+                break;
+            case 0x70:
+                // todo: i32.rem_u (unsigned division remainder)
                 break;
             case 0x71:
                 $instruction = new BitAnd($i32);
@@ -564,6 +579,21 @@ class FuncsBuilder implements BuilderInterface
             case 0x76: // todo: differ signed/unsigned
                 $instruction = new BitShr($i32);
                 break;
+            case 0x77:
+                // todo: i32.rotl (rotate left by k bits)
+                break;
+            case 0x78:
+                // todo: i32.rotr (rotate right by k bits)
+                break;
+            case 0x79:
+                // todo: i64.clz (count leading zero bits)
+                break;
+            case 0x7A:
+                // todo: i64.ctz (count trailing zero bits)
+                break;
+            case 0x7B:
+                // todo: i64.popcnt (count bits set to one)
+                break;
             case 0x7C:
                 $instruction = new Add($i64);
                 break;
@@ -576,6 +606,12 @@ class FuncsBuilder implements BuilderInterface
             case 0x7F:
             case 0x80: // todo: differ signed/unsigned
                 $instruction = new Div($i64);
+                break;
+            case 0x81:
+                // todo: i64.rem_s (signed division remainder)
+                break;
+            case 0x82:
+                // todo: i64.rem_u (unsigned division remainder)
                 break;
             case 0x83:
                 $instruction = new BitAnd($i64);
@@ -593,6 +629,33 @@ class FuncsBuilder implements BuilderInterface
             case 0x88: // todo: differ signed/unsigned
                 $instruction = new BitShr($i64);
                 break;
+            case 0x89:
+                // todo: i64.rotl (rotate left by k bits)
+                break;
+            case 0x8A:
+                // todo: i64.rotr (rotate right by k bits)
+                break;
+            case 0x8B:
+                // todo: f32.abs (absolute value)
+                break;
+            case 0x8C:
+                // todo: f32.neg (negation)
+                break;
+            case 0x8D:
+                // todo: f32.ceil (ceiling operator)
+                break;
+            case 0x8E:
+                // todo: f32.floor (floor operator)
+                break;
+            case 0x8F:
+                // todo: f32.trunc (round to nearest integer near zero)
+                break;
+            case 0x90:
+                // todo: f32.nearest (round to nearest integer, ties to even)
+                break;
+            case 0x91:
+                // todo: f32.sqrt (square root)
+                break;
             case 0x92:
                 $instruction = new Add($f32);
                 break;
@@ -605,6 +668,36 @@ class FuncsBuilder implements BuilderInterface
             case 0x95:
                 $instruction = new Div($f32);
                 break;
+            case 0x96:
+                // todo: f32.min (min operator)
+                break;
+            case 0x97:
+                // todo: f32.max (max operator)
+                break;
+            case 0x98:
+                // todo: f32.copysign (if z1 and z2 have same sign, return z1, else return -z1)
+                break;
+            case 0x99:
+                // todo: f64.abs (absolute value)
+                break;
+            case 0x9A:
+                // todo: f64.neg (negation)
+                break;
+            case 0x9B:
+                // todo: f64.ceil (ceiling operator)
+                break;
+            case 0x9C:
+                // todo: f64.floor (floor operator)
+                break;
+            case 0x9D:
+                // todo: f64.trunc (round to nearest integer near zero)
+                break;
+            case 0x9E:
+                // todo: f64.nearest (round to nearest integer, ties to even)
+                break;
+            case 0x9F:
+                // todo: f64.sqrt (square root)
+                break;
             case 0xA0:
                 $instruction = new Add($f64);
                 break;
@@ -616,6 +709,15 @@ class FuncsBuilder implements BuilderInterface
                 break;
             case 0xA3:
                 $instruction = new Div($f64);
+                break;
+            case 0xA4:
+                // todo: f64.min (min operator)
+                break;
+            case 0xA5:
+                // todo: f64.max (max operator)
+                break;
+            case 0xA6:
+                // todo: f64.copysign (if z1 and z2 have same sign, return z1, else return -z1)
                 break;
         }
 

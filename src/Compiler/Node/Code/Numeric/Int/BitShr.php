@@ -18,15 +18,16 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Numeric;
+namespace UnWasm\Compiler\Node\Code\Numeric\Int;
 
 use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Code\Numeric\Numeric;
 use UnWasm\Compiler\Source;
 
 /**
  * Add a constant value to the stack.
  */
-class BitOr extends Numeric
+class BitShr extends Numeric
 {
     public function compile(ExpressionCompiler $state, Source $src): void
     {
@@ -38,6 +39,6 @@ class BitOr extends Numeric
         list($var) = $state->push($this->type);
 
         // export code
-        $src->write("$var = $x | $y;");
+        $src->write("$var = $x >> $y;");
     }
 }
