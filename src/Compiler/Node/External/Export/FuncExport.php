@@ -40,14 +40,15 @@ class FuncExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
-        $source->write("\$this->funcs['$this->name'] = 'todo';");
+        $func = $module->func($this->funcIdx);
+        $type = strval($module->types[$func->typeIdx()]);
+        $source->write("\$this->funcs['$this->name'] = '$type';");
     }
 
     public function compile(ModuleCompiler $module, Source $src)
     {
         $func = $module->func($this->funcIdx);
         $type = $module->types[$func->typeIdx()];
-
 
         $params = implode(', ', $type->compileInput('x', true));
         $vars = implode(', ', $type->compileInput());

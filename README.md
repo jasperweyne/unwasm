@@ -29,7 +29,7 @@ fully supported.
 
 | Compilation    | Status      |
 | -------------- | ----------- |
-| Types          | Unsupported |
+| Types          | Supported   |
 | Imports        | Supported   |
 | Funcs          | Supported   |
 | Tables         | Supported   |

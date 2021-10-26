@@ -90,4 +90,9 @@ class FuncType
 
         return $params;
     }
+
+    public function __toString()
+    {
+        return implode('', $this->typeIn) . ':' . implode('', $this->typeOut);
+    }
 }
