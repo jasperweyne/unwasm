@@ -32,15 +32,18 @@ class BranchUncond extends Instruction
     /** @var int The break depth */
     private $depth;
 
-    public function __construct(int $depth)
+    public function __construct(?int $depth = null)
     {
         $this->depth = $depth;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
+        // get depth if null
+        $this->depth = $this->depth ?? $state->depth();
+
         // write return values
-        $return = $state->return($this->depth);
+        $return = $state->return();
         $stackVars = $state->pop(count($return));
         Block::compileReturn($src, $return, $stackVars);
 

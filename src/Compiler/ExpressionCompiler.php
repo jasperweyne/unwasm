@@ -181,6 +181,16 @@ class ExpressionCompiler
         return $this->returns;
     }
 
+    /**
+     * Return the current expression context depth
+     *
+     * @return int
+     */
+    public function depth(): int
+    {
+        return $this->parent ? $this->parent->depth() + 1 : 0;
+    }
+
     private function root(): self
     {
         return $this->parent ? $this->parent->root() : $this;
