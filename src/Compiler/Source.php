@@ -105,8 +105,8 @@ class Source
             if ($char === "\n") { // assumed that PHP_EOL always ends with \n
                 $eol--;
             }
-        } 
-        
+        }
+
         return $this;
     }
 

@@ -169,7 +169,9 @@ class BinaryParser implements ParserInterface
         // obtain raw string from stream
         $pos = ftell($this->stream);
         $size = $this->expectInt(true);
-        if ($size === 0) return '';
+        if ($size === 0) {
+            return '';
+        }
         $value = fread($this->stream, $size);
 
         if ($value === false) {
