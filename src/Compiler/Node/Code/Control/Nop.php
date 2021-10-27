@@ -29,8 +29,17 @@ use UnWasm\Compiler\Source;
  */
 class Nop extends Instruction
 {
+    /** @var int The position of the instruction */
+    private $source;
+
+    public function __construct(int $source)
+    {
+        $this->source = $source;
+    }
+
     public function compile(ExpressionCompiler $state, Source $src): void
     {
-        $src->write('// nop ' . $this->source);
+        $pos = str_pad(dechex($this->source), 8, '0', STR_PAD_LEFT);
+        $src->write("// nop @ 0x$pos");
     }
 }

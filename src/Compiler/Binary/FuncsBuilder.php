@@ -187,7 +187,7 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Unreachable();
                 break;
             case 0x01:
-                $instruction = new Nop();
+                $instruction = new Nop($parser->position() - 1);
                 break;
             case 0x02:
                 list($functype, $typeIdx) = self::parseBlocktype($parser);
