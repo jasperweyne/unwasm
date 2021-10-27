@@ -127,6 +127,7 @@ class ExpressionCompiler
      */
     public function pop($cnt = 1): ?array
     {
+        if ($cnt === 0) return [];
         array_splice($this->stack, -$cnt);
         return array_splice($this->names, -$cnt);
     }
@@ -138,6 +139,7 @@ class ExpressionCompiler
      */
     public function type($cnt): ?array
     {
+        if ($cnt === 0) return [];
         return array_slice($this->stack(), -$cnt);
     }
 
@@ -148,6 +150,7 @@ class ExpressionCompiler
      */
     public function peek($cnt): ?array
     {
+        if ($cnt === 0) return [];
         return array_slice($this->names(), -$cnt);
     }
 
