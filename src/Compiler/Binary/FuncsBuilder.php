@@ -48,6 +48,16 @@ use UnWasm\Compiler\Node\Code\Numeric\ConstStmt;
 use UnWasm\Compiler\Node\Code\Numeric\Div;
 use UnWasm\Compiler\Node\Code\Numeric\Eq;
 use UnWasm\Compiler\Node\Code\Numeric\Eqz;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Abs;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Ceil;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Copysign;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Floor;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Max;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Min;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Nearest;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Neg;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Sqrt;
+use UnWasm\Compiler\Node\Code\Numeric\Float\Trunc;
 use UnWasm\Compiler\Node\Code\Numeric\Ge;
 use UnWasm\Compiler\Node\Code\Numeric\Gt;
 use UnWasm\Compiler\Node\Code\Numeric\Int\BitAnd;
@@ -636,25 +646,25 @@ class FuncsBuilder implements BuilderInterface
                 // todo: i64.rotr (rotate right by k bits)
                 break;
             case 0x8B:
-                // todo: f32.abs (absolute value)
+                $instruction = new Abs($f32);
                 break;
             case 0x8C:
-                // todo: f32.neg (negation)
+                $instruction = new Neg($f32);
                 break;
             case 0x8D:
-                // todo: f32.ceil (ceiling operator)
+                $instruction = new Ceil($f32);
                 break;
             case 0x8E:
-                // todo: f32.floor (floor operator)
+                $instruction = new Floor($f32);
                 break;
             case 0x8F:
-                // todo: f32.trunc (round to nearest integer near zero)
+                $instruction = new Trunc($f32);
                 break;
             case 0x90:
-                // todo: f32.nearest (round to nearest integer, ties to even)
+                $instruction = new Nearest($f32);
                 break;
             case 0x91:
-                // todo: f32.sqrt (square root)
+                $instruction = new Sqrt($f32);
                 break;
             case 0x92:
                 $instruction = new Add($f32);
@@ -669,34 +679,34 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Div($f32);
                 break;
             case 0x96:
-                // todo: f32.min (min operator)
+                $instruction = new Min($f32);
                 break;
             case 0x97:
-                // todo: f32.max (max operator)
+                $instruction = new Max($f32);
                 break;
             case 0x98:
-                // todo: f32.copysign (if z1 and z2 have same sign, return z1, else return -z1)
+                $instruction = new Copysign($f32);
                 break;
             case 0x99:
-                // todo: f64.abs (absolute value)
+                $instruction = new Abs($f64);
                 break;
             case 0x9A:
-                // todo: f64.neg (negation)
+                $instruction = new Neg($f64);
                 break;
             case 0x9B:
-                // todo: f64.ceil (ceiling operator)
+                $instruction = new Ceil($f64);
                 break;
             case 0x9C:
-                // todo: f64.floor (floor operator)
+                $instruction = new Floor($f64);
                 break;
             case 0x9D:
-                // todo: f64.trunc (round to nearest integer near zero)
+                $instruction = new Trunc($f64);
                 break;
             case 0x9E:
-                // todo: f64.nearest (round to nearest integer, ties to even)
+                $instruction = new Nearest($f64);
                 break;
             case 0x9F:
-                // todo: f64.sqrt (square root)
+                $instruction = new Sqrt($f64);
                 break;
             case 0xA0:
                 $instruction = new Add($f64);
@@ -711,13 +721,13 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Div($f64);
                 break;
             case 0xA4:
-                // todo: f64.min (min operator)
+                $instruction = new Min($f64);
                 break;
             case 0xA5:
-                // todo: f64.max (max operator)
+                $instruction = new Max($f64);
                 break;
             case 0xA6:
-                // todo: f64.copysign (if z1 and z2 have same sign, return z1, else return -z1)
+                $instruction = new Copysign($f64);
                 break;
         }
 
