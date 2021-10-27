@@ -201,22 +201,6 @@ class ExpressionCompiler
         return $this->parent ? $this->parent->depth() + 1 : 0;
     }
 
-    /**
-     * Transfer arguments from the parent context to the current
-     */
-    public function transfer(ValueType ...$args): void
-    {
-        $buffer = [];
-        foreach ($args as $arg) {
-            $this->parent->typed($arg);
-            array_unshift($buffer, [$this->parent->pop(), $arg]);
-        }
-
-        foreach ($buffer as list($name, $type)) {
-            $this->const($name, $type);
-        }
-    }
-
     private function root(): self
     {
         return $this->parent ? $this->parent->root() : $this;

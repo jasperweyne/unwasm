@@ -51,9 +51,7 @@ class Block extends Instruction
         $src->write('do {')->indent();
 
         $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
-        $state = new ExpressionCompiler($outerState->module, $this->funcType->getOutput(), $outerState);
-        $state->transfer(...$this->funcType->getInput());
-
+        $state = self::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
@@ -67,6 +65,27 @@ class Block extends Instruction
             ->write('} while (0);')
             ->write()
         ;
+    }
+
+    public static function createContext(ExpressionCompiler $parent, FuncType $signature): ExpressionCompiler
+    {
+        // gather context parameters
+        $params = [];
+        foreach ($signature->getInput() as $arg) {
+            $parent->typed($arg);
+            array_unshift($params, [$parent->pop(), $arg]);
+        }
+
+        // gather return parameters
+        $return = array_combine($parent->push(...$signature->getOutput()), $signature->getOutput());
+
+        // create context and populate it
+        $state = new ExpressionCompiler($parent->module, $return, $parent);
+        foreach ($params as list($name, $type)) {
+            $state->const($name, $type);
+        }
+
+        return $state;
     }
 
     public static function compileReturn(Source $src, array $return, array $stack): void
