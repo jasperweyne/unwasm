@@ -48,14 +48,14 @@ class LocalSet extends Instruction
         $local = $state->set($this->localIdx, $type);
 
         // update stack
-        list($x) = $state->peek(1);
+        list($x) = $state->pop();
 
         // export code
         $src->write("$local = $x;");
 
         // remove item from stack if not retaining
-        if (!$this->retain) {
-            $state->pop();
+        if ($this->retain) {
+            $state->const($local, $type);
         }
     }
 }
