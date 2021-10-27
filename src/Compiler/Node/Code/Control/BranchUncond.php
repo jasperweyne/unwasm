@@ -43,7 +43,7 @@ class BranchUncond extends Instruction
         $this->depth = $this->depth ?? $state->depth();
 
         // write return values
-        $return = $state->return();
+        $return = $state->return($this->depth);
         $stackVars = $state->pop(count($return));
         Block::compileReturn($src, $return, $stackVars);
 
