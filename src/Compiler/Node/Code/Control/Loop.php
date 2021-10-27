@@ -48,9 +48,9 @@ class Loop extends Instruction
 
     public function compile(ExpressionCompiler $outerState, Source $src): void
     {
-        $src->write('while (1) {')->indent();
-
         $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
+        $src->write("while (1) { // $this->funcType")->indent();
+
         $state = Block::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);

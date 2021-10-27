@@ -48,9 +48,9 @@ class Block extends Instruction
 
     public function compile(ExpressionCompiler $outerState, Source $src): void
     {
-        $src->write('do {')->indent();
-
         $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
+        $src->write("do { // $this->funcType")->indent();
+        
         $state = self::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);

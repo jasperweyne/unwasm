@@ -51,11 +51,11 @@ class LocalSet extends Instruction
         list($x) = $state->pop();
 
         // export code
-        $src->write("$local = $x;");
-
-        // remove item from stack if not retaining
         if ($this->retain) {
+            $src->write("$local = $x; // tee");
             $state->const($local, $type);
+        } else {
+            $src->write("$local = $x;");
         }
     }
 }

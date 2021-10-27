@@ -52,12 +52,12 @@ class IfElse extends Instruction
 
         // Write the block top source
         // The if/else is wrapped in a do-while block for branching purposes
+        $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
         $src
-            ->write("do if ($condition) {")
+            ->write("do if ($condition) { // $this->funcType")
             ->indent()
         ;
 
-        $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
         $state = Block::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
