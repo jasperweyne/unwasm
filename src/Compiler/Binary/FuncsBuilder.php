@@ -25,6 +25,7 @@ use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Code\Control\Block;
 use UnWasm\Compiler\Node\Code\Control\BranchCond;
+use UnWasm\Compiler\Node\Code\Control\BranchIndirect;
 use UnWasm\Compiler\Node\Code\Control\BranchUncond;
 use UnWasm\Compiler\Node\Code\Control\Call;
 use UnWasm\Compiler\Node\Code\Control\CallIndirect;
@@ -215,6 +216,13 @@ class FuncsBuilder implements BuilderInterface
             case 0x0D:
                 $depth = $parser->expectInt(true);
                 $instruction = new BranchCond($depth);
+                break;
+            case 0x0E:
+                $options = $parser->expectVector(function (BinaryParser $parser) {
+                    return $parser->expectInt(true);
+                });
+                $default = $parser->expectInt(true);
+                $instruction = new BranchIndirect($options, $default);
                 break;
             case 0x0F:
                 $instruction = new BranchUncond();
