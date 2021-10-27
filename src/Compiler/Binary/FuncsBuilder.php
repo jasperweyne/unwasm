@@ -65,6 +65,12 @@ use UnWasm\Compiler\Node\Code\Numeric\Int\BitOr;
 use UnWasm\Compiler\Node\Code\Numeric\Int\BitShl;
 use UnWasm\Compiler\Node\Code\Numeric\Int\BitShr;
 use UnWasm\Compiler\Node\Code\Numeric\Int\BitXor;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Clz;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Ctz;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Popcnt;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Rem;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Rotl;
+use UnWasm\Compiler\Node\Code\Numeric\Int\Rotr;
 use UnWasm\Compiler\Node\Code\Numeric\Le;
 use UnWasm\Compiler\Node\Code\Numeric\Lt;
 use UnWasm\Compiler\Node\Code\Numeric\Mul;
@@ -546,13 +552,13 @@ class FuncsBuilder implements BuilderInterface
         $instruction = null;
         switch ($opcode) {
             case 0x67:
-                // todo: i32.clz (count leading zero bits)
+                $instruction = new Clz($i32);
                 break;
             case 0x68:
-                // todo: i32.ctz (count trailing zero bits)
+                $instruction = new Ctz($i32);
                 break;
             case 0x69:
-                // todo: i32.popcnt (count bits set to one)
+                $instruction = new Popcnt($i32);
                 break;
             case 0x6A:
                 $instruction = new Add($i32);
@@ -568,10 +574,8 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Div($i32);
                 break;
             case 0x6F:
-                // todo: i32.rem_s (signed division remainder)
-                break;
-            case 0x70:
-                // todo: i32.rem_u (unsigned division remainder)
+            case 0x70: // todo: differ signed/unsigned
+                $instruction = new Rem($i32);
                 break;
             case 0x71:
                 $instruction = new BitAnd($i32);
@@ -590,19 +594,19 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new BitShr($i32);
                 break;
             case 0x77:
-                // todo: i32.rotl (rotate left by k bits)
+                $instruction = new Rotl($i32);
                 break;
             case 0x78:
-                // todo: i32.rotr (rotate right by k bits)
+                $instruction = new Rotr($i32);
                 break;
             case 0x79:
-                // todo: i64.clz (count leading zero bits)
+                $instruction = new Clz($i64);
                 break;
             case 0x7A:
-                // todo: i64.ctz (count trailing zero bits)
+                $instruction = new Ctz($i64);
                 break;
             case 0x7B:
-                // todo: i64.popcnt (count bits set to one)
+                $instruction = new Popcnt($i64);
                 break;
             case 0x7C:
                 $instruction = new Add($i64);
@@ -618,10 +622,8 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new Div($i64);
                 break;
             case 0x81:
-                // todo: i64.rem_s (signed division remainder)
-                break;
-            case 0x82:
-                // todo: i64.rem_u (unsigned division remainder)
+            case 0x82: // todo: differ signed/unsigned
+                $instruction = new Rem($i64);
                 break;
             case 0x83:
                 $instruction = new BitAnd($i64);
@@ -640,10 +642,10 @@ class FuncsBuilder implements BuilderInterface
                 $instruction = new BitShr($i64);
                 break;
             case 0x89:
-                // todo: i64.rotl (rotate left by k bits)
+                $instruction = new Rotl($i64);
                 break;
             case 0x8A:
-                // todo: i64.rotr (rotate right by k bits)
+                $instruction = new Rotr($i64);
                 break;
             case 0x8B:
                 $instruction = new Abs($f32);
