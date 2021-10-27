@@ -148,11 +148,9 @@ class FuncsBuilder implements BuilderInterface
     public static function expression(BinaryParser $parser, bool $constExpr = false, $termOpcode = 0x0B): array
     {
         $instructions = [];
-        echo "Expression started\n";
         while (!$parser->eof()) {
             $opcode = $parser->expectByte();
             if ($opcode === $termOpcode) {
-                echo "Expression terminated\n";
                 return $instructions;
             }
 
