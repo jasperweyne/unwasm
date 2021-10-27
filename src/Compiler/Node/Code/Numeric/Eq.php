@@ -34,7 +34,7 @@ class Eq extends Numeric
         $state->typed($this->type, 2);
 
         // update stack
-        list($x, $y) = $state->pop(1);
+        list($x, $y) = $state->pop(2);
         list($var) = $state->push($this->type);
 
         // export code
