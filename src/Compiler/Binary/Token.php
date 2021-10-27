@@ -97,7 +97,7 @@ class Token
         $len = 0;
         $x = 0;
         $orig = $raw;
-        while ($raw) {
+        while (isset($raw[0])) {
             $char = ord($raw);
             $raw = substr($raw, 1);
 
