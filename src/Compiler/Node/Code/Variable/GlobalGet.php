@@ -40,7 +40,7 @@ class GlobalGet extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // set function
-        $global = $state->module->globals[$this->globalIdx];
+        $global = $state->module->global($this->globalIdx);
         $type = $global->globalType()->valueType;
         switch ($type->type) {
             case ExpressionCompiler::I32:
