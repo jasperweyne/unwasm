@@ -35,9 +35,8 @@ class Lt extends Numeric
 
         // update stack
         list($x, $y) = $state->pop(2);
-        list($var) = $state->push($this->type);
 
         // export code
-        $src->write("$var = $x < $y;");
+        $state->const("($x < $y)", $this->type);
     }
 }

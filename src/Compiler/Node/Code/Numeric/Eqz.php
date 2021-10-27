@@ -35,9 +35,8 @@ class Eqz extends Numeric
 
         // update stack
         list($x) = $state->pop(1);
-        list($var) = $state->push($this->type);
 
         // export code
-        $src->write("$var = (int)($x === 0);");
+        $state->const("(int)($x === 0)", $this->type);
     }
 }
