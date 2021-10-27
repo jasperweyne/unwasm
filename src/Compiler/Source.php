@@ -29,9 +29,9 @@ class Source
     /** @var int */
     private $indentation = 0;
 
-    public function __construct()
+    public function __construct(string $file = 'php://temp')
     {
-        $this->source = fopen('php://temp', 'r+t');
+        $this->source = fopen($file, 'w+t');
     }
 
     /**

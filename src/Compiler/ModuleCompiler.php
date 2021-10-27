@@ -140,7 +140,7 @@ class ModuleCompiler
         return $idx < $importCnt ? $tableImports[$idx] : $this->tables[$idx - $importCnt];
     }
 
-    public function compile(string $fqcn): Source
+    public function compile(string $fqcn, Source $source)
     {
         // prepare import references
         foreach ($this->imports as $import) {
@@ -150,8 +150,6 @@ class ModuleCompiler
 
         // begin source compilation
         echo "Begin compiling PHP\n";
-
-        $source = new Source();
 
         $this->compileHeader($source, $fqcn);
 
@@ -164,8 +162,6 @@ class ModuleCompiler
         $this->compileFooter($source);
 
         echo "Finished compiling PHP\n";
-
-        return $source;
     }
 
     private function compileHeader(Source $src, string $fqcn): void

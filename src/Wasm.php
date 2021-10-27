@@ -24,6 +24,7 @@ use UnWasm\Cache\CacheInterface;
 use UnWasm\Cache\MemoryCache;
 use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ParserInterface;
+use UnWasm\Compiler\Source;
 use UnWasm\Compiler\TextParser;
 use UnWasm\Runtime\Environment;
 
@@ -77,7 +78,9 @@ class Wasm
         $cacheTs = $this->cache->getTimestamp($module);
         if (!$timestamp || !$cacheTs || $timestamp > $cacheTs) {
             $compiler = $parser->scan();
-            $this->cache->write($module, $compiler->compile($this->namespace.'\\'.$module)->read());
+            $source = new Source();
+            $compiler->compile($this->namespace.'\\'.$module, $source);
+            $this->cache->write($module, $source->read());
         }
     }
 
