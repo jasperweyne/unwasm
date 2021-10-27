@@ -45,6 +45,12 @@ use UnWasm\Compiler\Node\Code\Memory\Size;
 use UnWasm\Compiler\Node\Code\Memory\Store;
 use UnWasm\Compiler\Node\Code\Numeric\Add;
 use UnWasm\Compiler\Node\Code\Numeric\ConstStmt;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\Cast;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\Extend;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\Promote;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\Reinterpret;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\SignExtend;
+use UnWasm\Compiler\Node\Code\Numeric\Conversion\Wrap;
 use UnWasm\Compiler\Node\Code\Numeric\Div;
 use UnWasm\Compiler\Node\Code\Numeric\Eq;
 use UnWasm\Compiler\Node\Code\Numeric\Eqz;
@@ -156,6 +162,7 @@ class FuncsBuilder implements BuilderInterface
                 self::constInstr($opcode, $parser) ??
                 self::compInstr($opcode) ??
                 self::computeInstr($opcode) ??
+                self::convertInstr($opcode) ??
                 self::miscInstr($opcode, $parser)
             ;
         }
@@ -730,6 +737,110 @@ class FuncsBuilder implements BuilderInterface
                 break;
             case 0xA6:
                 $instruction = new Copysign($f64);
+                break;
+        }
+
+        return $instruction;
+    }
+
+    private static function convertInstr(int $opcode): ?Instruction
+    {
+        $i32 = new ValueType(ExpressionCompiler::I32);
+        $i64 = new ValueType(ExpressionCompiler::I64);
+        $f32 = new ValueType(ExpressionCompiler::F32);
+        $f64 = new ValueType(ExpressionCompiler::F64);
+
+        $instruction = null;
+        switch ($opcode) {
+            case 0xA7:
+                $instruction = new Wrap();
+                break;
+            case 0xA8:
+                $instruction = new Cast($i32, $f32);
+                break;
+            case 0xA9:
+                $instruction = new Cast($i32, $f32, true);
+                break;
+            case 0xAA:
+                $instruction = new Cast($i32, $f64);
+                break;
+            case 0xAB:
+                $instruction = new Cast($i32, $f64, true);
+                break;
+            case 0xAC:
+                $instruction = new Extend();
+                break;
+            case 0xAD:
+                $instruction = new Extend(true);
+                break;
+            case 0xAE:
+                $instruction = new Cast($i64, $f32);
+                break;
+            case 0xAF:
+                $instruction = new Cast($i64, $f32, true);
+                break;
+            case 0xB0:
+                $instruction = new Cast($i64, $f64);
+                break;
+            case 0xB1:
+                $instruction = new Cast($i64, $f64, true);
+                break;
+            case 0xB2:
+                $instruction = new Cast($f32, $i32);
+                break;
+            case 0xB3:
+                $instruction = new Cast($f32, $i32, true);
+                break;
+            case 0xB4:
+                $instruction = new Cast($f32, $i64);
+                break;
+            case 0xB5:
+                $instruction = new Cast($f32, $i64, true);
+                break;
+            case 0xB6:
+                $instruction = new Promote($f32);
+                break;
+            case 0xB7:
+                $instruction = new Cast($f64, $i32);
+                break;
+            case 0xB8:
+                $instruction = new Cast($f64, $i32, true);
+                break;
+            case 0xB9:
+                $instruction = new Cast($f64, $i64);
+                break;
+            case 0xBA:
+                $instruction = new Cast($f64, $i64, true);
+                break;
+            case 0xBB:
+                $instruction = new Promote($f64);
+                break;
+            case 0xBC:
+                $instruction = new Reinterpret($i32);
+                break;
+            case 0xBD:
+                $instruction = new Reinterpret($i64);
+                break;
+            case 0xBE:
+                $instruction = new Reinterpret($f32);
+                break;
+            case 0xBF:
+                $instruction = new Reinterpret($f64);
+                break;
+            case 0xC0:
+                $instruction = new SignExtend($i32, 8);
+                break;
+            case 0xC1:
+                $instruction = new SignExtend($i32, 16);
+                break;
+            case 0xC2:
+                $instruction = new SignExtend($i64, 8);
+                break;
+            case 0xC3:
+                $instruction = new SignExtend($i64, 16);
+                break;
+            case 0xC4:
+                $instruction = new SignExtend($i64, 32);
                 break;
         }
 

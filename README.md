@@ -40,13 +40,13 @@ fully supported.
 
 | Instructions   | Status      |
 | -------------- | ----------- |
-| Numeric        | Partial     |
+| Numeric        | Partial   |
 | Reference      | Supported   |
 | Parametric     | Supported   |
 | Variable       | Supported   |
 | Table          | Supported   |
 | Memory         | Supported   |
-| Control        | Supported   |
+| Control        | Partial     |
 
 | Runtime        | Status      |
 | -------------- | ----------- |
