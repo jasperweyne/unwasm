@@ -51,12 +51,14 @@ class Loop extends Instruction
         $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
         $src->write("while (1) { // $this->funcType")->indent();
 
-        $state = Block::createContext($outerState, $this->funcType);
+        // since a branch will continue back to the top, pretend it doesn't have a return type and deal with it below
+        $contextType = new FuncType($this->funcType->getInput(), []);
+        $state = Block::createContext($outerState, $contextType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
 
-        // write returnvars
+        // write returnvars (aka. dealing with the return type)
         $stackVars = $state->pop(count($state->return()));
         Block::compileReturn($src, $state->return(), $stackVars);
 
