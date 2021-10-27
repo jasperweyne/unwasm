@@ -59,8 +59,11 @@ class Loop extends Instruction
         }
 
         // write returnvars (aka. dealing with the return type)
-        $stackVars = $state->pop(count($state->return()));
-        Block::compileReturn($src, $state->return(), $stackVars);
+        $last = end($this->instructions);
+        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
+            $stackVars = $state->pop(count($state->return()));
+            Block::compileReturn($src, $state->return(), $stackVars);
+        }
 
         $src
             ->write('break;')

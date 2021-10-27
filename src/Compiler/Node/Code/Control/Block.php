@@ -57,8 +57,11 @@ class Block extends Instruction
         }
 
         // write returnvars
-        $stackVars = $state->pop(count($state->return()));
-        self::compileReturn($src, $state->return(), $stackVars);
+        $last = end($this->instructions);
+        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
+            $stackVars = $state->pop(count($state->return()));
+            self::compileReturn($src, $state->return(), $stackVars);
+        }
 
         $src
             ->outdent()

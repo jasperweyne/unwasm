@@ -34,12 +34,9 @@ class ElseStmt extends Instruction
         // todo: verify that context is a if/else
 
         // write returnvars
+        // todo: ignore if previous is branch
         $stackVars = $state->pop(count($state->return()));
-        foreach ($state->return() as $to => $type) {
-            // todo: validate types
-            $from = array_shift($stackVars);
-            $src->write("$to = $from;");
-        }
+        Block::compileReturn($src, $state->return(), $stackVars);
 
         $src
             ->outdent()

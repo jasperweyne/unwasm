@@ -64,8 +64,11 @@ class IfElse extends Instruction
         }
 
         // write returnvars
-        $stackVars = $state->pop(count($state->return()));
-        Block::compileReturn($src, $state->return(), $stackVars);
+        $last = end($this->instructions);
+        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
+            $stackVars = $state->pop(count($state->return()));
+            Block::compileReturn($src, $state->return(), $stackVars);
+        }
 
         // Close the block
         $src
