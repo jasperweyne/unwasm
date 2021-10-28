@@ -86,7 +86,7 @@ class ModuleCompiler
         }
 
         $importCnt = count($funcImports);
-        return $idx < $importCnt ? $funcImports[$idx] : $this->funcs[$idx - $importCnt];
+        return $idx < $importCnt ? array_values($funcImports)[$idx] : $this->funcs[$idx - $importCnt];
     }
 
     /**
@@ -94,16 +94,16 @@ class ModuleCompiler
      */
     public function global(int $idx = null)
     {
-        $globalImports = array_filter($this->imports, function ($import) {
+        $globalImports = array_values(array_filter($this->imports, function ($import) {
             return $import instanceof GlobalImport;
-        });
+        }));
 
         if ($idx === null) {
             return array_merge($globalImports, $this->globals);
         }
 
         $importCnt = count($globalImports);
-        return $idx < $importCnt ? $globalImports[$idx] : $this->globals[$idx - $importCnt];
+        return $idx < $importCnt ? array_values($globalImports)[$idx] : $this->globals[$idx - $importCnt];
     }
 
     /**
@@ -120,7 +120,7 @@ class ModuleCompiler
         }
 
         $importCnt = count($memImports);
-        return $idx < $importCnt ? $memImports[$idx] : $this->mems[$idx - $importCnt];
+        return $idx < $importCnt ? array_values($memImports)[$idx] : $this->mems[$idx - $importCnt];
     }
 
     /**
@@ -137,7 +137,7 @@ class ModuleCompiler
         }
 
         $importCnt = count($tableImports);
-        return $idx < $importCnt ? $tableImports[$idx] : $this->tables[$idx - $importCnt];
+        return $idx < $importCnt ? array_values($tableImports)[$idx] : $this->tables[$idx - $importCnt];
     }
 
     public function compile(string $fqcn, Source $source)
@@ -146,7 +146,7 @@ class ModuleCompiler
         foreach ($this->imports as $import) {
             $this->importRefs[] = $import->module();
         }
-        $this->importRefs = array_flip(array_unique($this->importRefs));
+        $this->importRefs = array_flip(array_values(array_unique($this->importRefs)));
 
         // begin source compilation
         echo "Begin compiling PHP\n";
