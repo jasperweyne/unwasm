@@ -54,6 +54,7 @@ class Loop extends Instruction
         // since a branch will continue back to the top, pretend it doesn't have a return type and deal with it below
         $contextType = new FuncType($this->funcType->getInput(), []);
         $state = Block::createContext($outerState, $contextType);
+        $return = array_combine($outerState->push(...$this->funcType->getOutput()), $this->funcType->getOutput());
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
         }
@@ -61,8 +62,8 @@ class Loop extends Instruction
         // write returnvars (aka. dealing with the return type)
         $last = end($this->instructions);
         if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
-            $stackVars = $state->pop(count($state->return()));
-            Block::compileReturn($src, $state->return(), $stackVars);
+            $stackVars = $state->pop(count($return));
+            Block::compileReturn($src, $return, $stackVars);
         }
 
         $src
