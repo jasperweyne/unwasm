@@ -29,5 +29,8 @@ use UnWasm\Compiler\Source;
  */
 abstract class Instruction
 {
+    /** @var int Position in the original webassembly code */
+    public $position;
+
     abstract public function compile(ExpressionCompiler $state, Source $src): void;
 }

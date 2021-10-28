@@ -40,12 +40,16 @@ class Func implements FuncInterface
 
     /** @var Instruction[] The representation of the func component */
     public $body;
+    
+    /** @var int The position in the original webassembly source */
+    public $position;
 
-    public function __construct(int $type, array $locals, array $body)
+    public function __construct(int $type, array $locals, array $body, int $position)
     {
         $this->typeIdx = $type;
         $this->locals = $locals;
         $this->body = $body;
+        $this->position = $position;
     }
 
     public function typeIdx(): int
@@ -62,8 +66,9 @@ class Func implements FuncInterface
         $output = array_combine($functype->compileOutput('ret_'), $functype->getOutput());
 
         // write function header
+        $pos = str_pad(dechex($this->position), 8, '0', STR_PAD_LEFT);
         $src
-            ->write("\$this->fn_$index = function ($input) {")
+            ->write("\$this->fn_$index = function ($input) { // 0x$pos")
             ->indent()
         ;
 

@@ -128,7 +128,8 @@ class FuncsBuilder implements BuilderInterface
         } else {
             // assume code section
             $compiler->funcs = $parser->expectVector(function (BinaryParser $parser, int $index) {
-                return $parser->assertSize(function (BinaryParser $parser) use ($index) {
+                $pos = $parser->position();
+                return $parser->assertSize(function (BinaryParser $parser) use ($index, $pos) {
                     // create array of arrays of local variables
                     $locals = $parser->expectVector(function (BinaryParser $parser) {
                         $n = $parser->expectInt(true);
@@ -138,7 +139,7 @@ class FuncsBuilder implements BuilderInterface
 
                     $expr = self::expression($parser);
 
-                    return new Func($this->funcTypes[$index], array_merge([], ...$locals), $expr);
+                    return new Func($this->funcTypes[$index], array_merge([], ...$locals), $expr, $pos);
                 });
             });
             echo 'Scanned '.count($compiler->funcs)." funcs\n";
@@ -149,12 +150,13 @@ class FuncsBuilder implements BuilderInterface
     {
         $instructions = [];
         while (!$parser->eof()) {
+            $pos = $parser->position();
             $opcode = $parser->expectByte();
             if ($opcode === $termOpcode) {
                 return $instructions;
             }
 
-            $instructions[] =
+            $instruction =
                 self::controlInstr($opcode, $parser, $constExpr, $termOpcode) ??
                 self::varInstr($opcode, $parser) ??
                 self::memoryInstr($opcode, $parser) ??
@@ -164,6 +166,8 @@ class FuncsBuilder implements BuilderInterface
                 self::convertInstr($opcode) ??
                 self::miscInstr($opcode, $parser)
             ;
+            $instruction->position = $pos;
+            $instructions[] = $instruction;
         }
     }
 
