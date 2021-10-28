@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler\Node\Code\Numeric;
 
 use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -37,6 +38,6 @@ class Eqz extends Numeric
         list($x) = $state->pop(1);
 
         // export code
-        $state->const("(int)($x === 0)", $this->type);
+        $state->const("(int)($x === 0)", new ValueType(ExpressionCompiler::I32));
     }
 }

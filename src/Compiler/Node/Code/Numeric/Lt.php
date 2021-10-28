@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler\Node\Code\Numeric;
 
 use UnWasm\Compiler\ExpressionCompiler;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -37,6 +38,6 @@ class Lt extends Numeric
         list($x, $y) = $state->pop(2);
 
         // export code
-        $state->const("($x < $y)", $this->type);
+        $state->const("(int)($x < $y)", new ValueType(ExpressionCompiler::I32));
     }
 }
