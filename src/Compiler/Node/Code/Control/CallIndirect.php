@@ -60,7 +60,7 @@ class CallIndirect extends Instruction
         // todo: dynamically verify signature
         $assign = $output ? "list($output) = " : '';
         $src
-            ->write("\$indirect = \$this->table_$this->tableIdx[$offset];")
+            ->write("\$indirect = \$this->table_$this->tableIdx->get($offset);")
             ->write("if (\$indirect === null) throw new \RuntimeException('Problem occurred');")
             ->write($assign."(\$indirect)($input);")
         ;
