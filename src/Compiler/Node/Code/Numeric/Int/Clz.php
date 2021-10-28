@@ -39,7 +39,7 @@ class Clz extends Numeric
         list($var) = $state->push($this->type);
 
         // export code
-        $bits = $this->type()->type == ExpressionCompiler::I64 ? 64 : 32;
+        $bits = $this->type->type == ExpressionCompiler::I64 ? 64 : 32;
         $src
             ->write("for (\$i = 0; 0 < $x; $x >>= 1) \$i++;")
             ->write("$var = $x < 0 ? 0 : $bits - \$i;")

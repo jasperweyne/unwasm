@@ -39,7 +39,7 @@ class Ctz extends Numeric
         list($var) = $state->push($this->type);
 
         // export code
-        $bits = $this->type()->type == ExpressionCompiler::I64 ? 64 : 32;
+        $bits = $this->type->type == ExpressionCompiler::I64 ? 64 : 32;
         $src->write("for ($var = 0; $var < $bits && !($x & 1); $x >>=1) $var++;");
     }
 }

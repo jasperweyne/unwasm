@@ -38,6 +38,6 @@ abstract class Numeric extends Instruction
 
     public function type(): ValueType
     {
-        return $this->valueType;
+        return $this->type;
     }
 }
