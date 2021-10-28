@@ -39,6 +39,6 @@ class Popcnt extends Numeric
         list($var) = $state->push($this->type);
 
         // export code
-        $src->write("for(\$i=1, $var=0; \$i; \$i <<= 1) $x & \$i && $var++;");
+        $src->write("for(\$i=1, \$x = $x, $var=0; \$i; \$i <<= 1) \$x & \$i && $var++;");
     }
 }

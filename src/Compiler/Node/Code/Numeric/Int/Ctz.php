@@ -40,6 +40,6 @@ class Ctz extends Numeric
 
         // export code
         $bits = $this->type->type == ExpressionCompiler::I64 ? 64 : 32;
-        $src->write("for ($var = 0; $var < $bits && !($x & 1); $x >>=1) $var++;");
+        $src->write("for ($var = 0, \$x = $x; $var < $bits && !(\$x & 1); \$x >>=1) $var++;");
     }
 }

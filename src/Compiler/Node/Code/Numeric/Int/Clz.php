@@ -41,7 +41,7 @@ class Clz extends Numeric
         // export code
         $bits = $this->type->type == ExpressionCompiler::I64 ? 64 : 32;
         $src
-            ->write("for (\$i = 0; 0 < $x; $x >>= 1) \$i++;")
+            ->write("for (\$i = 0, \$x = $x; 0 < \$x; \$x >>= 1) \$i++;")
             ->write("$var = $x < 0 ? 0 : $bits - \$i;")
         ;
     }
