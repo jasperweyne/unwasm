@@ -54,9 +54,6 @@ class GlobalGet extends Instruction
         }
 
         // update stack
-        list($x) = $state->push($type);
-
-        // export code
-        $src->write("$x = \$this->global_$this->globalIdx->$compileFn();");
+        $state->const("\$this->global_$this->globalIdx->$compileFn()", $type);
     }
 }
