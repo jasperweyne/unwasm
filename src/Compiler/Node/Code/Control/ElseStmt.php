@@ -32,11 +32,13 @@ class ElseStmt extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // todo: verify that context is a if/else
+        // todo: refresh ExpressionCompiler
 
-        // write returnvars
-        // todo: ignore if previous is branch
-        $stackVars = $state->pop(count($state->return()));
-        Block::compileReturn($src, $state->return(), $stackVars);
+        // write returnvars;
+        if (!($state->previous instanceof BranchUncond || $state->previous instanceof BranchIndirect || $state->previous instanceof Unreachable)) {
+            $stackVars = $state->pop(count($state->return()));
+            Block::compileReturn($src, $state->return(), $stackVars);
+        }
 
         $src
             ->outdent()

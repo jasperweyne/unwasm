@@ -57,11 +57,12 @@ class Loop extends Instruction
         $return = array_combine($outerState->push(...$this->funcType->getOutput()), $this->funcType->getOutput());
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
+            $state->previous = $instr;
         }
 
         // write returnvars (aka. dealing with the return type)
         $last = end($this->instructions);
-        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
+        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect || $last instanceof Unreachable)) {
             $stackVars = $state->pop(count($return));
             Block::compileReturn($src, $return, $stackVars);
         }

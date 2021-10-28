@@ -23,6 +23,7 @@ namespace UnWasm\Compiler\Node\Code;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Code\Control\Block;
+use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\External\FuncInterface;
 use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Source;
@@ -90,11 +91,14 @@ class Func implements FuncInterface
         // write function body
         foreach ($this->body as $instr) {
             $instr->compile($expr, $src);
+            $expr->previous = $instr;
         }
 
         // write returnvars
-        $stackVars = $expr->pop(count($expr->return()));
-        Block::compileReturn($src, $expr->return(), $stackVars);
+        if (!($expr->previous instanceof Unreachable)) {
+            $stackVars = $expr->pop(count($expr->return()));
+            Block::compileReturn($src, $expr->return(), $stackVars);
+        }
 
         // write function footer
         $output = implode(", ", array_keys($output));

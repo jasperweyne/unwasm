@@ -54,11 +54,12 @@ class Block extends Instruction
         $state = self::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
+            $state->previous = $instr;
         }
 
         // write returnvars
         $last = end($this->instructions);
-        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect)) {
+        if (!($last instanceof BranchUncond || $last instanceof BranchIndirect || $last instanceof Unreachable)) {
             $stackVars = $state->pop(count($state->return()));
             self::compileReturn($src, $state->return(), $stackVars);
         }
