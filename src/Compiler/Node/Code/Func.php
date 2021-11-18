@@ -23,6 +23,8 @@ namespace UnWasm\Compiler\Node\Code;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\Code\Control\Block;
+use UnWasm\Compiler\Node\Code\Control\BranchIndirect;
+use UnWasm\Compiler\Node\Code\Control\BranchUncond;
 use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\External\FuncInterface;
 use UnWasm\Compiler\Node\Type\FuncType;
@@ -95,7 +97,7 @@ class Func implements FuncInterface
         }
 
         // write returnvars
-        if (!($expr->previous instanceof Unreachable)) {
+        if (!($expr->previous instanceof BranchUncond || $expr->previous instanceof BranchIndirect || $expr->previous instanceof Unreachable)) {
             $stackVars = $expr->pop(count($expr->return()));
             Block::compileReturn($src, $expr->return(), $stackVars);
         }
