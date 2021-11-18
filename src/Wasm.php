@@ -52,6 +52,59 @@ class Wasm
         $this->namespace = $namespace;
     }
 
+    public function loadWapm(string $package, ?string $module = null)
+    {
+        $url = 'http://registry.wapm.io/graphql/';
+        $data = <<<GRAPHQL
+{
+    getPackageVersion(name: "$package") {
+        modules {
+            name
+            publicUrl
+        }
+    }
+}
+
+GRAPHQL;
+        $options = array(
+            'http' => array(
+                'header'  => "Content-Type: application/json\r\nAccept: application/json\r\n",
+                'method'  => 'POST',
+                'content' => json_encode(['query' => $data])
+            )
+        );
+        $context  = stream_context_create($options);
+        $result = json_decode(file_get_contents($url, false, $context) ?: 'null', true);
+
+        // handle metadata download errors
+        if (!$result || isset($result['errors'])) { /* todo: handle error */ }
+
+        // get module
+        $module_info = null;
+        $modules = $result['data']['getPackageVersion']['modules'];
+        if (count($modules) == 1) {
+            $module_info = $modules[0];
+        } elseif ($module) {
+            foreach ($modules as $m) {
+                if ($m['name'] === $module) {
+                    $module_info = $m;
+                }
+            }
+        }
+
+        // handle unknown module errors
+        if (!$module_info) { /* todo: handle error */ }
+
+        // download module and compile it
+        $stream = fopen('php://memory', 'w+b');
+        fwrite($stream, file_get_contents($module_info['publicUrl']));
+        rewind($stream);
+        $parser = new BinaryParser($stream);
+        $result = $this->load($parser, $module_info['name'], null);
+        fclose($stream);
+        return $result;
+    }
+
     public function loadBinary(string $location, string $module, bool $forceCompile = false)
     {
         $stream = fopen($location, 'rb');
