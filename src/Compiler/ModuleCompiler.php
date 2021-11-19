@@ -246,7 +246,7 @@ class ModuleCompiler
 
         // write constructor header
         $src
-            ->write("public function __construct(?\UnWasm\Runtime\Environment \$env = null, string \$module = '$module')")
+            ->write("public function __construct(?\UnWasm\Wasm \$env = null, string \$module = '$module')")
             ->write('{')
             ->indent()
         ;

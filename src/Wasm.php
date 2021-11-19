@@ -26,30 +26,65 @@ use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ParserInterface;
 use UnWasm\Compiler\Source;
 use UnWasm\Compiler\TextParser;
-use UnWasm\Runtime\Environment;
 
 /**
- * A general Wasm manager class for UnWasm
+ * The general Wasm environment for UnWasm
  */
 class Wasm
 {
     /** @var CacheInterface The module cache */
     private $cache;
-
-    /** @var Environment The global data store */
-    private $env;
+    
+    /** @var string[] The directories where a module may be loaded from */
+    private $locations;
 
     /** @var string The namespace where module classes are registered */
     private $namespace;
+    
+    /** @var array The dictionary of module instances and their names. */
+    private $modules = array();
 
     public function __construct(
-        CacheInterface $cache,
-        Environment $env,
+        ?CacheInterface $cache = null,
+        $locations = [],
         $namespace = 'WasmModule'
     ) {
-        $this->cache = $cache;
-        $this->env = $env;
+        $this->cache = $cache ?? new MemoryCache();
+        $this->locations = $locations;
         $this->namespace = $namespace;
+        $this->modules = array();
+    }
+
+    public function import(string $module)
+    {
+        if (!isset($this->modules[$module]) && $this->load($module) === null) {
+            throw new \RuntimeException("Tried to import unregistered module '$module', make sure you've exported it to the environment.");
+        }
+
+        return $this->modules[$module];
+    }
+
+    public function export($object, string $module): void
+    {
+        $this->modules[$module] = $object;
+    }
+
+    public function load(string $module)
+    {
+        // try loading the module from disk first
+        foreach ($this->locations as $dir) {
+            if ($results = glob($dir.$module)) {
+                // a file was found
+                if (substr($results[0], -4) == '.wat') {
+                    return $this->loadText($results[0], $module);
+                } else {
+                    return $this->loadBinary($results[0], $module);
+                }
+            }
+        }
+
+        // module could not be found on disk, try loading it from registry 
+        return $this->loadWapm($module);
     }
 
     public function loadWapm(string $package, ?string $module = null)
@@ -73,19 +108,19 @@ GRAPHQL;
                 'content' => json_encode(['query' => $data])
             )
         );
-        $context  = stream_context_create($options);
+        $context = stream_context_create($options);
         $result = json_decode(file_get_contents($url, false, $context) ?: 'null', true);
 
         // handle metadata download errors
-        if (!$result || isset($result['errors'])) { /* todo: handle error */ }
+        if (!$result || isset($result['errors']) || $result['data']['getPackageVersion'] === null) { 
+            return null;
+        }
 
         // get module
         $module_info = null;
-        $modules = $result['data']['getPackageVersion']['modules'];
-        if (count($modules) == 1) {
-            $module_info = $modules[0];
-        } elseif ($module) {
-            foreach ($modules as $m) {
+        $pkgModules = $result['data']['getPackageVersion']['modules'];
+        if ($module) {
+            foreach ($pkgModules as $m) {
                 if ($m['name'] === $module) {
                     $module_info = $m;
                 }
@@ -93,36 +128,56 @@ GRAPHQL;
         }
 
         // handle unknown module errors
-        if (!$module_info) { /* todo: handle error */ }
+        if (!$module_info) {
+            if (count($pkgModules) == 1) {
+                $module_info = $pkgModules[0];
+            } else {
+                /* todo: handle error */
+            }
+        }
 
         // download module and compile it
         $stream = fopen('php://memory', 'w+b');
         fwrite($stream, file_get_contents($module_info['publicUrl']));
         rewind($stream);
         $parser = new BinaryParser($stream);
-        $result = $this->load($parser, $module_info['name'], null);
+        $this->compile($parser, $module_info['name'], null);
         fclose($stream);
-        return $result;
+
+        // instantiate it, cache it, return it
+        $inst = $this->instantiate($module_info['name']);
+        $this->export($inst, $module_info['name']);
+        return $inst;
     }
 
     public function loadBinary(string $location, string $module, bool $forceCompile = false)
     {
+        // compile the .wasm file to a module
         $stream = fopen($location, 'rb');
         $timestamp = $forceCompile ? null : (@filemtime($location) ?: null);
         $parser = new BinaryParser($stream);
-        $result = $this->load($parser, $module, $timestamp);
+        $this->compile($parser, $module, $timestamp);
         fclose($stream);
-        return $result;
+        
+        // instantiate it, cache it, return it
+        $inst = $this->instantiate($module);
+        $this->export($inst, $module);
+        return $inst;
     }
 
     public function loadText(string $location, string $module, bool $forceCompile = false)
     {
+        // compile the .wat file to a module
         $stream = fopen($location, 'rt');
         $timestamp = $forceCompile ? null : (@filemtime($location) ?: null);
         $parser = new TextParser($stream);
-        $result = $this->load($parser, $module, $timestamp);
+        $this->compile($parser, $module, $timestamp);
         fclose($stream);
-        return $result;
+
+        // instantiate it, cache it, return it
+        $inst = $this->instantiate($module);
+        $this->export($inst, $module);
+        return $inst;
     }
 
     public function compile(ParserInterface $parser, string $module, ?int $timestamp)
@@ -137,12 +192,6 @@ GRAPHQL;
         }
     }
 
-    public function load(ParserInterface $parser, string $module, ?int $timestamp)
-    {
-        $this->compile($parser, $module, $timestamp);
-        return $this->instantiate($module);
-    }
-
     public function instantiate(string $module)
     {
         // Load the module from cache
@@ -153,14 +202,6 @@ GRAPHQL;
 
         // Instantiate module
         $classname = "$this->namespace\\$module";
-        return new $classname($this->env);
-    }
-
-    public static function new($opts = []): self
-    {
-        $cache = $opts['cache'] ?? new MemoryCache();
-        $env = $opts['env'] ?? new Environment();
-
-        return new Wasm($cache, $env);
+        return new $classname($this);
     }
 }
