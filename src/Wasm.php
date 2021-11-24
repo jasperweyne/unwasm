@@ -25,7 +25,7 @@ use UnWasm\Cache\MemoryCache;
 use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ParserInterface;
 use UnWasm\Compiler\Source;
-use UnWasm\Compiler\TextParser;
+use UnWasm\Runtime\Wasi;
 
 /**
  * The general Wasm environment for UnWasm
@@ -43,6 +43,9 @@ class Wasm
     
     /** @var array The dictionary of module instances and their names. */
     private $modules = array();
+    
+    /** @var ?\UnWasm\Runtime\MemoryInst The global memory instance. */
+    public $memory;
 
     public function __construct(
         ?CacheInterface $cache = null,
@@ -66,12 +69,20 @@ class Wasm
 
     public function export($object, string $module): void
     {
+        if (isset($object->mems) && count($object->mems) > 0) {
+            $this->memory = reset($object->mems);
+        }
         $this->modules[$module] = $object;
     }
 
     public function load(string $module)
     {
-        // try loading the module from disk first
+        // first, try loading from cache
+        if ($inst = $this->instantiate($module)) {
+            return $inst;
+        }
+
+        // then, try loading the module from disk
         foreach ($this->locations as $dir) {
             if ($results = glob($dir.$module)) {
                 // a file was found
@@ -117,37 +128,32 @@ GRAPHQL;
         }
 
         // get module
-        $module_info = null;
         $pkgModules = $result['data']['getPackageVersion']['modules'];
-        if ($module) {
-            foreach ($pkgModules as $m) {
-                if ($m['name'] === $module) {
-                    $module_info = $m;
+        if ($module !== null) {
+            foreach ($pkgModules as $pkgModule) {
+                if ($pkgModule['name'] === $module) {
+                    $pkgModules = [$pkgModule];
+                    break;
                 }
             }
         }
 
-        // handle unknown module errors
-        if (!$module_info) {
-            if (count($pkgModules) == 1) {
-                $module_info = $pkgModules[0];
-            } else {
-                /* todo: handle error */
-            }
+        // compile modules
+        foreach ($pkgModules as $module_info) {
+            // download module and compile it
+            $stream = fopen('php://memory', 'w+b');
+            fwrite($stream, file_get_contents($module_info['publicUrl']));
+            rewind($stream);
+            $parser = new BinaryParser($stream);
+            $this->compile($parser, $module_info['name'], null);
+            fclose($stream);
         }
-
-        // download module and compile it
-        $stream = fopen('php://memory', 'w+b');
-        fwrite($stream, file_get_contents($module_info['publicUrl']));
-        rewind($stream);
-        $parser = new BinaryParser($stream);
-        $this->compile($parser, $module_info['name'], null);
-        fclose($stream);
-
+        
         // instantiate it, cache it, return it
-        $inst = $this->instantiate($module_info['name']);
-        $this->export($inst, $module_info['name']);
-        return $inst;
+        if ($module !== null && $inst = $this->instantiate($module)) {
+            $this->export($inst, $module);
+            return $inst;
+        }
     }
 
     public function loadBinary(string $location, string $module, bool $forceCompile = false)
@@ -167,17 +173,28 @@ GRAPHQL;
 
     public function loadText(string $location, string $module, bool $forceCompile = false)
     {
-        // compile the .wat file to a module
-        $stream = fopen($location, 'rt');
-        $timestamp = $forceCompile ? null : (@filemtime($location) ?: null);
-        $parser = new TextParser($stream);
-        $this->compile($parser, $module, $timestamp);
-        fclose($stream);
 
-        // instantiate it, cache it, return it
-        $inst = $this->instantiate($module);
-        $this->export($inst, $module);
-        return $inst;
+        // create temporary file for binary
+        $tmpFile = tempnam(__DIR__, 'wat');
+
+        // convert and compile
+        try {
+            // setup cli application
+            $clean = new Wasm($this->cache);
+            $env = new Wasi($clean);
+            $env->args = ['--disable-simd', "--output='$tmpFile'", $location];
+
+            // start wat2wasm
+            $wat2wasm = $clean->load('wat2wasm') ?? $clean->loadWapm('wabt', 'wat2wasm');
+            $wat2wasm->_start();
+
+            // instantiate it, cache it, remove cache data, return it
+            $inst = $this->loadBinary($tmpFile, $module, $forceCompile);
+            $this->export($inst, $module);
+            return $inst;
+        } finally {
+            unlink($tmpFile);
+        }
     }
 
     public function compile(ParserInterface $parser, string $module, ?int $timestamp)
