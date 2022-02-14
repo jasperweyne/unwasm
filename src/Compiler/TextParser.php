@@ -63,28 +63,31 @@ class TextParser implements ParserInterface
         echo "Begin scanning text\n";
         $compiler = new ModuleCompiler();
 
+        // module parser function
+        $parseModule = function () use ($compiler) {
+            $this->parenthesised(function () use ($compiler) {
+                $ctx = $this->expectKeyword();
+                if (!isset($this->builders[$ctx])) {
+                    throw new \RuntimeException("Unknown item '$ctx' in .wat");
+                }
+                $this->builders[$ctx]->scan($this, $compiler);
+            });
+        };
+
         // scan start of the module
-        $module = $this->maybe(function () {
-            $this->expectOpen();
-            $this->expectKeyword('module');
-            $this->expectId();
-        });
-
-        // while items available, parse them
-        $this->vec(function () use ($compiler) {
-            $this->expectOpen();
-            $ctx = $this->expectKeyword();
-            if (!isset($this->builders[$ctx])) {
-                throw new \RuntimeException("Unknown item '$ctx' in .wat");
+        $this->oneOf(
+            function () use ($compiler, $parseModule) {
+                $this->parenthesised(function () use ($compiler, $parseModule) {
+                    $this->expectKeyword('module');
+                    $this->expectId(true);
+                    ($parseModule)($compiler);
+                });
+            },
+            function () use ($compiler, $parseModule) {
+                ($parseModule)($compiler);
             }
-            $this->builders[$ctx]->scan($this, $compiler);
-            $this->expectClose();
-        });
+        );
 
-        // finish the modules
-        if ($module) {
-            $this->expectClose();
-        }
         echo "Finished scanning text\n";
         return $compiler;
     }
@@ -107,7 +110,7 @@ class TextParser implements ParserInterface
     {
         $origOffset = $this->offset;
         try {
-            ($func)();
+            ($func)($this);
             return true;
         } catch (\UnexpectedValueException $e) {
             // continue to next item
@@ -116,32 +119,38 @@ class TextParser implements ParserInterface
         return false;
     }
 
-    public function oneOf(callable ...$funcs): void
+    public function oneOf(callable ...$funcs)
     {
+        $origOffset = $this->offset;
         foreach ($funcs as $func) {
             try {
-                ($func)();
-                return;
+                return ($func)($this);
             } catch (\UnexpectedValueException $e) {
                 // continue to next item
+                $this->offset = $origOffset;
             }
         }
 
         throw new \UnexpectedValueException('Expected a token');
     }
 
-    public function expectOpen(): void
+    public function parenthesised(callable $func)
     {
+        // parse (
         if ($this->nextToken('/\G\(/') === null) {
             throw new \UnexpectedValueException("Expected '('");
         }
-    }
 
-    public function expectClose(): void
-    {
+        // parse contents
+        $value = ($func)($this);
+
+        // parse )
         if ($this->nextToken('/\G\)/') === null) {
             throw new \UnexpectedValueException("Expected ')'");
         }
+
+        // return contents
+        return $value;
     }
 
     public function expectInt($unsigned = false): int
