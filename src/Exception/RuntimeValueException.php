@@ -27,5 +27,4 @@ namespace UnWasm\Exception;
  */
 class RuntimeValueException extends ExecutionException
 {
-    
 }

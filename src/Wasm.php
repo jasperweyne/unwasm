@@ -35,16 +35,16 @@ class Wasm
 {
     /** @var CacheInterface The module cache */
     private $cache;
-    
+
     /** @var string[] The directories where a module may be loaded from */
     private $locations;
 
     /** @var string The namespace where module classes are registered */
     private $namespace;
-    
+
     /** @var array The dictionary of module instances and their names. */
     private $modules = array();
-    
+
     /** @var ?\UnWasm\Runtime\MemoryInst The global memory instance. */
     public $memory;
 
@@ -95,7 +95,7 @@ class Wasm
             }
         }
 
-        // module could not be found on disk, try loading it from registry 
+        // module could not be found on disk, try loading it from registry
         return $this->loadWapm($module);
     }
 
@@ -124,7 +124,7 @@ GRAPHQL;
         $result = json_decode(file_get_contents($url, false, $context) ?: 'null', true);
 
         // handle metadata download errors
-        if (!$result || isset($result['errors']) || $result['data']['getPackageVersion'] === null) { 
+        if (!$result || isset($result['errors']) || $result['data']['getPackageVersion'] === null) {
             return null;
         }
 
@@ -147,7 +147,7 @@ GRAPHQL;
                 $this->compile($parser, $module_info['name'], null);
             });
         }
-        
+
         // instantiate it, cache it, return it
         if ($module !== null && $inst = $this->instantiate($module)) {
             $this->export($inst, $module);
@@ -163,7 +163,7 @@ GRAPHQL;
         $parser = new BinaryParser($stream);
         $this->compile($parser, $module, $timestamp);
         fclose($stream);
-        
+
         // instantiate it, cache it, return it
         $inst = $this->instantiate($module);
         $this->export($inst, $module);

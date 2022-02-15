@@ -26,5 +26,4 @@ namespace UnWasm\Exception;
  */
 class AccessException extends ExecutionException
 {
-    
 }

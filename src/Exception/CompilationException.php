@@ -26,5 +26,4 @@ namespace UnWasm\Exception;
  */
 class CompilationException extends CompilerException
 {
-    
 }

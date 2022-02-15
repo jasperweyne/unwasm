@@ -24,137 +24,137 @@ use UnWasm\Wasm;
 
 class Wasi extends Module
 {
-    const ERRNO_SUCCESS = 0;
-    const ERRNO_2BIG = 1;
-    const ERRNO_ACCES = 2;
-    const ERRNO_ADDRINUSE = 3;
-    const ERRNO_ADDRNOTAVAIL = 4;
-    const ERRNO_AFNOSUPPORT = 5;
-    const ERRNO_AGAIN = 6;
-    const ERRNO_ALREADY = 7;
-    const ERRNO_BADF = 8;
-    const ERRNO_BADMSG = 9;
-    const ERRNO_BUSY = 10;
-    const ERRNO_CANCELED = 11;
-    const ERRNO_CHILD = 12;
-    const ERRNO_CONNABORTED = 13;
-    const ERRNO_CONNREFUSED = 14;
-    const ERRNO_CONNRESET = 15;
-    const ERRNO_DEADLK = 16;
-    const ERRNO_DESTADDRREQ = 17;
-    const ERRNO_DOM = 18;
-    const ERRNO_DQUOT = 19;
-    const ERRNO_EXIST = 20;
-    const ERRNO_FAULT = 21;
-    const ERRNO_FBIG = 22;
-    const ERRNO_HOSTUNREACH = 23;
-    const ERRNO_IDRM = 24;
-    const ERRNO_ILSEQ = 25;
-    const ERRNO_INPROGRESS = 26;
-    const ERRNO_INTR = 27;
-    const ERRNO_INVAL = 28;
-    const ERRNO_IO = 29;
-    const ERRNO_ISCONN = 30;
-    const ERRNO_ISDIR = 31;
-    const ERRNO_LOOP = 32;
-    const ERRNO_MFILE = 33;
-    const ERRNO_MLINK = 34;
-    const ERRNO_MSGSIZE = 35;
-    const ERRNO_MULTIHOP = 36;
-    const ERRNO_NAMETOOLONG = 37;
-    const ERRNO_NETDOWN = 38;
-    const ERRNO_NETRESET = 39;
-    const ERRNO_NETUNREACH = 40;
-    const ERRNO_NFILE = 41;
-    const ERRNO_NOBUFS = 42;
-    const ERRNO_NODEV = 43;
-    const ERRNO_NOENT = 44;
-    const ERRNO_NOEXEC = 45;
-    const ERRNO_NOLCK = 46;
-    const ERRNO_NOLINK = 47;
-    const ERRNO_NOMEM = 48;
-    const ERRNO_NOMSG = 49;
-    const ERRNO_NOPROTOOPT = 50;
-    const ERRNO_NOSPC = 51;
-    const ERRNO_NOSYS = 52;
-    const ERRNO_NOTCONN = 53;
-    const ERRNO_NOTDIR = 54;
-    const ERRNO_NOTEMPTY = 55;
-    const ERRNO_NOTRECOVERABLE = 56;
-    const ERRNO_NOTSOCK = 57;
-    const ERRNO_NOTSUP = 58;
-    const ERRNO_NOTTY = 59;
-    const ERRNO_NXIO = 60;
-    const ERRNO_OVERFLOW = 61;
-    const ERRNO_OWNERDEAD = 62;
-    const ERRNO_PERM = 63;
-    const ERRNO_PIPE = 64;
-    const ERRNO_PROTO = 65;
-    const ERRNO_PROTONOSUPPORT = 66;
-    const ERRNO_PROTOTYPE = 67;
-    const ERRNO_RANGE = 68;
-    const ERRNO_ROFS = 69;
-    const ERRNO_SPIPE = 70;
-    const ERRNO_SRCH = 71;
-    const ERRNO_STALE = 72;
-    const ERRNO_TIMEDOUT = 73;
-    const ERRNO_TXTBSY = 74;
-    const ERRNO_XDEV = 75;
-    const ERRNO_NOTCAPABLE = 76;
-    
-    const RIGHTS_FD_DATASYNC = 0x1;
-    const RIGHTS_FD_READ = 0x2;
-    const RIGHTS_FD_SEEK = 0x4;
-    const RIGHTS_FD_FDSTAT_SET_FLAGS = 0x8;
-    const RIGHTS_FD_SYNC = 0x10;
-    const RIGHTS_FD_TELL = 0x20;
-    const RIGHTS_FD_WRITE = 0x40;
-    const RIGHTS_FD_ADVISE = 0x80;
-    const RIGHTS_FD_ALLOCATE = 0x100;
-    const RIGHTS_PATH_CREATE_DIRECTORY = 0x200;
-    const RIGHTS_PATH_CREATE_FILE = 0x400;
-    const RIGHTS_PATH_LINK_SOURCE = 0x800;
-    const RIGHTS_PATH_LINK_TARGET = 0x1000;
-    const RIGHTS_PATH_OPEN = 0x2000;
-    const RIGHTS_FD_READDIR = 0x4000;
-    const RIGHTS_PATH_READLINK = 0x8000;
-    const RIGHTS_PATH_RENAME_SOURCE = 0x10000;
-    const RIGHTS_PATH_RENAME_TARGET = 0x20000;
-    const RIGHTS_PATH_FILESTAT_GET = 0x40000;
-    const RIGHTS_PATH_FILESTAT_SET_SIZE = 0x80000;
-    const RIGHTS_PATH_FILESTAT_SET_TIMES = 0x100000;
-    const RIGHTS_FD_FILESTAT_GET = 0x200000;
-    const RIGHTS_FD_FILESTAT_SET_SIZE = 0x400000;
-    const RIGHTS_FD_FILESTAT_SET_TIMES = 0x800000;
-    const RIGHTS_PATH_SYMLINK = 0x1000000;
-    const RIGHTS_PATH_REMOVE_DIRECTORY = 0x2000000;
-    const RIGHTS_PATH_UNLINK_FILE = 0x4000000;
-    const RIGHTS_POLL_FD_READWRITE = 0x8000000;
-    const RIGHTS_SOCK_SHUTDOWN = 0x10000000;
+    public const ERRNO_SUCCESS = 0;
+    public const ERRNO_2BIG = 1;
+    public const ERRNO_ACCES = 2;
+    public const ERRNO_ADDRINUSE = 3;
+    public const ERRNO_ADDRNOTAVAIL = 4;
+    public const ERRNO_AFNOSUPPORT = 5;
+    public const ERRNO_AGAIN = 6;
+    public const ERRNO_ALREADY = 7;
+    public const ERRNO_BADF = 8;
+    public const ERRNO_BADMSG = 9;
+    public const ERRNO_BUSY = 10;
+    public const ERRNO_CANCELED = 11;
+    public const ERRNO_CHILD = 12;
+    public const ERRNO_CONNABORTED = 13;
+    public const ERRNO_CONNREFUSED = 14;
+    public const ERRNO_CONNRESET = 15;
+    public const ERRNO_DEADLK = 16;
+    public const ERRNO_DESTADDRREQ = 17;
+    public const ERRNO_DOM = 18;
+    public const ERRNO_DQUOT = 19;
+    public const ERRNO_EXIST = 20;
+    public const ERRNO_FAULT = 21;
+    public const ERRNO_FBIG = 22;
+    public const ERRNO_HOSTUNREACH = 23;
+    public const ERRNO_IDRM = 24;
+    public const ERRNO_ILSEQ = 25;
+    public const ERRNO_INPROGRESS = 26;
+    public const ERRNO_INTR = 27;
+    public const ERRNO_INVAL = 28;
+    public const ERRNO_IO = 29;
+    public const ERRNO_ISCONN = 30;
+    public const ERRNO_ISDIR = 31;
+    public const ERRNO_LOOP = 32;
+    public const ERRNO_MFILE = 33;
+    public const ERRNO_MLINK = 34;
+    public const ERRNO_MSGSIZE = 35;
+    public const ERRNO_MULTIHOP = 36;
+    public const ERRNO_NAMETOOLONG = 37;
+    public const ERRNO_NETDOWN = 38;
+    public const ERRNO_NETRESET = 39;
+    public const ERRNO_NETUNREACH = 40;
+    public const ERRNO_NFILE = 41;
+    public const ERRNO_NOBUFS = 42;
+    public const ERRNO_NODEV = 43;
+    public const ERRNO_NOENT = 44;
+    public const ERRNO_NOEXEC = 45;
+    public const ERRNO_NOLCK = 46;
+    public const ERRNO_NOLINK = 47;
+    public const ERRNO_NOMEM = 48;
+    public const ERRNO_NOMSG = 49;
+    public const ERRNO_NOPROTOOPT = 50;
+    public const ERRNO_NOSPC = 51;
+    public const ERRNO_NOSYS = 52;
+    public const ERRNO_NOTCONN = 53;
+    public const ERRNO_NOTDIR = 54;
+    public const ERRNO_NOTEMPTY = 55;
+    public const ERRNO_NOTRECOVERABLE = 56;
+    public const ERRNO_NOTSOCK = 57;
+    public const ERRNO_NOTSUP = 58;
+    public const ERRNO_NOTTY = 59;
+    public const ERRNO_NXIO = 60;
+    public const ERRNO_OVERFLOW = 61;
+    public const ERRNO_OWNERDEAD = 62;
+    public const ERRNO_PERM = 63;
+    public const ERRNO_PIPE = 64;
+    public const ERRNO_PROTO = 65;
+    public const ERRNO_PROTONOSUPPORT = 66;
+    public const ERRNO_PROTOTYPE = 67;
+    public const ERRNO_RANGE = 68;
+    public const ERRNO_ROFS = 69;
+    public const ERRNO_SPIPE = 70;
+    public const ERRNO_SRCH = 71;
+    public const ERRNO_STALE = 72;
+    public const ERRNO_TIMEDOUT = 73;
+    public const ERRNO_TXTBSY = 74;
+    public const ERRNO_XDEV = 75;
+    public const ERRNO_NOTCAPABLE = 76;
 
-    const FILETYPE_UNKNOWN = 0;
-    const FILETYPE_BLOCK_DEVICE = 1;
-    const FILETYPE_CHARACTER_DEVICE = 2;
-    const FILETYPE_DIRECTORY = 3;
-    const FILETYPE_REGULAR_FILE = 4;
-    const FILETYPE_SOCKET_DGRAM = 5;
-    const FILETYPE_SOCKET_STREAM = 6;
-    const FILETYPE_SYMBOLIC_LINK = 7;
-    
-    const FDFLAGS_APPEND = 0x1;
-    const FDFLAGS_DSYNC = 0x2;
-    const FDFLAGS_NONBLOCK = 0x4;
-    const FDFLAGS_RSYNC = 0x8;
-    const FDFLAGS_SYNC = 0x10;
-    
-    const LOOKUPFLAGS_SYMLINK_FOLLOW = 0x1;
-    
-    const OFLAGS_CREAT = 0x1;
-    const OFLAGS_DIRECTORY = 0x2;
-    const OFLAGS_EXCL = 0x4;
-    const OFLAGS_TRUNC = 0x8;
-    
-    const PREOPENTYPE_DIR = 0;
+    public const RIGHTS_FD_DATASYNC = 0x1;
+    public const RIGHTS_FD_READ = 0x2;
+    public const RIGHTS_FD_SEEK = 0x4;
+    public const RIGHTS_FD_FDSTAT_SET_FLAGS = 0x8;
+    public const RIGHTS_FD_SYNC = 0x10;
+    public const RIGHTS_FD_TELL = 0x20;
+    public const RIGHTS_FD_WRITE = 0x40;
+    public const RIGHTS_FD_ADVISE = 0x80;
+    public const RIGHTS_FD_ALLOCATE = 0x100;
+    public const RIGHTS_PATH_CREATE_DIRECTORY = 0x200;
+    public const RIGHTS_PATH_CREATE_FILE = 0x400;
+    public const RIGHTS_PATH_LINK_SOURCE = 0x800;
+    public const RIGHTS_PATH_LINK_TARGET = 0x1000;
+    public const RIGHTS_PATH_OPEN = 0x2000;
+    public const RIGHTS_FD_READDIR = 0x4000;
+    public const RIGHTS_PATH_READLINK = 0x8000;
+    public const RIGHTS_PATH_RENAME_SOURCE = 0x10000;
+    public const RIGHTS_PATH_RENAME_TARGET = 0x20000;
+    public const RIGHTS_PATH_FILESTAT_GET = 0x40000;
+    public const RIGHTS_PATH_FILESTAT_SET_SIZE = 0x80000;
+    public const RIGHTS_PATH_FILESTAT_SET_TIMES = 0x100000;
+    public const RIGHTS_FD_FILESTAT_GET = 0x200000;
+    public const RIGHTS_FD_FILESTAT_SET_SIZE = 0x400000;
+    public const RIGHTS_FD_FILESTAT_SET_TIMES = 0x800000;
+    public const RIGHTS_PATH_SYMLINK = 0x1000000;
+    public const RIGHTS_PATH_REMOVE_DIRECTORY = 0x2000000;
+    public const RIGHTS_PATH_UNLINK_FILE = 0x4000000;
+    public const RIGHTS_POLL_FD_READWRITE = 0x8000000;
+    public const RIGHTS_SOCK_SHUTDOWN = 0x10000000;
+
+    public const FILETYPE_UNKNOWN = 0;
+    public const FILETYPE_BLOCK_DEVICE = 1;
+    public const FILETYPE_CHARACTER_DEVICE = 2;
+    public const FILETYPE_DIRECTORY = 3;
+    public const FILETYPE_REGULAR_FILE = 4;
+    public const FILETYPE_SOCKET_DGRAM = 5;
+    public const FILETYPE_SOCKET_STREAM = 6;
+    public const FILETYPE_SYMBOLIC_LINK = 7;
+
+    public const FDFLAGS_APPEND = 0x1;
+    public const FDFLAGS_DSYNC = 0x2;
+    public const FDFLAGS_NONBLOCK = 0x4;
+    public const FDFLAGS_RSYNC = 0x8;
+    public const FDFLAGS_SYNC = 0x10;
+
+    public const LOOKUPFLAGS_SYMLINK_FOLLOW = 0x1;
+
+    public const OFLAGS_CREAT = 0x1;
+    public const OFLAGS_DIRECTORY = 0x2;
+    public const OFLAGS_EXCL = 0x4;
+    public const OFLAGS_TRUNC = 0x8;
+
+    public const PREOPENTYPE_DIR = 0;
 
     /**
      * @var string[] Process arguments.
@@ -165,7 +165,7 @@ class Wasi extends Module
      * @var array<string, string> Environment variables.
      */
     public $env = array();
-    
+
     /**
      * @var array[] Opened file descriptor handles and metadata.
      */
@@ -175,7 +175,7 @@ class Wasi extends Module
      * @var Wasm The Wasm environment.
      */
     private $wasm;
-    
+
     public function __construct(Wasm $env, array $preopens = array())
     {
         $this->wasm = $env;
@@ -228,7 +228,7 @@ class Wasi extends Module
 
         $env->export($this, 'wasi_unstable');
     }
-    
+
     /**
      * Read command-line argument data. The size of the array should match that
      * returned by args_sizes_get()
@@ -246,7 +246,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Return command-line argument data sizes.
      */
@@ -259,7 +259,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Read environment variable data. The sizes of the buffers should match
      * that returned by environ_sizes_get().
@@ -277,7 +277,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Return command-line argument data sizes.
      */
@@ -292,7 +292,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Close a file descriptor. Note: This is similar to close in POSIX.
      */
@@ -313,7 +313,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Get the attributes of a file descriptor. Note: This returns similar flags
      * to fsync(fd, F_GETFL) in POSIX, as well as additional fields.
@@ -334,7 +334,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Adjust the flags associated with a file descriptor. Note: This is similar
      * to fcntl(fd, F_SETFL, flags) in POSIX.
@@ -343,7 +343,7 @@ class Wasi extends Module
     {
         return array(self::ERRNO_NOSYS);
     }
-    
+
     /**
      * Return a description of the given preopened file descriptor.
      */
@@ -353,7 +353,7 @@ class Wasi extends Module
             return array(self::ERRNO_BADF);
         }
         $entry = $this->fds[$fd];
-        
+
         if (!isset($entry['vpath'])) {
             return array(self::ERRNO_BADF);
         }
@@ -371,7 +371,7 @@ class Wasi extends Module
             return array(self::ERRNO_BADF);
         }
         $entry = $this->fds[$fd];
-        
+
         if (!isset($entry['vpath'])) {
             return array(self::ERRNO_BADF);
         }
@@ -381,7 +381,7 @@ class Wasi extends Module
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Read from a file descriptor. Note: This is similar to readv in POSIX.
      */
@@ -419,18 +419,18 @@ class Wasi extends Module
             return array(self::ERRNO_BADF);
         }
         $entry = $this->fds[$fd];
-        
+
         fseek($entry['rid'], $offset, $whence); // todo: handle error
         $newOffset = ftell($entry['rid']);
         $this->wasm->memory->storeInt($newOffset, $newOffsetOffset, 64);
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Write to a file descriptor. Note: This is similar to writev in POSIX.
      */
-    public function fd_write( int $fd, int $iovsOffset, int $iovsLength, int $nwrittenOffset): array // [int]
+    public function fd_write(int $fd, int $iovsOffset, int $iovsLength, int $nwrittenOffset): array // [int]
     {
         if (!isset($this->fds[$fd])) {
             return array(self::ERRNO_BADF);
@@ -452,7 +452,7 @@ class Wasi extends Module
         $this->wasm->memory->storeInt($nwritten, $nwrittenOffset);
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Open a file or directory. The returned file descriptor is not guaranteed
      * to be the lowest-numbered file descriptor not currently open; it is
@@ -489,7 +489,7 @@ class Wasi extends Module
         if (($dirflags & self::LOOKUPFLAGS_SYMLINK_FOLLOW) && !($path = realpath($resolvedPath))) {
             $path = $resolvedPath;
         }
-        
+
         // check if path is outside of sandbox
         if (substr($this->relative($entry['path'], $path), 0, 2) == '..') {
             return array(self::ERRNO_NOTCAPABLE);
@@ -515,7 +515,7 @@ class Wasi extends Module
             $this->wasm->memory->storeInt($openedFd, $openedFdOffset);
             return array(self::ERRNO_SUCCESS);
         }
-        
+
         $write = (
             self::RIGHTS_FD_DATASYNC |
             self::RIGHTS_FD_WRITE |
@@ -528,8 +528,8 @@ class Wasi extends Module
             self::RIGHTS_FD_READDIR
         );
 
-        /** 
-         * note, ignored $fdflags: 
+        /**
+         * note, ignored $fdflags:
          *   self::FDFLAGS_DSYNC
          *   self::FDFLAGS_NONBLOCK
          *   self::FDFLAGS_RSYNC
@@ -562,7 +562,7 @@ class Wasi extends Module
         $this->wasm->memory->storeInt($openedFd, $openedFdOffset);
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Return the attributes of a file or directory. Note: This is similar to
      * stat in POSIX.
@@ -573,7 +573,7 @@ class Wasi extends Module
             return array(self::ERRNO_BADF);
         }
         $entry = $this->fds[$fd];
-        
+
         if (!isset($entry['path'])) {
             return array(self::ERRNO_INVAL);
         }
@@ -618,19 +618,19 @@ class Wasi extends Module
 
         $this->wasm->memory->storeInt($info['size'] ?? 0, $bufferOffset, 64);
         $bufferOffset += 64 / 8;
-        
+
         $this->wasm->memory->storeInt($info['atime'] ?? 0, $bufferOffset, 64);
         $bufferOffset += 64 / 8;
 
         $this->wasm->memory->storeInt($info['mtime'] ?? 0, $bufferOffset, 64);
         $bufferOffset += 64 / 8;
-        
+
         $this->wasm->memory->storeInt($info['ctime'] ?? 0, $bufferOffset, 64);
         $bufferOffset += 64 / 8;
 
         return array(self::ERRNO_SUCCESS);
     }
-    
+
     /**
      * Terminate the process normally. An exit code of 0 indicates successful
      * termination of the program. The meanings of other values is dependent on
@@ -663,23 +663,23 @@ class Wasi extends Module
     {
         // some compatibility fixes for Windows paths
         $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
-        $to   = is_dir($to)   ? rtrim($to, '\/') . '/'   : $to;
+        $to   = is_dir($to) ? rtrim($to, '\/') . '/' : $to;
         $from = str_replace('\\', '/', $from);
         $to   = str_replace('\\', '/', $to);
-    
+
         $from     = explode('/', $from);
         $to       = explode('/', $to);
         $relPath  = $to;
-    
-        foreach($from as $depth => $dir) {
+
+        foreach ($from as $depth => $dir) {
             // find first non-matching dir
-            if($dir === $to[$depth]) {
+            if ($dir === $to[$depth]) {
                 // ignore this directory
                 array_shift($relPath);
             } else {
                 // get number of remaining dirs to $from
                 $remaining = count($from) - $depth;
-                if($remaining > 1) {
+                if ($remaining > 1) {
                     // add traversals up to first matching dir
                     $padLength = (count($relPath) + $remaining - 1) * -1;
                     $relPath = array_pad($relPath, $padLength, '..');
@@ -691,18 +691,19 @@ class Wasi extends Module
         }
         return implode('/', $relPath);
     }
-    
+
     /**
      * Resolves a path (possibly split up into multiple segments) into a single,
      * absolute path without relative links such as ./ or ../. Similar to
      * realpath, but doesn't follow symlinks.
      */
-    private function resolve(string ...$pathSegments) {
+    private function resolve(string ...$pathSegments)
+    {
         // preprocess
         $raw = implode('/', $pathSegments);
         $raw = rtrim($raw, '\/');
         $raw = str_replace('\\', '/', $raw);
-    
+
         // handle parts
         $root = $raw[0] == '/' ? '/' : '';
         $parts = array();

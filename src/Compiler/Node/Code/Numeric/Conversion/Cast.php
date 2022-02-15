@@ -59,7 +59,7 @@ class Cast extends Numeric
                 throw new CompilationException('Unexpected type');
         }
     }
-    
+
     private function compileToInt(ExpressionCompiler $state, Source $src): void
     {
         // assert type

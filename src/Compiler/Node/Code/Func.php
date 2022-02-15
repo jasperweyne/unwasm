@@ -43,7 +43,7 @@ class Func implements FuncInterface
 
     /** @var Instruction[] The representation of the func component */
     public $body;
-    
+
     /** @var int The position in the original webassembly source */
     public $position;
 

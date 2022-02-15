@@ -25,5 +25,4 @@ namespace UnWasm\Exception;
  */
 class ParsingException extends CompilerException
 {
-    
 }

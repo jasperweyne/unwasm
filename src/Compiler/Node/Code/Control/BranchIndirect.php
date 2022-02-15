@@ -32,7 +32,7 @@ class BranchIndirect extends Instruction
 {
     /** @var int[] The branching depth options */
     private $options;
-    
+
     /** @var int The default branching depth */
     private $default;
 
@@ -68,7 +68,7 @@ class BranchIndirect extends Instruction
         $defaultDepth = $this->default + 2;
         $return = $state->return($this->default);
         $stackVars = $state->peek(count($return));
-        
+
         $src->write("default:")->indent();
         Block::compileReturn($src, $return, $stackVars);
         $src->write("continue $defaultDepth;")->outdent();

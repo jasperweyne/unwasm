@@ -50,7 +50,7 @@ class Block extends Instruction
     {
         $this->funcType = $this->funcType ?? $outerState->module->types[$this->typeIdx];
         $src->write("do { // $this->funcType")->indent();
-        
+
         $state = self::createContext($outerState, $this->funcType);
         foreach ($this->instructions as $instr) {
             $instr->compile($state, $src);
