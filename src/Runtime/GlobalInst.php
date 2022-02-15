@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace UnWasm\Runtime;
 
+use UnWasm\Exception\ExecutionException;
+use UnWasm\Exception\RuntimeValueException;
+
 /**
  * A runtime global instance for a module
  */
@@ -52,7 +55,7 @@ class GlobalInst
     public function getInt(): int
     {
         if ($this->type !== 'i' && $this->type !== 'I') {
-            throw new \LogicException('The type of this global is not an integer');
+            throw new RuntimeValueException('The type of this global is not an integer');
         }
 
         return $this->intValue;
@@ -61,7 +64,7 @@ class GlobalInst
     public function getFloat(): float
     {
         if ($this->type !== 'f' && $this->type !== 'F') {
-            throw new \LogicException('The type of this global is not a float');
+            throw new RuntimeValueException('The type of this global is not a float');
         }
 
         return $this->floatValue;
@@ -70,7 +73,7 @@ class GlobalInst
     public function getRef(): ?callable
     {
         if ($this->type !== 'r') {
-            throw new \LogicException('The type of this global is not a callable reference');
+            throw new RuntimeValueException('The type of this global is not a callable reference');
         }
 
         return $this->refValue;
@@ -79,11 +82,11 @@ class GlobalInst
     public function setInt(int $value): void
     {
         if ($this->type !== 'i' && $this->type !== 'I') {
-            throw new \LogicException('The type of this global is not an integer');
+            throw new RuntimeValueException('The type of this global is not an integer');
         }
 
         if ($this->mutateCnt === 0) {
-            throw new \LogicException('This global is immutable');
+            throw new ExecutionException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
             $this->mutateCnt--;
         }
@@ -94,11 +97,11 @@ class GlobalInst
     public function setFloat(float $value): void
     {
         if ($this->type !== 'f' && $this->type !== 'F') {
-            throw new \LogicException('The type of this global is not a float');
+            throw new RuntimeValueException('The type of this global is not a float');
         }
 
         if ($this->mutateCnt === 0) {
-            throw new \LogicException('This global is immutable');
+            throw new ExecutionException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
             $this->mutateCnt--;
         }
@@ -109,11 +112,11 @@ class GlobalInst
     public function setRef(?callable $value): void
     {
         if ($this->type !== 'r') {
-            throw new \LogicException('The type of this global is not a callable reference');
+            throw new RuntimeValueException('The type of this global is not a callable reference');
         }
 
         if ($this->mutateCnt === 0) {
-            throw new \LogicException('This global is immutable');
+            throw new ExecutionException('This global is immutable');
         } elseif ($this->mutateCnt !== null) {
             $this->mutateCnt--;
         }

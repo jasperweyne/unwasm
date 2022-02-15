@@ -22,6 +22,10 @@ namespace UnWasm\Compiler;
 
 use UnWasm\Compiler\Text\BuilderInterface;
 use UnWasm\Compiler\Text\TypesBuilder;
+use UnWasm\Exception\CompilationException;
+use UnWasm\Exception\CompilerException;
+use UnWasm\Exception\LexingException;
+use UnWasm\Exception\ParsingException;
 
 /**
  * Parses webassembly text format and generates an internal
@@ -68,7 +72,7 @@ class TextParser implements ParserInterface
             $this->parenthesised(function () use ($compiler) {
                 $ctx = $this->expectKeyword();
                 if (!isset($this->builders[$ctx])) {
-                    throw new \RuntimeException("Unknown item '$ctx' in .wat");
+                    throw new CompilationException("Unknown item '$ctx' in .wat");
                 }
                 $this->builders[$ctx]->scan($this, $compiler);
             });
@@ -99,7 +103,7 @@ class TextParser implements ParserInterface
             $origOffset = $this->offset;
             try {
                 $result[] = ($func)($this);
-            } catch (\UnexpectedValueException $e) {
+            } catch (CompilerException $e) {
                 $this->offset = $origOffset;
                 return $result;
             }
@@ -112,7 +116,7 @@ class TextParser implements ParserInterface
         try {
             ($func)($this);
             return true;
-        } catch (\UnexpectedValueException $e) {
+        } catch (CompilerException $e) {
             // continue to next item
         }
         $this->offset = $origOffset;
@@ -125,20 +129,20 @@ class TextParser implements ParserInterface
         foreach ($funcs as $func) {
             try {
                 return ($func)($this);
-            } catch (\UnexpectedValueException $e) {
+            } catch (CompilerException $e) {
                 // continue to next item
                 $this->offset = $origOffset;
             }
         }
 
-        throw new \UnexpectedValueException('Expected a token');
+        throw new CompilationException('Expected a token');
     }
 
     public function parenthesised(callable $func)
     {
         // parse (
         if ($this->nextToken('/\G\(/') === null) {
-            throw new \UnexpectedValueException("Expected '('");
+            throw new ParsingException("Expected '('");
         }
 
         // parse contents
@@ -146,7 +150,7 @@ class TextParser implements ParserInterface
 
         // parse )
         if ($this->nextToken('/\G\)/') === null) {
-            throw new \UnexpectedValueException("Expected ')'");
+            throw new ParsingException("Expected ')'");
         }
 
         // return contents
@@ -162,7 +166,7 @@ class TextParser implements ParserInterface
         $s = $unsigned ? '+?' : '[-+]?';
         $result = $this->nextToken("/\G$s(?:0x$hexnum|$num)/");
         if ($result === null) {
-            throw new \UnexpectedValueException('Expected integer');
+            throw new LexingException('Expected integer');
         }
 
         // parse and return int
@@ -178,7 +182,7 @@ class TextParser implements ParserInterface
         // get int string
         $result = $this->nextToken("/\G[-+]?(?:0x$hexnum(?:\\.$hexnum)?[Pp][+-]?$num|$num(?:\\.$num)?[Ee][+-]?$num)/");
         if ($result === null) {
-            throw new \UnexpectedValueException('Expected float');
+            throw new LexingException('Expected float');
         }
 
         // convert hex to dec notation
@@ -197,7 +201,7 @@ class TextParser implements ParserInterface
             if ($maybe) {
                 return null;
             } else {
-                throw new \UnexpectedValueException('Expected id');
+                throw new LexingException('Expected id');
             }
         }
         return $result;
@@ -213,7 +217,7 @@ class TextParser implements ParserInterface
         // if no keyword (option) found, return null
         if ($result === null || (count($options) > 0 && !in_array($result, $options))) {
             $this->offset = $origOffset;
-            throw new \UnexpectedValueException('Expected keyword');
+            throw new LexingException('Expected keyword');
         } else {
             return $result;
         }
@@ -231,7 +235,7 @@ class TextParser implements ParserInterface
         $escaped = implode('|', array_merge($constRepl, [$utf8Repl, $hexRepl]));
         $result = $this->nextToken("/\G\"((?:[^\\x00-\\x1f\\\"]|$escaped)*)\"/u", 1);
         if ($result === null) {
-            throw new \UnexpectedValueException('Expected string');
+            throw new LexingException('Expected string');
         }
 
         // replace escaped characters
@@ -249,7 +253,7 @@ class TextParser implements ParserInterface
         // validate utf 8 encoding
         if (!mb_check_encoding($result, 'UTF-8')) {
             $this->offset = $origOffset;
-            throw new \UnexpectedValueException('Invalid string encoding');
+            throw new ParsingException('Invalid string encoding');
         }
 
         // replace hex byte specifier

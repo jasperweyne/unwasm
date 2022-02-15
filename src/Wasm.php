@@ -25,6 +25,7 @@ use UnWasm\Cache\MemoryCache;
 use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ParserInterface;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\RuntimeValueException;
 use UnWasm\Runtime\Wasi;
 
 /**
@@ -61,7 +62,7 @@ class Wasm
     public function import(string $module)
     {
         if (!isset($this->modules[$module]) && $this->load($module) === null) {
-            throw new \RuntimeException("Tried to import unregistered module '$module', make sure you've exported it to the environment.");
+            throw new RuntimeValueException("Tried to import unregistered module '$module', make sure you've exported it to the environment.");
         }
 
         return $this->modules[$module];

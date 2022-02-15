@@ -61,7 +61,7 @@ class CallIndirect extends Instruction
         $assign = $output ? "list($output) = " : '';
         $src
             ->write("\$indirect = \$this->table_$this->tableIdx->get($offset);")
-            ->write("if (\$indirect === null) throw new \RuntimeException('Problem occurred');")
+            ->write("if (\$indirect === null) throw new \UnWasm\Exception\ExecutionException('Problem occurred');")
             ->write($assign."(\$indirect)($input);")
         ;
     }

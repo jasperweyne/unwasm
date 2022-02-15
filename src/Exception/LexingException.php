@@ -18,19 +18,12 @@
 
 declare(strict_types=1);
 
-namespace UnWasm\Compiler\Node\Code\Control;
-
-use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\ExpressionCompiler;
-use UnWasm\Compiler\Source;
+namespace UnWasm\Exception;
 
 /**
- * An unreachable instruction.
+ * An error occured during lexing of the raw webassembly.
  */
-class Unreachable extends Instruction
+class LexingException extends CompilerException
 {
-    public function compile(ExpressionCompiler $state, Source $src): void
-    {
-        $src->write('throw new \UnWasm\Exception\ExecutionException(\'Unreachable code executed\');');
-    }
+    
 }

@@ -33,6 +33,7 @@ use UnWasm\Compiler\Node\Store\Table;
 use UnWasm\Compiler\Node\Store\Memory;
 use UnWasm\Compiler\Node\Store\GlobalData;
 use UnWasm\Compiler\Node\Type\FuncType;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Stores an internal representation of webassembly code and compiles it
@@ -348,7 +349,7 @@ class ModuleCompiler
             $functype = $this->types[$func->typeIdx()];
 
             if (count($functype->getInput()) !== 0) {
-                throw new \RuntimeException('A function with input parameters cant be start');
+                throw new CompilationException('A function with input parameters cant be start');
             }
 
             $src

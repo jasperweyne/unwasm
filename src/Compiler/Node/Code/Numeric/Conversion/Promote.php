@@ -24,6 +24,7 @@ use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Numeric\Numeric;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Change an fnn into an fmm.
@@ -41,7 +42,7 @@ class Promote extends Numeric
                 $from = ExpressionCompiler::F32;
                 break;
             default:
-                throw new \RuntimeException('Unsupported type given');
+                throw new CompilationException('Unsupported type given');
         }
 
         // assert type

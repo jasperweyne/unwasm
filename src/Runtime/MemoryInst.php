@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace UnWasm\Runtime;
 
+use UnWasm\Exception\AccessException;
+use UnWasm\Exception\RuntimeValueException;
+
 /**
  * A runtime memory instance for a module
  */
@@ -111,7 +114,7 @@ class MemoryInst
     {
         // validate offset+length(value) is inside memory bounds
         if ($offset + strlen($data) > $this->size() * self::PAGE_SIZE) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // move the pointer to the offset
@@ -125,7 +128,7 @@ class MemoryInst
     {
         // validate offset+length(value) is inside memory bounds
         if ($offset + $n > $this->size() * self::PAGE_SIZE) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // move the pointer to the offset
@@ -210,7 +213,7 @@ class MemoryInst
             case 64:
                 return $signed ? 'q' : 'Q';
             default:
-                throw new \InvalidArgumentException('Unsupported bit width');
+                throw new RuntimeValueException('Unsupported bit width');
         }
     }
 }

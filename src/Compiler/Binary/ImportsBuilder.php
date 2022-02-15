@@ -26,6 +26,7 @@ use UnWasm\Compiler\Node\External\Import\FuncImport;
 use UnWasm\Compiler\Node\External\Import\GlobalImport;
 use UnWasm\Compiler\Node\External\Import\MemImport;
 use UnWasm\Compiler\Node\External\Import\TableImport;
+use UnWasm\Exception\ParsingException;
 
 /**
  * A factory class for the imports component of a binary-format module.
@@ -64,7 +65,7 @@ class ImportsBuilder implements BuilderInterface
                     $import = new GlobalImport($module, $name, $type);
                     break;
                 default:
-                    throw new \UnexpectedValueException("Invalid import type");
+                    throw new ParsingException("Invalid import type");
             }
 
             return $import;

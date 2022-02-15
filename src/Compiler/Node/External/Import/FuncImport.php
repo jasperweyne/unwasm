@@ -48,7 +48,7 @@ class FuncImport extends Import implements FuncInterface
     {
         $type = strval($module->types[$this->typeIdx]);
         $ref = $module->importRefs[$this->module];
-        $source->write("if (\$this->ref_{$ref}->funcs['$this->name'] !== '$type') throw new \UnexpectedValueException('Invalid type');");
+        $source->write("if (\$this->ref_{$ref}->funcs['$this->name'] !== '$type') throw new \UnWasm\Exception\RuntimeValueException('Invalid type');");
     }
 
     public function compile(int $index, ModuleCompiler $module, Source $src): void

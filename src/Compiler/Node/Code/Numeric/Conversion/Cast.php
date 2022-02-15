@@ -24,6 +24,7 @@ use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Numeric\Numeric;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Cast (convert/trunc) an inn into an fmm or vice versa, optionally respecting the sign.
@@ -55,7 +56,7 @@ class Cast extends Numeric
                 $this->compileToFloat($state, $src);
                 break;
             default:
-                throw new \RuntimeException('Unexpected type');
+                throw new CompilationException('Unexpected type');
         }
     }
     
@@ -68,7 +69,7 @@ class Cast extends Numeric
             case ExpressionCompiler::F64:
                 break;
             default:
-                throw new \RuntimeException('Unexpected type');
+                throw new CompilationException('Unexpected type');
         }
 
         // update stack
@@ -95,7 +96,7 @@ class Cast extends Numeric
                 $bits = 63;
                 break;
             default:
-                throw new \RuntimeException('Unexpected type');
+                throw new CompilationException('Unexpected type');
         }
 
         // update stack

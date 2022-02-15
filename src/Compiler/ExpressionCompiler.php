@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler;
 
 use UnWasm\Compiler\Node\Type\ValueType;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Represents the stack used during webassembly execution for a single context
@@ -68,7 +69,7 @@ class ExpressionCompiler
         // if local has not been assigned, zero initialise
         $rootLocals = $this->root()->locals;
         if (!isset($rootLocals[$local])) {
-            throw new \UnexpectedValueException("Invalid local variable index $local in total of ".count($rootLocals));
+            throw new CompilationException("Invalid local variable index $local in total of ".count($rootLocals));
         }
 
         array_push($this->names, "\$local_$local");
@@ -106,7 +107,7 @@ class ExpressionCompiler
     public function push(ValueType ...$type): array
     {
         if ($this->const) {
-            throw new \LogicException("Can't call push() when in constant expression mode");
+            throw new CompilationException("Can't call push() when in constant expression mode");
         }
 
         $newVars = [];
@@ -157,14 +158,14 @@ class ExpressionCompiler
     /**
      * Assert that the stack elements have a given type
      *
-     * @throws \InvalidArgumentException
+     * @throws CompilationException
      */
     public function typed(ValueType $type, $cnt = 1): void
     {
         $types = $this->type($cnt);
         foreach ($types as $t) {
             if ($t->type != $type->type) {
-                throw new \InvalidArgumentException('Types ('.$cnt.') mismatch: '.$t->type.' vs '.$type->type);
+                throw new CompilationException('Types ('.$cnt.') mismatch: '.$t->type.' vs '.$type->type);
             }
         }
     }

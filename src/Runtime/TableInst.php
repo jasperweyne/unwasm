@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace UnWasm\Runtime;
 
+use UnWasm\Exception\AccessException;
+
 /**
  * A runtime table instance for a module
  */
@@ -47,7 +49,7 @@ class TableInst
     {
         // validate offset is inside memory bounds
         if ($offset >= $this->size()) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // return the value from contents
@@ -58,7 +60,7 @@ class TableInst
     {
         // validate offset is inside memory bounds
         if ($offset >= $this->size()) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // override contents with value at offset
@@ -91,7 +93,7 @@ class TableInst
     {
         // validate offset+n is inside memory bounds
         if ($offset + $n > $this->size()) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // override contents values
@@ -104,7 +106,7 @@ class TableInst
     {
         // validate offset+n is inside memory bounds
         if ($sourceOffset + $n > $this->size() || $destOffset + $n > $dest->size()) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // read the data at source and write it to dest
@@ -115,7 +117,7 @@ class TableInst
     {
         // validate offset+n is inside memory bounds
         if ($offset + count($data) > $this->size()) {
-            throw new \OutOfBoundsException();
+            throw new AccessException();
         }
 
         // overwrite per element from data

@@ -24,6 +24,8 @@ use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\CompilationException;
+use UnWasm\Exception\ParsingException;
 
 /**
  * Load a value from memory.
@@ -61,7 +63,7 @@ class Load extends Instruction
                     $this->memBits = 64;
                     break;
                 default:
-                    throw new \InvalidArgumentException('Invalid value type provided');
+                    throw new ParsingException('Invalid value type provided');
             }
         }
     }
@@ -87,7 +89,7 @@ class Load extends Instruction
                 $src->write("$value = \$this->mem_0->loadFloat($this->offset + $dynOffset, $this->memBits);");
                 break;
             default:
-                throw new \InvalidArgumentException('Invalid value type provided');
+                throw new CompilationException('Invalid value type provided');
         }
     }
 }

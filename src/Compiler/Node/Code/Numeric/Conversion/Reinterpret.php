@@ -24,6 +24,7 @@ use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Numeric\Numeric;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Change an fnn into an imm or vice versa.
@@ -55,7 +56,7 @@ class Reinterpret extends Numeric
                 $unpack = 'd';
                 break;
             default:
-                throw new \RuntimeException('Unsupported type given');
+                throw new CompilationException('Unsupported type given');
         }
 
         // assert type

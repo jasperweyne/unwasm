@@ -102,6 +102,7 @@ use UnWasm\Compiler\Node\Code\Variable\LocalGet;
 use UnWasm\Compiler\Node\Code\Variable\LocalSet;
 use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Node\Type\ValueType;
+use UnWasm\Exception\ParsingException;
 
 /**
  * A factory class for the types component of a binary-format module.
@@ -919,12 +920,12 @@ class FuncsBuilder implements BuilderInterface
                         $instruction = new TableFill($tableIdx);
                         break;
                     default:
-                        throw new \RuntimeException('Unknown secondary opcode ' . strval($secondary));
+                        throw new ParsingException('Unknown secondary opcode ' . strval($secondary));
                 }
                 break;
             default:
                 $pos = str_pad(dechex($parser->position() - 1), 8, '0', STR_PAD_LEFT);
-                throw new \RuntimeException('Unknown opcode 0x' . str_pad(dechex($opcode), 2, '0', STR_PAD_LEFT) . '@0x' . $pos);
+                throw new ParsingException('Unknown opcode 0x' . str_pad(dechex($opcode), 2, '0', STR_PAD_LEFT) . '@0x' . $pos);
         }
         return $instruction;
     }

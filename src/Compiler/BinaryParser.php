@@ -32,6 +32,8 @@ use UnWasm\Compiler\Binary\StartBuilder;
 use UnWasm\Compiler\Binary\TablesBuilder;
 use UnWasm\Compiler\Binary\Token;
 use UnWasm\Compiler\Binary\TypesBuilder;
+use UnWasm\Exception\LexingException;
+use UnWasm\Exception\ParsingException;
 
 /**
  * Parses webassembly binary format and generates an internal
@@ -111,14 +113,14 @@ class BinaryParser implements ParserInterface
         // validate stream
         $magic = "\0asm";
         if (fread($this->stream, 4) !== $magic) {
-            throw new \InvalidArgumentException('Provided stream does not represent a valid binary webassembly source');
+            throw new ParsingException('Provided stream does not represent a valid binary webassembly source');
         }
 
         // validate wasm version
         $read = fread($this->stream, 4);
         list(, $version) = unpack('V', $read);
         if ($version !== 1) {
-            throw new \InvalidArgumentException('Only version 1 binary webassembly is supported');
+            throw new ParsingException('Only version 1 binary webassembly is supported');
         }
     }
 
@@ -126,7 +128,7 @@ class BinaryParser implements ParserInterface
     {
         $pos = ftell($this->stream);
         if ($pos === false) {
-            throw new \RuntimeException("Can't tell position of stream");
+            throw new LexingException("Can't tell position of stream");
         }
         return $pos;
     }
@@ -136,16 +138,16 @@ class BinaryParser implements ParserInterface
         $pos = ftell($this->stream);
         $value = fread($this->stream, 1);
         if ($value === false) {
-            throw new \RuntimeException("No value read");
+            throw new LexingException("No value read");
         }
 
         $result = Token::parse(Token::BYTE_TYPE, $value, $pos);
         if ($minIncl && $result->getValue() < $minIncl) {
-            throw new \RuntimeException("Invalid value");
+            throw new ParsingException("Invalid value");
         }
 
         if (($maxIncl && $result->getValue() > $maxIncl) || ($minIncl && $result->getValue() != $minIncl)) {
-            throw new \RuntimeException("Invalid value");
+            throw new ParsingException("Invalid value");
         }
 
         return $result->getValue();
@@ -175,18 +177,18 @@ class BinaryParser implements ParserInterface
         $value = fread($this->stream, $size);
 
         if ($value === false) {
-            throw new \UnexpectedValueException();
+            throw new LexingException();
         }
 
         // validate utf8 encoding
         if ($validate && !mb_check_encoding($value, 'UTF-8')) {
-            throw new \UnexpectedValueException('Invalid utf8 string');
+            throw new ParsingException('Invalid utf8 string');
         }
 
         // parse and validate result value
         $result = Token::parse(Token::STRING_TYPE, $value, $pos);
         if (preg_match($regex, $result->getValue()) !== 1) {
-            throw new \UnexpectedValueException();
+            throw new ParsingException();
         }
 
         return $result->getValue();
@@ -198,7 +200,7 @@ class BinaryParser implements ParserInterface
         $width = $bits / 8;
         $value = fread($this->stream, $width);
         if (!is_string($value)) {
-            throw new \RuntimeException("Invalid value");
+            throw new LexingException("Invalid value");
         }
 
         $type = $bits == 64 ? Token::FLOAT_64_TYPE : Token::FLOAT_TYPE;
@@ -214,12 +216,12 @@ class BinaryParser implements ParserInterface
         $value = "";
         for ($i = 0;; $i++) {
             if ($i >= ceil($bits / 7.0)) {
-                throw new \RuntimeException("An int larger than $bits bits was provided");
+                throw new LexingException("An int larger than $bits bits was provided");
             }
 
             $char = fread($this->stream, 1);
             if (!is_string($char)) {
-                throw new \RuntimeException("Unexpected read error");
+                throw new LexingException("Unexpected read error");
             }
             $value .= $char;
 
@@ -233,7 +235,7 @@ class BinaryParser implements ParserInterface
         if ((ord(substr($value, -1)) & 0x80) != 0) {
             $str = bin2hex($value);
             $posstr = str_pad(dechex(ftell($this->stream)), 8, '0', STR_PAD_LEFT);
-            throw new \RuntimeException("Invalid integer provided $str@0x$posstr");
+            throw new ParsingException("Invalid integer provided $str@0x$posstr");
         }
 
         // set type
@@ -257,7 +259,7 @@ class BinaryParser implements ParserInterface
         // validate section size with contents size
         $contents = $this->position() - $start;
         if ($size !== 0 && $size !== $contents) {
-            throw new \UnexpectedValueException("Expected size $size does not match contents size $contents");
+            throw new ParsingException("Expected size $size does not match contents size $contents");
         }
 
         return $result;
