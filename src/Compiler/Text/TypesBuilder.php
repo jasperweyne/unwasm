@@ -51,12 +51,12 @@ class TypesBuilder implements BuilderInterface
 
     public static function functype(TextParser $parser): FuncType
     {
-        $parser->expectOpen();
-        $parser->expectKeyword('func');
-        $in = self::resulttype($parser, true);
-        $out = self::resulttype($parser, false);
-        $parser->expectClose();
-        return new FuncType($in, $out);
+        return $parser->parenthesised(function () use ($parser) {
+            $parser->expectKeyword('func');
+            $in = self::resulttype($parser, true);
+            $out = self::resulttype($parser, false);
+            return new FuncType($in, $out);
+        });
     }
 
     /**
@@ -65,14 +65,13 @@ class TypesBuilder implements BuilderInterface
     public static function resulttype(TextParser $parser, bool $param): array
     {
         return array_merge([], $parser->vec(function (TextParser $parser) use ($param) {
-            $parser->expectOpen();
-            $parser->expectKeyword($param ? 'param' : 'result');
-            if ($param) {
-                $parser->expectId();
-            }
-            $types = $parser->vec([self::class, 'valuetype']);
-            $parser->expectClose();
-            return $types;
+            return $parser->parenthesised(function () use ($parser, $param) {
+                $parser->expectKeyword($param ? 'param' : 'result');
+                if ($param) {
+                    $parser->expectId();
+                }
+                return $parser->vec([self::class, 'valuetype']);
+            });
         }));
     }
 
