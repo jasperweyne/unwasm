@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Code\Numeric\Int;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Numeric\Numeric;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -29,6 +30,15 @@ use UnWasm\Compiler\Source;
  */
 class BitShr extends Numeric
 {
+    /** @var bool Whether the operation should be performed unsigned */
+    private $unsigned;
+
+    public function __construct(ValueType $type, bool $unsigned = false)
+    {
+        parent::__construct($type);
+        $this->unsigned = $unsigned;
+    }
+
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // assert type
@@ -39,6 +49,10 @@ class BitShr extends Numeric
         list($var) = $state->push($this->type);
 
         // export code
-        $src->write("$var = $x >> $y;");
+        if ($this->unsigned) {
+            $src->write("$var = ($y == 0) ? $x : ($x >> $y) & ~(1<<(8*PHP_INT_SIZE-1)>>($y-1));");
+        } else {
+            $src->write("$var = $x >> $y;");
+        }
     }
 }

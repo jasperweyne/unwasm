@@ -79,7 +79,8 @@ class Load extends Instruction
         switch ($this->type) {
             case ExpressionCompiler::I32:
             case ExpressionCompiler::I64:
-                $src->write("$value = \$this->mem_0->loadInt($this->offset + $dynOffset, $this->memBits, $this->signed);");
+                $signed = $this->signed ? 'true' : 'false';
+                $src->write("$value = \$this->mem_0->loadInt($this->offset + $dynOffset, $this->memBits, $signed);");
                 break;
             case ExpressionCompiler::F32:
             case ExpressionCompiler::F64:

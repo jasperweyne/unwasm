@@ -46,7 +46,7 @@ class GlobalInst
         $this->intValue = 0;
         $this->floatValue = 0;
         $this->refValue = null;
-        $this->mutateCnt = $mutable ? 1 : null;
+        $this->mutateCnt = $mutable ? null : 1;
     }
 
     public function getInt(): int
