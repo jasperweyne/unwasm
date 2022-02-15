@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2021 Jasper Weyne
+ * Copyright 2021-2022 Jasper Weyne
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 */
 
 namespace UnWasm\Compiler\Binary;
+
+use UnWasm\Exception\ParsingException;
 
 class Token
 {
@@ -87,7 +89,7 @@ class Token
                 $result = self::decodeLeb128($raw, false);
                 break;
             default:
-                throw new \UnexpectedValueException();
+                throw new ParsingException();
         }
         return $result;
     }

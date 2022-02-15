@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2021 Jasper Weyne
+ * Copyright 2021-2022 Jasper Weyne
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ use UnWasm\Compiler\Node\External\Export\FuncExport;
 use UnWasm\Compiler\Node\External\Export\GlobalExport;
 use UnWasm\Compiler\Node\External\Export\MemExport;
 use UnWasm\Compiler\Node\External\Export\TableExport;
+use UnWasm\Exception\ParsingException;
 
 /**
  * A factory class for the exports component of a binary-format module.
@@ -60,7 +61,7 @@ class ExportsBuilder implements BuilderInterface
                     $export = new GlobalExport($name, $index);
                     break;
                 default:
-                    throw new \UnexpectedValueException("Invalid export type");
+                    throw new ParsingException("Invalid export type");
             }
 
             return $export;
