@@ -141,12 +141,10 @@ GRAPHQL;
         // compile modules
         foreach ($pkgModules as $module_info) {
             // download module and compile it
-            $stream = fopen('php://memory', 'w+b');
-            fwrite($stream, file_get_contents($module_info['publicUrl']));
-            rewind($stream);
-            $parser = new BinaryParser($stream);
-            $this->compile($parser, $module_info['name'], null);
-            fclose($stream);
+            self::asStream(file_get_contents($module_info['publicUrl']), function ($stream) use ($module_info) {
+                $parser = new BinaryParser($stream);
+                $this->compile($parser, $module_info['name'], null);
+            });
         }
         
         // instantiate it, cache it, return it
@@ -220,5 +218,15 @@ GRAPHQL;
         // Instantiate module
         $classname = "$this->namespace\\$module";
         return new $classname($this);
+    }
+
+    public static function asStream(string $data, callable $withStream)
+    {
+        $stream = fopen('php://memory', 'w+b');
+        fwrite($stream, $data);
+        rewind($stream);
+        $ret = ($withStream)($stream);
+        fclose($stream);
+        return $ret;
     }
 }
