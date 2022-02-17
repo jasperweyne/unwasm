@@ -83,7 +83,7 @@ class TextParser implements ParserInterface
             function () use ($compiler, $parseModule) {
                 $this->parenthesised(function () use ($compiler, $parseModule) {
                     $this->expectKeyword('module');
-                    $this->expectId(true);
+                    $compiler->id = $this->expectId(true);
                     ($parseModule)($compiler);
                 });
             },

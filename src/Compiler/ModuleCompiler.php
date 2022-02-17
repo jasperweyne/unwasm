@@ -41,6 +41,9 @@ use UnWasm\Exception\CompilationException;
  */
 class ModuleCompiler
 {
+    /** @var ?string Module name (if specified) */
+    public $id = null;
+
     /** @var FuncType[] Types */
     public $types = array();
 
