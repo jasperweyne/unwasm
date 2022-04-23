@@ -25,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\Source;
 use UnWasm\Compiler\TextParser;
+use UnWasm\Runtime\Store;
 use UnWasm\Wasm;
 
 /**
@@ -33,6 +34,8 @@ use UnWasm\Wasm;
 
 final class WebAssemblyTest extends TestCase
 {
+    const DEFAULT_MODULE = 0;
+
     /**
      * @dataProvider wastProvider
      */
@@ -86,53 +89,77 @@ final class WebAssemblyTest extends TestCase
         // cleanup and return
         fclose($stream);
         return function () use ($commands) {
-            $module = null;
+            $store = new Store();
             foreach ($commands as $cmd) {
-                $ret = ($cmd)($module);
-                if ($ret) {
-                    $module = $ret;
-                }
+                ($cmd)($store);
             }
         };
     }
 
     public function parseModule(TextParser $p): \Closure
     {
+        // return function, compiles a module and adds it to the store
+        // accepts a function that returns a ModuleCompiler inst
+        $returnFactory = function ($id, callable $compilerGen) {
+            return function (Store $store) use ($id, $compilerGen) {
+                // generate random classname to avoid collisions
+                $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $classname = '';
+                for ($i = 0; $i < 12; $i++) {
+                    $index = rand(0, strlen($characters) - 1);
+                    $classname .= $characters[$index];
+                }
+
+                // compile module
+                $compiler = ($compilerGen)();
+                $source = new Source();
+                $compiler->compile($classname, $source);
+
+                // load the compiled module
+                // this adds a class
+                eval($source->read());
+                new $classname($store, $id); // expect it to register itself to the store
+            };
+        };
+
         return $p->oneOf(
-            [$p, 'scan'],
-            function () use ($p) {
-                return $p->parenthesised(function () use ($p) {
+            function () use ($p, $returnFactory) {
+                // parses during script interpretation
+                $module = $p->scan();
+                return ($returnFactory)(self::DEFAULT_MODULE, function () use ($module) {
+                    return $module;
+                });
+            },
+            function () use ($p, $returnFactory) {
+                // parses during testing
+                return $p->parenthesised(function () use ($p, $returnFactory) {
                     $p->expectKeyword("module");
-                    $p->expectId(true);
+                    $id = $p->expectId(true) ?? self::DEFAULT_MODULE;
 
                     return $p->oneOf(
-                        function () use ($p) {
+                        function () use ($p, $id, $returnFactory) {
                             $p->expectKeyword("binary");
                             $module = implode($p->vec([$p, 'expectString']));
 
                             // return function that tries to parse/compile binary module
-                            return function () use ($module) {
-                                $compiler = Wasm::asStream($module, function ($stream) {
+                            return ($returnFactory)($id, function () use ($module) {
+                                return Wasm::asStream($module, function ($stream) {
                                     $parser = new BinaryParser($stream);
                                     return $parser->scan();
                                 });
-                                $source = new Source();
-                                $compiler->compile('module', $source);
-                            };
+                            });
                         },
-                        function () use ($p) {
+                        function () use ($p, $id, $returnFactory) {
                             $p->expectKeyword("quote");
                             $module = implode("\n", $p->vec([$p, 'expectString']));
 
                             // return function that tries to parse/compile text module
-                            return function () use ($module) {
-                                $compiler = Wasm::asStream($module, function ($stream) {
+                            return ($returnFactory)($id, function () use ($module) {
+                                return Wasm::asStream($module, function ($stream) {
                                     $parser = new TextParser($stream);
                                     return $parser->scan();
                                 });
-                                $source = new Source();
-                                $compiler->compile('module', $source);
-                            };
+                            });
                         }
                     );
                 });
@@ -142,105 +169,141 @@ final class WebAssemblyTest extends TestCase
     
     public function parseRegister(TextParser $p)
     {
-        return $p->parenthesised(function ($module) use ($p) {
+        return $p->parenthesised(function () use ($p) {
             $p->expectKeyword("register");
-            $str = $p->expectString();
-            $mod = $p->expectId(true);
+            $name = $p->expectString();
+            $module = $p->expectId(true) ?? self::DEFAULT_MODULE;
 
-            // todo: add $mod (or $module otherwise) to $env with name $str
-            return function () {};
+            return function (Store $store) use ($name, $module) {
+                // todo: add $mod (or $module otherwise) to $env with name $str
+            };
         });
     }
     
-    public function parseAction(TextParser $p)
+    public function parseAction(TextParser $p): \Closure
     {
         return $p->parenthesised(function () use ($p) {
-            $p->oneOf(
+            return $p->oneOf(
                 function () use ($p) {
                     $p->expectKeyword("invoke");
-                    $p->expectId(true);
-                    $p->expectString();
-                    $p->vec(function () use ($p) {
-                        // todo: parse const
-                    });
+                    $module = $p->expectId(true) ?? self::DEFAULT_MODULE;
+                    $func = $p->expectString();
+                    $args = $p->vec([$this, 'parseConst']);
         
-                    return function () {
+                    return function (Store $store) use ($module, $func, $args) {
                         // todo: call function with consts
+                        return ($store->funcs[$module][$func])(...$args);
                     };
                 },
                 function () use ($p) {
                     $p->expectKeyword("get");
-                    $p->expectId(true);
-                    $p->expectString();
+                    $module = $p->expectId(true) ?? self::DEFAULT_MODULE;
+                    $global = $p->expectString();
         
-                    return function () {
+                    return function (Store $store) use ($module, $global) {
                         // todo: get global
+                        return ($store->globals[$module][$global]);
                     };
                 }
             );
         });
     }
     
+    public function parseConst(TextParser $p)
+    {
+        return $p->parenthesised(function () use ($p) {
+            return $p->oneOf(
+                function () use ($p) {
+                    // ( <num_type>.const <num> )                 ;; number value
+                },
+                function () use ($p) {
+                    // ( <vec_type> <vec_shape> <num>+ )          ;; vector value
+                },
+                function () use ($p) {
+                    // ( ref.null <ref_kind> )                    ;; null reference
+                    $p->expectKeyword("ref.null");
+                },
+                function () use ($p) {
+                    // ( ref.extern <nat> )                       ;; host reference
+                    $p->expectKeyword("ref.extern");
+                }
+            );
+        });
+    }
+
+    public function withException(string $failure, callable $action, ?string $type = \Exception::class)
+    {
+        return function (Store $store) use ($failure, $action, $type) {
+            $thrown = null;
+            try {
+                ($action)($store);
+            } catch (\Exception $e) {
+                $thrown = $e;
+            }
+            $this->assertNotNull($thrown, 'No exception was thrown.');
+            $this->assertInstanceOf($type, $thrown);
+            $this->assertEquals($failure, $thrown->getMessage());
+        };
+    }
+    
     public function parseAssert(TextParser $p)
     {
-        // todo: implement asserts
         return $p->parenthesised(function () use ($p) {
             return $p->oneOf(
                 function () use ($p) {
                     $p->expectKeyword("assert_return");
                     $action = $this->parseAction($p);
-                    $p->vec(function () use ($p) {
-                        // todo parse result
-                    });
+                    $expected = $p->vec([$this, 'parseResult']);
 
-                    return function () use ($action) {
-                        $this->assertEquals($action, '');
+                    return function (Store $store) use ($action, $expected) {
+                        $result = ($action)($store);
+                        $this->assertEqualsCanonicalizing($expected, $result);
                     };
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_trap");
                     $action = $this->parseAction($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $action);
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_exhaustion");
                     $action = $this->parseAction($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $action);
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_malformed");
                     $module = $this->parseModule($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $module);
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_invalid");
                     $module = $this->parseModule($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $module);
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_unlinkable");
                     $module = $this->parseModule($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $module);
                 },
                 function () use ($p) {
                     $p->expectKeyword("assert_trap");
                     $module = $this->parseModule($p);
                     $failure = $p->expectString();
-
-                    return function () {};
+                    return $this->withException($failure, $module);
                 }
             );
         });
+    }
+    
+    public function parseResult(TextParser $p)
+    {
+        throw new \Exception("Not implemented");
+        // todo
     }
     
     public function parseMeta(TextParser $p)
@@ -251,10 +314,10 @@ final class WebAssemblyTest extends TestCase
                 "input",
                 "output"
             );
-            $p->expectId(true);
+            $p->expectId(true) ?? self::DEFAULT_MODULE;
 
             // todo: return
-            return function () {};
+            return function (Store $store) {};
         });
     }
 }

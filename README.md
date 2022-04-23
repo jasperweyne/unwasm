@@ -65,6 +65,13 @@ Note: runtime funcs are managed by PHP and therefore implicitly supported.
   support 64-bit integers.
 * Integers are always encoded signed in PHP. When using large unsigned
   integers, this might currently result in unexpected behaviour.
+* Integers in PHP don't overflow as expected. Instead, they're casted to a
+  float. Therefore, UnWasm doesn't support integer overflow.
+* When a stack overflow occurs in PHP, this cannot be gracefully caught as an
+  exception. Therefore, the library allows for running webassembly in a memory-
+  safe way, by creating a child PHP process and running the webassembly there.
+  However, this incurs a performance cost during communication between the host
+  and child process.
 
 ## License
 UnWasm is licensed under the Apache License, Version 2.0. Please refer to the

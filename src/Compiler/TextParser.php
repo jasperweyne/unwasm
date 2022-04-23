@@ -206,6 +206,22 @@ class TextParser implements ParserInterface
         }
         return $result;
     }
+    
+    public function expectPartialKeyword(string ...$options): string
+    {
+        if (count($options) == 0) {
+            throw new \InvalidArgumentException('No options provided');
+        }
+
+        // if no keyword (option) found, return null
+        $options = implode('|', array_map('preg_quote', $options));
+        $result = $this->nextToken("/\G($options)/");
+        if ($result === null) {
+            throw new LexingException('Expected partial keyword '.$options);
+        }
+
+        return $result;
+    }
 
     public function expectKeyword(string ...$options): string
     {

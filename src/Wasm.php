@@ -26,6 +26,7 @@ use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ParserInterface;
 use UnWasm\Compiler\Source;
 use UnWasm\Exception\RuntimeValueException;
+use UnWasm\Runtime\Store;
 use UnWasm\Runtime\Wasi;
 
 /**
@@ -42,11 +43,8 @@ class Wasm
     /** @var string The namespace where module classes are registered */
     private $namespace;
 
-    /** @var array The dictionary of module instances and their names. */
-    private $modules = array();
-
-    /** @var ?\UnWasm\Runtime\MemoryInst The global memory instance. */
-    public $memory;
+    /** @var Store The dictionary of module instances and their names. */
+    private $store;
 
     public function __construct(
         ?CacheInterface $cache = null,
@@ -56,7 +54,7 @@ class Wasm
         $this->cache = $cache ?? new MemoryCache();
         $this->locations = $locations;
         $this->namespace = $namespace;
-        $this->modules = array();
+        $this->store = new Store();
     }
 
     public function import(string $module)
