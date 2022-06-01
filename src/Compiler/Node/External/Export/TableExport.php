@@ -43,7 +43,7 @@ class TableExport extends Export
         $source->write("\$this->tables['$this->name'] = \$this->table_$this->tableIdx;");
     }
 
-    public function compile(ModuleCompiler $module, Source $src)
+    public function compile(ModuleCompiler $module, Source $src): void
     {
         // todo
     }

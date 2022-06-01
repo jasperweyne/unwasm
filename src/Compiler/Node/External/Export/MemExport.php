@@ -43,7 +43,7 @@ class MemExport extends Export
         $source->write("\$this->mems['$this->name'] = \$this->mem_$this->memIdx;");
     }
 
-    public function compile(ModuleCompiler $module, Source $src)
+    public function compile(ModuleCompiler $module, Source $src): void
     {
         // todo
     }

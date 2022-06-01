@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Store;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
@@ -39,13 +40,18 @@ class Element
     /** @var ?int The table index the element segment refers to */
     public $tableIdx;
 
-    /** @var ?Instruction[] Table offset location expression */
+    /** @var Instruction[] Table offset location expression */
     private $offsetExpr;
 
+    /**
+     * @param Instruction[][] $initExpressions
+     * @param ?Instruction[] $offsetExpr
+     */
     protected function __construct(int $mode, array $initExpressions, ?int $tableIdx = null, ?array $offsetExpr = null)
     {
+        $this->mode = $mode;
         $this->tableIdx = $tableIdx;
-        $this->offsetExpr = $offsetExpr;
+        $this->offsetExpr = $offsetExpr ?? [];
         $this->initExpressions = $initExpressions;
     }
 
@@ -89,17 +95,27 @@ class Element
         }
     }
 
-    public static function active(array $initExpr, int $tableIdx = null, array $offsetExpr = null)
+    /**
+     * @param Instruction[][] $initExpr Value initialization data
+     * @param Instruction[] $offsetExpr Table offset location expression
+     */
+    public static function active(array $initExpr, int $tableIdx = null, array $offsetExpr = null): self
     {
         return new self(0, $initExpr, $tableIdx, $offsetExpr);
     }
 
-    public static function passive(array $initExpr)
+    /**
+     * @param Instruction[][] $initExpr Value initialization data
+     */
+    public static function passive(array $initExpr): self
     {
         return new self(1, $initExpr);
     }
 
-    public static function declarative(array $initExpr)
+    /**
+     * @param Instruction[][] $initExpr Value initialization data
+     */
+    public static function declarative(array $initExpr): self
     {
         return new self(2, $initExpr);
     }

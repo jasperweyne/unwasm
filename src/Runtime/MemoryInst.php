@@ -52,9 +52,14 @@ class MemoryInst
     public function __construct(int $minimum, ?int $maximum = null)
     {
         $this->maximum = $maximum;
-        $this->stream = fopen('php://temp', 'r+b');
         $this->size = 0;
         $this->bigEndian = pack('L', 1) === pack('N', 1);
+        
+        $handle = fopen('php://temp', 'r+b');
+        if (!$handle) {
+            throw new \Exception('Failed to create a temporary stream');
+        }
+        $this->stream = $handle;
 
         // todo: respect datas/elems?
 
@@ -62,7 +67,7 @@ class MemoryInst
         $this->grow($minimum);
     }
 
-    public function size()
+    public function size(): int
     {
         return $this->size;
     }
@@ -101,7 +106,7 @@ class MemoryInst
         return $prev;
     }
 
-    public function fill(int $n, int $value, int $offset)
+    public function fill(int $n, int $value, int $offset): void
     {
         // create the block of data (note that $value is truncated to a single byte)
         $data = str_repeat(chr($value % 256), $n);
@@ -110,7 +115,7 @@ class MemoryInst
         $this->write($data, $offset);
     }
 
-    public function write(string $data, int $offset)
+    public function write(string $data, int $offset): void
     {
         // validate offset+length(value) is inside memory bounds
         if ($offset + strlen($data) > $this->size() * self::PAGE_SIZE) {
@@ -124,6 +129,7 @@ class MemoryInst
         fwrite($this->stream, $data);
     }
 
+    /** @param int<0, max> $n */
     public function read(int $offset, int $n): string
     {
         // validate offset+length(value) is inside memory bounds
@@ -135,20 +141,24 @@ class MemoryInst
         fseek($this->stream, $offset);
 
         // return the data directly from the stream
-        return fread($this->stream, $n);
+        return (string) fread($this->stream, $n);
     }
 
-    public function copy(int $sourceOffset, int $destOffset, int $n)
+    /** @param int<0, max> $n */
+    public function copy(int $sourceOffset, int $destOffset, int $n): void
     {
         // defer memory bounds check to read()/write()
         // read the data at source and write it to dest
         $this->write($this->read($sourceOffset, $n), $destOffset);
     }
 
+    /** @param int<0, max> $bits */
     public function loadInt(int $offset, int $bits = 32, bool $signed = true): int
     {
         // defer memory bounds check to read(), read data as bytes
-        $bytes = $this->read($offset, $bits / 8);
+        /** @var int<0, max> $n */
+        $n = $bits / 8;
+        $bytes = $this->read($offset, $n);
 
         // if system is big endian, reverse bytes from little to big endian
         if ($this->bigEndian) {
@@ -156,13 +166,15 @@ class MemoryInst
         }
 
         // convert the bytes to data and return it
-        return unpack(self::intFlag($bits, $signed), $bytes)[1];
+        return ((array) unpack(self::intFlag($bits, $signed), $bytes))[1];
     }
 
     public function loadFloat(int $offset, int $bits = 32): float
     {
         // defer memory bounds check to read(), read data as bytes
-        $bytes = $this->read($offset, $bits / 8);
+        /** @var int<0, max> $n */
+        $n = $bits / 8;
+        $bytes = $this->read($offset, $n);
 
         // if system is big endian, reverse bytes from little to big endian
         if ($this->bigEndian) {
@@ -170,7 +182,7 @@ class MemoryInst
         }
 
         // convert the bytes to data and return it
-        return unpack($bits == 32 ? 'f' : 'd', $bytes)[1];
+        return ((array) unpack($bits == 32 ? 'f' : 'd', $bytes))[1];
     }
 
     public function storeInt(int $value, int $offset, int $bits = 32): void

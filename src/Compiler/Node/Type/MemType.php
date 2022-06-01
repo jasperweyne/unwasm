@@ -25,6 +25,7 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class MemType
 {
+    /** @var Limits Memory limits. */
     public $limits;
 
     public function __construct(Limits $limits)

@@ -30,6 +30,7 @@ use UnWasm\Compiler\Node\Type\MemType;
 use UnWasm\Compiler\Node\Type\RefType;
 use UnWasm\Compiler\Node\Type\TableType;
 use UnWasm\Compiler\Node\Type\ValueType;
+use UnWasm\Exception\ParsingException;
 
 /**
  * A factory class for the types component of a binary-format module.
@@ -67,7 +68,11 @@ class TypesBuilder implements BuilderInterface
     public static function resulttype(BinaryParser $parser): array
     {
         return $parser->expectVector(function (BinaryParser $parser) {
-            return self::valuetype($parser);
+            $valueType = self::valuetype($parser);
+            if (!$valueType) {
+                throw new ParsingException('Invalid value type in result type');
+            }
+            return $valueType;
         });
     }
 
@@ -123,6 +128,9 @@ class TypesBuilder implements BuilderInterface
     public static function globaltype(BinaryParser $parser): GlobalType
     {
         $valType = self::valuetype($parser);
+        if (!$valType) {
+            throw new \InvalidArgumentException("Unknown value type.");
+        }
         $mut = $parser->expectByte(0x00, 0x01) === 0x01;
         return new GlobalType($valType, $mut);
     }

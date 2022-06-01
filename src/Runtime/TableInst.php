@@ -31,7 +31,7 @@ class TableInst
     private $maximum;
 
     /**
-     * @var ?callable[] The table contents
+     * @var (?callable)[] The table contents
      */
     private $contents;
 
@@ -89,7 +89,7 @@ class TableInst
         return $prev;
     }
 
-    public function fill(int $n, ?callable $value, int $offset)
+    public function fill(int $n, ?callable $value, int $offset): void
     {
         // validate offset+n is inside memory bounds
         if ($offset + $n > $this->size()) {
@@ -102,7 +102,7 @@ class TableInst
         }
     }
 
-    public function copy(TableInst $dest, int $sourceOffset, int $destOffset, int $n)
+    public function copy(TableInst $dest, int $sourceOffset, int $destOffset, int $n): void
     {
         // validate offset+n is inside memory bounds
         if ($sourceOffset + $n > $this->size() || $destOffset + $n > $dest->size()) {
@@ -113,7 +113,8 @@ class TableInst
         $dest->overwrite(array_slice($this->contents, $sourceOffset, $n), $destOffset);
     }
 
-    public function overwrite(array $data, int $offset)
+    /** @param (?callable)[] $data */
+    public function overwrite(array $data, int $offset): void
     {
         // validate offset+n is inside memory bounds
         if ($offset + count($data) > $this->size()) {

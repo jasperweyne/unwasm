@@ -39,7 +39,7 @@ class Init extends Instruction
     public function __construct(int $tableIdx, int $elemIdx)
     {
         $this->tableIdx = $tableIdx;
-        $this->dataIdx = $elemIdx;
+        $this->elemIdx = $elemIdx;
     }
 
     public function compile(ExpressionCompiler $state, Source $src): void

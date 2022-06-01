@@ -22,8 +22,13 @@ use UnWasm\Exception\ParsingException;
 
 class Token
 {
+    /** @var string|int|float The parsed token value. */
     private $value;
+
+    /** @var int The type constant representing the token type. */
     private $type;
+    
+    /** @var ?int The position in the stream of the token. */
     private $pos;
 
     public const INT_TYPE = -1; // 0x7F
@@ -37,6 +42,9 @@ class Token
     public const UINT_TYPE = 6;
     public const UINT_64_TYPE = 7;
 
+    /**
+     * @param string|int|float $value The parsed value.
+     */
     public function __construct(int $type, $value, int $pos = null)
     {
         $this->type = $type;
@@ -44,7 +52,7 @@ class Token
         $this->pos = $pos;
     }
 
-    public function getPos(): int
+    public function getPos(): ?int
     {
         return $this->pos;
     }
@@ -54,6 +62,9 @@ class Token
         return $this->type;
     }
 
+    /**
+     * @return string|int|float
+     */
     public function getValue()
     {
         return $this->value;
@@ -64,6 +75,9 @@ class Token
         return new self($type, self::decode($type, $raw), $pos);
     }
 
+    /**
+     * @return string|int|float
+     */
     private static function decode(int $type, string $raw)
     {
         $result = 0;
@@ -75,10 +89,18 @@ class Token
                 $result = $raw;
                 break;
             case self::FLOAT_TYPE:
-                list(, $result) = unpack("g", $raw);
+                $unpacked = unpack("g", $raw);
+                if (!$unpacked) {
+                    throw new \InvalidArgumentException('Invalid float value');
+                }
+                list(, $result) = $unpacked; 
                 break;
             case self::FLOAT_64_TYPE:
-                list(, $result) = unpack("e", $raw);
+                $unpacked = unpack("e", $raw);
+                if (!$unpacked) {
+                    throw new \InvalidArgumentException('Invalid float value');
+                }
+                list(, $result) = $unpacked; 
                 break;
             case self::INT_TYPE:
             case self::INT_64_TYPE:

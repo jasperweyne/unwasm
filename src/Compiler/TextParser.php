@@ -33,7 +33,10 @@ use UnWasm\Exception\ParsingException;
  */
 class TextParser implements ParserInterface
 {
+    /** @var string The string being parsed. */
     protected $data;
+
+    /** @var int The current read offset within $this->data. */
     protected $offset;
 
     /** @var BuilderInterface[] A list of builder class instances */
@@ -43,11 +46,12 @@ class TextParser implements ParserInterface
     private const NUM = '[0-9](?:_?[0-9])*';
     private const HEXNUM = '[0-9A-Fa-f](?:_?[0-9A-Fa-f])*';
 
+    /** @param resource $stream */
     public function __construct($stream)
     {
         // copy the stream to memory for regexes
         rewind($stream);
-        $this->data = stream_get_contents($stream);
+        $this->data = (string) stream_get_contents($stream);
         $this->offset = 0;
 
         // intialise builders
@@ -84,11 +88,11 @@ class TextParser implements ParserInterface
                 $this->parenthesised(function () use ($compiler, $parseModule) {
                     $this->expectKeyword('module');
                     $compiler->id = $this->expectId(true);
-                    ($parseModule)($compiler);
+                    ($parseModule)();
                 });
             },
-            function () use ($compiler, $parseModule) {
-                ($parseModule)($compiler);
+            function () use ($parseModule) {
+                ($parseModule)();
             }
         );
 
@@ -96,6 +100,11 @@ class TextParser implements ParserInterface
         return $compiler;
     }
 
+    /**
+     * @template T
+     * @return T[]
+     * @param callable(TextParser): T $func
+     */
     public function vec(callable $func): array
     {
         $result = [];
@@ -123,6 +132,11 @@ class TextParser implements ParserInterface
         return false;
     }
 
+    /**
+     * @template T
+     * @return T
+     * @param callable(TextParser): T $funcs
+     */
     public function oneOf(callable ...$funcs)
     {
         $origOffset = $this->offset;
@@ -138,6 +152,11 @@ class TextParser implements ParserInterface
         throw new CompilationException('Expected a token');
     }
 
+    /**
+     * @template T
+     * @return T
+     * @param callable(TextParser): T $func
+     */
     public function parenthesised(callable $func)
     {
         // parse (
@@ -157,7 +176,7 @@ class TextParser implements ParserInterface
         return $value;
     }
 
-    public function expectInt($unsigned = false): int
+    public function expectInt(bool $unsigned = false): int
     {
         $hexnum = self::HEXNUM;
         $num = self::NUM;
@@ -262,8 +281,8 @@ class TextParser implements ParserInterface
         );
 
         // replace UTF8 codepoint specifier
-        $result = preg_replace_callback("/$utf8Repl/", function ($hex) {
-            return hex2bin(str_replace('_', '', $hex[1]));
+        $result = (string) preg_replace_callback("/$utf8Repl/", function (array $hex) {
+            return (string) hex2bin(str_replace('_', '', $hex[1]));
         }, $result);
 
         // validate utf 8 encoding
@@ -273,8 +292,8 @@ class TextParser implements ParserInterface
         }
 
         // replace hex byte specifier
-        $result = preg_replace_callback("/$hexRepl/", function ($hex) {
-            return hex2bin($hex[1]);
+        $result = (string) preg_replace_callback("/$hexRepl/", function (array $hex) {
+            return (string) hex2bin($hex[1]);
         }, $result);
 
         return $result;

@@ -33,6 +33,7 @@ class Select extends Instruction
     /** @var ?ValueType[] The return type of the operation */
     private $type;
 
+    /** @param ?ValueType[] $type The return type of the operation */
     public function __construct(?array $type = null)
     {
         $this->type = $type;

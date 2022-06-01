@@ -31,7 +31,7 @@ class GlobalInst
     /** @var int The current value of this global instance, in case the type is an int */
     private $intValue;
 
-    /** @var int The current value of this global instance, in case the type is a float */
+    /** @var float The current value of this global instance, in case the type is a float */
     private $floatValue;
 
     /** @var ?callable The current value of this global instance, in case the type is a callable */

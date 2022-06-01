@@ -147,7 +147,10 @@ class FuncsBuilder implements BuilderInterface
         }
     }
 
-    public static function expression(BinaryParser $parser, bool $constExpr = false, $termOpcode = 0x0B): array
+    /**
+     * @return Instruction[] The (ordered) list of parsed instructions.
+     */
+    public static function expression(BinaryParser $parser, bool $constExpr = false, int $termOpcode = 0x0B): array
     {
         $instructions = [];
         while (!$parser->eof()) {
@@ -170,8 +173,13 @@ class FuncsBuilder implements BuilderInterface
             $instruction->position = $pos;
             $instructions[] = $instruction;
         }
+
+        throw new \InvalidArgumentException('Missing termination opcode');
     }
 
+    /**
+     * @return array{?FuncType, ?int}
+     */
     private static function parseBlocktype(BinaryParser $parser): array
     {
         $raw = $parser->expectInt(false, 33);
@@ -182,6 +190,8 @@ class FuncsBuilder implements BuilderInterface
         } elseif ($raw >= 0) {
             return [null, $raw];
         }
+
+        throw new \InvalidArgumentException('Invalid block type');
     }
 
     private static function controlInstr(int $opcode, BinaryParser $parser, bool $constExpr, int $termOpcode): ?Instruction

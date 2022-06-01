@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace UnWasm\Compiler\Node\External\Export;
 
 use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\External\FuncInterface;
 use UnWasm\Compiler\Source;
 
 /**
@@ -40,13 +41,15 @@ class FuncExport extends Export
 
     public function compileSetup(int $index, ModuleCompiler $module, Source $source): void
     {
+        /** @var FuncInterface $func */
         $func = $module->func($this->funcIdx);
         $type = strval($module->types[$func->typeIdx()]);
         $source->write("\$this->funcs['$this->name'] = '$type';");
     }
 
-    public function compile(ModuleCompiler $module, Source $src)
+    public function compile(ModuleCompiler $module, Source $src): void
     {
+        /** @var FuncInterface $func */
         $func = $module->func($this->funcIdx);
         $type = $module->types[$func->typeIdx()];
 

@@ -30,9 +30,10 @@ use UnWasm\Compiler\Source;
  */
 class ConstStmt extends Numeric
 {
-    /** @var Number The constant value */
+    /** @var int|float The constant value */
     private $value;
 
+    /** @param int|float $value */
     public function __construct(ValueType $type, $value)
     {
         parent::__construct($type);
@@ -42,7 +43,8 @@ class ConstStmt extends Numeric
 
     public function compile(ExpressionCompiler $state, Source $src): void
     {
-        $state->const($this->value, $this->type);
+        $state->const(strval($this->value), $this->type);
+
         // list($var) = $state->push($this->type);
         // $src->write($var, ' = ', $this->value, ';');
     }

@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Code\Variable;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\Node\Code\Instruction;
+use UnWasm\Compiler\Node\External\GlobalInterface;
 use UnWasm\Compiler\Source;
 
 /**
@@ -40,6 +41,7 @@ class GlobalGet extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // set function
+        /** @var GlobalInterface */
         $global = $state->module->global($this->globalIdx);
         $type = $global->globalType()->valueType;
         switch ($type->type) {
@@ -51,6 +53,8 @@ class GlobalGet extends Instruction
             case ExpressionCompiler::F64:
                 $compileFn = 'getFloat';
                 break;
+            default:
+                throw new \InvalidArgumentException('Unknown value type.');
         }
 
         // update stack

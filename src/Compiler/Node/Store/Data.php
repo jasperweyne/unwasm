@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\Store;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Source;
 
 /**
@@ -38,6 +39,7 @@ class Data
     /** @var string Value initialization data */
     private $initData;
 
+    /** @param ?Instruction[] $initExpr */
     public function __construct(string $initData, int $memIdx = 0, ?array $initExpr = null)
     {
         $this->memIdx = $memIdx;

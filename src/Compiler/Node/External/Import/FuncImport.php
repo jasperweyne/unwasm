@@ -22,6 +22,7 @@ namespace UnWasm\Compiler\Node\External\Import;
 
 use UnWasm\Compiler\ModuleCompiler;
 use UnWasm\Compiler\Node\External\FuncInterface;
+use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -55,7 +56,7 @@ class FuncImport extends Import implements FuncInterface
     {
         $ref = $module->importRefs[$this->module];
 
-        /** @var FuncType */
+        /** @var FuncType $functype */
         $functype = $module->types[$this->typeIdx];
         $params = implode(", ", $functype->compileInput('param_', true));
         $vars = implode(", ", $functype->compileInput('param_'));

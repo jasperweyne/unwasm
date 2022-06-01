@@ -41,11 +41,13 @@ use UnWasm\Exception\ParsingException;
  */
 class BinaryParser implements ParserInterface
 {
+    /** @var resource The data stream parsed. */
     protected $stream;
 
     /** @var BuilderInterface[] A list of builder class instances */
     public $builders;
 
+    /** @param resource $stream */
     public function __construct($stream)
     {
         $this->stream = $stream;
@@ -79,7 +81,7 @@ class BinaryParser implements ParserInterface
         while (1) {
             $section = $this->expectByte();
 
-            $break = $this->assertSize(function (self $parser, int $start, int $size) use ($section, $compiler, &$unknown) {
+            $break = $this->assertSize(function (self $parser, int $start, int $size) use ($section, $compiler) {
                 do { // do/while(0) block provides structured way to break when section has been scanned
                     if ($size === 0) {
                         return true;
@@ -108,7 +110,7 @@ class BinaryParser implements ParserInterface
         return $compiler;
     }
 
-    public function scanHeader()
+    public function scanHeader(): void
     {
         // validate stream
         $magic = "\0asm";
@@ -117,8 +119,8 @@ class BinaryParser implements ParserInterface
         }
 
         // validate wasm version
-        $read = fread($this->stream, 4);
-        list(, $version) = unpack('V', $read);
+        $read = (string) fread($this->stream, 4);
+        list(, $version) = (array) unpack('V', $read);
         if ($version !== 1) {
             throw new ParsingException('Only version 1 binary webassembly is supported');
         }
@@ -135,28 +137,33 @@ class BinaryParser implements ParserInterface
 
     public function expectByte(int $minIncl = null, int $maxIncl = null): int
     {
-        $pos = ftell($this->stream);
+        $pos = $this->position();
         $value = fread($this->stream, 1);
         if ($value === false) {
             throw new LexingException("No value read");
         }
 
-        $result = Token::parse(Token::BYTE_TYPE, $value, $pos);
-        if ($minIncl && $result->getValue() < $minIncl) {
+        $result = (int) Token::parse(Token::BYTE_TYPE, $value, $pos)->getValue();
+        if ($minIncl && $result < $minIncl) {
             throw new ParsingException("Invalid value");
         }
 
-        if (($maxIncl && $result->getValue() > $maxIncl) || ($minIncl && $result->getValue() != $minIncl)) {
+        if (($maxIncl && $result > $maxIncl) || ($minIncl && $result != $minIncl)) {
             throw new ParsingException("Invalid value");
         }
 
-        return $result->getValue();
+        return $result;
     }
 
+    /**
+     * @phpstan-template X
+     * @phpstan-param callable(self, int): X $elementFn
+     * @phpstan-return array<int, X>
+     */
     public function expectVector(callable $elementFn): array
     {
         $size = $this->expectInt(true);
-        $children = array_fill(0, $size, 0); // initialize array with length
+        $children = [];
 
         for ($i = 0; $i < $size; $i++) {
             $children[$i] = $elementFn($this, $i);
@@ -169,7 +176,7 @@ class BinaryParser implements ParserInterface
     {
         // technically, expectVector could be wrapped, but this is more efficient
         // obtain raw string from stream
-        $pos = ftell($this->stream);
+        $pos = $this->position();
         $size = $this->expectInt(true);
         if ($size === 0) {
             return '';
@@ -186,17 +193,20 @@ class BinaryParser implements ParserInterface
         }
 
         // parse and validate result value
-        $result = Token::parse(Token::STRING_TYPE, $value, $pos);
-        if (preg_match($regex, $result->getValue()) !== 1) {
+        $result = (string) Token::parse(Token::STRING_TYPE, $value, $pos)->getValue();
+        if (preg_match($regex, $result) !== 1) {
             throw new ParsingException();
         }
 
-        return $result->getValue();
+        return $result;
     }
 
-    public function expectFloat($bits = 32): float
+    /**
+     * @param int<0,max> $bits
+     */
+    public function expectFloat(int $bits = 32): float
     {
-        $pos = ftell($this->stream);
+        $pos = $this->position();
         $width = $bits / 8;
         $value = fread($this->stream, $width);
         if (!is_string($value)) {
@@ -204,12 +214,15 @@ class BinaryParser implements ParserInterface
         }
 
         $type = $bits == 64 ? Token::FLOAT_64_TYPE : Token::FLOAT_TYPE;
-        return Token::parse($type, $value, $pos)->getValue();
+        return (float) Token::parse($type, $value, $pos)->getValue();
     }
 
-    public function expectInt($unsigned = false, $bits = 32): int
+    /**
+     * @param int<0,max> $bits
+     */
+    public function expectInt(bool $unsigned = false, int $bits = 32): int
     {
-        $pos = ftell($this->stream);
+        $pos = $this->position();
         $width = $bits / 8;
 
         // lex LEB128
@@ -234,7 +247,7 @@ class BinaryParser implements ParserInterface
         // validate integer by checking last character
         if ((ord(substr($value, -1)) & 0x80) != 0) {
             $str = bin2hex($value);
-            $posstr = str_pad(dechex(ftell($this->stream)), 8, '0', STR_PAD_LEFT);
+            $posstr = str_pad(dechex($this->position()), 8, '0', STR_PAD_LEFT);
             throw new ParsingException("Invalid integer provided $str@0x$posstr");
         }
 
@@ -246,13 +259,18 @@ class BinaryParser implements ParserInterface
             $type = $bits == 64 ? Token::INT_64_TYPE : Token::INT_TYPE;
         }
 
-        return Token::parse($type, $value, $pos)->getValue();
+        return (int) Token::parse($type, $value, $pos)->getValue();
     }
 
+    /**
+     * @template T
+     * @return T
+     * @param callable(self, int, int): T $inner
+     */
     public function assertSize(callable $inner)
     {
         $size = $this->expectInt(true);
-        $start = ftell($this->stream);
+        $start = $this->position();
 
         $result = $inner($this, $start, $size);
 

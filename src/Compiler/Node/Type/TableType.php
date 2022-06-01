@@ -25,7 +25,10 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class TableType
 {
+    /** @var RefType Table encoding. */
     public $encoding;
+
+    /** @var Limits Table limits. */
     public $limits;
 
     public function __construct(RefType $encoding, Limits $limits)

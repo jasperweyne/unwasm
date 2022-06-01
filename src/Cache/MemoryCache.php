@@ -22,6 +22,9 @@ namespace UnWasm\Cache;
 
 class MemoryCache implements CacheInterface
 {
+    /**
+     * @var array<string, array<string, int|string>> The associative array cache.
+     */
     private $cache;
 
     public function __construct()
@@ -50,7 +53,7 @@ class MemoryCache implements CacheInterface
     public function getTimestamp(string $key): ?int
     {
         if (isset($this->cache[$key])) {
-            return $this->cache[$key]['timestamp'];
+            return (int) $this->cache[$key]['timestamp'];
         }
 
         return null;

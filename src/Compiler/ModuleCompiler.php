@@ -27,6 +27,10 @@ use UnWasm\Compiler\Node\External\Import\GlobalImport;
 use UnWasm\Compiler\Node\External\Import\Import;
 use UnWasm\Compiler\Node\External\Import\MemImport;
 use UnWasm\Compiler\Node\External\Import\TableImport;
+use UnWasm\Compiler\Node\External\FuncInterface;
+use UnWasm\Compiler\Node\External\GlobalInterface;
+use UnWasm\Compiler\Node\External\MemInterface;
+use UnWasm\Compiler\Node\External\TableInterface;
 use UnWasm\Compiler\Node\Store\Data;
 use UnWasm\Compiler\Node\Store\Element;
 use UnWasm\Compiler\Node\Store\Table;
@@ -144,7 +148,7 @@ class ModuleCompiler
         return $idx < $importCnt ? array_values($tableImports)[$idx] : $this->tables[$idx - $importCnt];
     }
 
-    public function compile(string $fqcn, Source $source)
+    public function compile(string $fqcn, Source $source): void
     {
         // prepare import references
         foreach ($this->imports as $import) {
@@ -196,9 +200,9 @@ class ModuleCompiler
     private function compileVars(Source $src): void
     {
         // register local funcs
-        if (count($this->func()) > 0) {
+        if (count((array) $this->func()) > 0) {
             $src->write('// funcs');
-            foreach ($this->func() as $i => $func) {
+            foreach ((array) $this->func() as $i => $func) {
                 $src->write("/** @var callable */ private \$fn_$i;");
             }
             $src->write();
@@ -214,27 +218,27 @@ class ModuleCompiler
         }
 
         // register memories
-        if (count($this->mem()) > 0) {
+        if (count((array) $this->mem()) > 0) {
             $src->write('// memories');
-            foreach ($this->mem() as $i => $mem) {
+            foreach ((array) $this->mem() as $i => $mem) {
                 $src->write("/** @var \UnWasm\Runtime\MemoryInst */ private \$mem_$i;");
             }
             $src->write();
         }
 
         // register globals
-        if (count($this->global()) > 0) {
+        if (count((array) $this->global()) > 0) {
             $src->write('// globals');
-            foreach ($this->global() as $i => $global) {
+            foreach ((array) $this->global() as $i => $global) {
                 $src->write("/** @var \UnWasm\Runtime\GlobalInst */ private \$global_$i;");
             }
             $src->write();
         }
 
         // register tables
-        if (count($this->table()) > 0) {
+        if (count((array) $this->table()) > 0) {
             $src->write('// tables');
-            foreach ($this->table() as $i => $tables) {
+            foreach ((array) $this->table() as $i => $tables) {
                 $src->write("/** @var \UnWasm\Runtime\TableInst */ private \$table_$i;");
             }
             $src->write();
@@ -265,7 +269,7 @@ class ModuleCompiler
         }
 
         // write func intialisation
-        $allFuncs = $this->func();
+        $allFuncs = (array) $this->func();
         if (count($allFuncs) > 0) {
             $src->write('// function import asserts');
             foreach ($allFuncs as $i => $func) {
@@ -275,7 +279,7 @@ class ModuleCompiler
         }
 
         // write memory intialisation
-        $allMems = $this->mem();
+        $allMems = (array) $this->mem();
         if (count($allMems) > 0) {
             $src->write('// memories');
             foreach ($allMems as $i => $mem) {
@@ -285,7 +289,7 @@ class ModuleCompiler
         }
 
         // write global intialisation
-        $allGlobals = $this->global();
+        $allGlobals = (array) $this->global();
         if (count($allGlobals) > 0) {
             $src->write('// globals');
             foreach ($allGlobals as $i => $global) {
@@ -295,16 +299,17 @@ class ModuleCompiler
         }
 
         // write table intialisation
-        $allTables = $this->table();
+        $allTables = (array) $this->table();
         if (count($allTables) > 0) {
             $src->write('// tables');
-            foreach ($this->table() as $i => $table) {
+            foreach ($allTables as $i => $table) {
                 $table->compileSetup($i, $this, $src);
             }
             $src->write();
         }
 
         // write func declaration
+        /** @var FuncInterface[] $allFuncs */
         $allFuncs = $this->func();
         if (count($allFuncs) > 0) {
             $src->write('// function declarations');
@@ -348,6 +353,7 @@ class ModuleCompiler
         // execute start function
         if ($this->start !== -1) {
             // verify that module doesn't have input params
+            /** @var FuncInterface $func */
             $func = $this->func($this->start);
             $functype = $this->types[$func->typeIdx()];
 

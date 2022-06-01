@@ -25,23 +25,23 @@ namespace UnWasm\Runtime;
  */
 class Store
 {
-    /** @var array Function list */
+    /** @var array<string, callable> Function list */
     public $funcs;
 
-    /** @var array Tables list */
+    /** @var array<string, \UnWasm\Runtime\TableInst> Tables list */
     public $tables;
 
-    /** @var ?\UnWasm\Runtime\MemoryInst The global memory instance. */
+    /** @var \UnWasm\Runtime\MemoryInst The global memory instance. */
     public $memory;
 
-    /** @var array Globals list */
+    /** @var array<string, \UnWasm\Runtime\GlobalInst> Globals list */
     public $globals;
 
     public function __construct()
     {
         $this->funcs = [];
         $this->tables = [];
-        $this->memory = null;
+        $this->memory = new MemoryInst(0);
         $this->globals = [];
     }
 

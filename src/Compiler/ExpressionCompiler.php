@@ -47,11 +47,19 @@ class ExpressionCompiler
     /** @var bool Whether this expression compiler should only compile constant expressions (disabling push) */
     private $const;
 
+    /** @var ValueType[] The value types currently placed on the stack. Top of the stack is at the end of the array. */
     private $stack = [];
+    
+    /** @var string[] The variable names/constant values on the stack. Top of the stack is at the end of the array. */
     private $names = [];
+
+    /** @var int A variable that increases with each new value on the stack, for generating unique names. */
     private $nameCnt = 1;
+
+    /** @var ValueType[] The value types for the local variables in the current context. */
     private $locals = [];
 
+    /** @param array<string, ValueType> $returns Dictionary that maps variable names to return types */
     public function __construct(ModuleCompiler $module, array $returns, ?ExpressionCompiler $parent, bool $constExpr = false)
     {
         $this->module = $module;
@@ -93,9 +101,9 @@ class ExpressionCompiler
      * avoids the need for a compiled variable assigment, and instead defers it
      * to a later point.
      */
-    public function const($value, ValueType $type): void
+    public function const(string $value, ValueType $type): void
     {
-        array_push($this->names, strval($value));
+        array_push($this->names, $value);
         array_push($this->stack, $type);
     }
 
@@ -126,7 +134,7 @@ class ExpressionCompiler
      *
      * @return string[] The variable names
      */
-    public function pop($cnt = 1): ?array
+    public function pop(int $cnt = 1): array
     {
         if ($cnt === 0) {
             return [];
@@ -138,9 +146,9 @@ class ExpressionCompiler
     /**
      * Peek at type of one or more elements from the stack, where the top is the last element in the returned array
      *
-     * @return ?ValueType[]
+     * @return ValueType[]
      */
-    public function type($cnt): ?array
+    public function type(int $cnt): array
     {
         if ($cnt === 0) {
             return [];
@@ -153,7 +161,7 @@ class ExpressionCompiler
      *
      * @return string[]
      */
-    public function peek($cnt): ?array
+    public function peek(int $cnt): array
     {
         if ($cnt === 0) {
             return [];
@@ -166,7 +174,7 @@ class ExpressionCompiler
      *
      * @throws CompilationException
      */
-    public function typed(ValueType $type, $cnt = 1): void
+    public function typed(ValueType $type, int $cnt = 1): void
     {
         $types = $this->type($cnt);
         foreach ($types as $t) {
@@ -192,6 +200,10 @@ class ExpressionCompiler
     public function return(int $depth = 0): array
     {
         if ($depth > 0) {
+            if (!$this->parent) {
+                throw new \LogicException('Depth > 0 without parent');
+            }
+
             return $this->parent->return($depth - 1);
         }
 
@@ -213,12 +225,14 @@ class ExpressionCompiler
         return $this->parent ? $this->parent->root() : $this;
     }
 
+    /** @return ValueType[] */
     private function stack(): array
     {
         $top = $this->parent ? $this->parent->stack() : [];
         return array_merge($top, $this->stack);
     }
 
+    /** @return string[] */
     private function names(): array
     {
         $top = $this->parent ? $this->parent->names() : [];

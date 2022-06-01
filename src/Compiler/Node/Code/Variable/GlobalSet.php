@@ -50,6 +50,8 @@ class GlobalSet extends Instruction
             case ExpressionCompiler::F64:
                 $compileFn = 'setFloat';
                 break;
+            default:
+                throw new \InvalidArgumentException('Unknown value type.');
         }
 
         // update stack

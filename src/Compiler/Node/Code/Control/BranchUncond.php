@@ -29,7 +29,7 @@ use UnWasm\Compiler\Source;
  */
 class BranchUncond extends Instruction
 {
-    /** @var int The break depth */
+    /** @var ?int The break depth */
     private $depth;
 
     public function __construct(?int $depth = null)

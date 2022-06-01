@@ -22,9 +22,11 @@ namespace UnWasm\Compiler\Node\Store;
 
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
+use UnWasm\Compiler\Node\Code\Instruction;
 use UnWasm\Compiler\Node\External\GlobalInterface;
 use UnWasm\Compiler\Node\Type\GlobalType;
 use UnWasm\Compiler\Source;
+use UnWasm\Exception\CompilationException;
 
 /**
  * Represents a global, local to the module.
@@ -37,6 +39,9 @@ class GlobalData implements GlobalInterface
     /** @var Instruction[] Value initiation expression */
     private $initExpr;
 
+    /**
+     * @param Instruction[] $initExpr Value initialization expression instructions
+     */
     public function __construct(GlobalType $type, array $initExpr)
     {
         $this->globalType = $type;
@@ -70,6 +75,8 @@ class GlobalData implements GlobalInterface
             case ExpressionCompiler::F64:
                 $compileInit = 'setFloat';
                 break;
+            default:
+                throw new CompilationException('Unknown value type.');
         }
 
         $src

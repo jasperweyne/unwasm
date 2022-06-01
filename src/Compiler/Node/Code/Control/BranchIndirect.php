@@ -36,6 +36,7 @@ class BranchIndirect extends Instruction
     /** @var int The default branching depth */
     private $default;
 
+    /** @param int[] $options The branching depth options */
     public function __construct(array $options, int $default)
     {
         $this->options = $options;

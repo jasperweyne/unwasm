@@ -39,6 +39,7 @@ class Loop extends Instruction
     /** @var ?int The type index of this context, when funcType is null */
     private $typeIdx;
 
+    /** @param Instruction[] $inner The nested instructions */
     public function __construct(array $inner, ?FuncType $funcType, ?int $typeIdx)
     {
         $this->instructions = $inner;

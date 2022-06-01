@@ -43,17 +43,26 @@ class FuncType
         $this->typeOut = $out;
     }
 
+    /**
+     * @return ValueType[]
+     */
     public function getInput()
     {
         return $this->typeIn;
     }
 
+    /**
+     * @return ValueType[]
+     */
     public function getOutput()
     {
         return $this->typeOut;
     }
 
-    public function compileOutput($prefix = 'x'): array
+    /**
+     * @return string[]
+     */
+    public function compileOutput(string $prefix = 'x'): array
     {
         $params = [];
         foreach ($this->getOutput() as $i => $type) {
@@ -63,7 +72,10 @@ class FuncType
         return $params;
     }
 
-    public function compileInput($prefix = 'x', $typed = false): array
+    /**
+     * @return string[]
+     */
+    public function compileInput(string $prefix = 'x', bool $typed = false): array
     {
         $params = [];
         foreach ($this->getInput() as $i => $type) {

@@ -28,6 +28,7 @@ use UnWasm\Compiler\Node\Code\Control\BranchUncond;
 use UnWasm\Compiler\Node\Code\Control\Unreachable;
 use UnWasm\Compiler\Node\External\FuncInterface;
 use UnWasm\Compiler\Node\Type\FuncType;
+use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Compiler\Source;
 
 /**
@@ -47,6 +48,10 @@ class Func implements FuncInterface
     /** @var int The position in the original webassembly source */
     public $position;
 
+    /**
+     * @param ValueType[] $locals Local variable value types
+     * @param Instruction[] $body The representation of the func component
+     */
     public function __construct(int $type, array $locals, array $body, int $position)
     {
         $this->typeIdx = $type;

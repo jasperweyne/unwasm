@@ -25,8 +25,10 @@ namespace UnWasm\Compiler\Node\Type;
  */
 class GlobalType
 {
+    /** @var ValueType Global value type. */
     public $valueType;
 
+    /** @var bool Whether the global value is mutable during runtime. */
     public $mutable;
 
     public function __construct(ValueType $valueType, bool $mutable)

@@ -22,6 +22,9 @@ namespace UnWasm\Cache;
 
 class FilesystemCache implements CacheInterface
 {
+    /**
+     * @var string The cache directory path on disk.
+     */
     private $directory;
 
     public function __construct(string $directory)
@@ -56,7 +59,7 @@ class FilesystemCache implements CacheInterface
         }
 
         $tmpFile = tempnam($dir, basename($location));
-        if (false !== @file_put_contents($tmpFile, '<?php'.PHP_EOL.PHP_EOL.$content) && @rename($tmpFile, $location)) {
+        if ($tmpFile && false !== @file_put_contents($tmpFile, '<?php'.PHP_EOL.PHP_EOL.$content) && @rename($tmpFile, $location)) {
             @chmod($location, 0666 & ~umask());
             return;
         }

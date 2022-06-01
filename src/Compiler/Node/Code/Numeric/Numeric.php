@@ -31,7 +31,7 @@ abstract class Numeric extends Instruction
     /** @var ValueType The type associated with the constant value */
     protected $type;
 
-    public function __construct($type)
+    public function __construct(ValueType $type)
     {
         $this->type = $type;
     }

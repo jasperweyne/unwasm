@@ -41,6 +41,6 @@ class NullRef extends Instruction
     public function compile(ExpressionCompiler $state, Source $src): void
     {
         // update stack
-        $state->const(null, $this->type);
+        $state->const('null', $this->type);
     }
 }

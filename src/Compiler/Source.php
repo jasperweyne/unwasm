@@ -24,14 +24,18 @@ namespace UnWasm\Compiler;
 class Source
 {
     /** @var resource A handle for php://temp */
-    private $source = '';
+    private $source;
 
     /** @var int */
     private $indentation = 0;
 
     public function __construct(string $file = 'php://temp')
     {
-        $this->source = fopen($file, 'w+t');
+        $handle = fopen($file, 'w+t');
+        if (!$handle) {
+            throw new \RuntimeException('Could not open file ' . $file);
+        }
+        $this->source = $handle;
     }
 
     /**
@@ -42,7 +46,7 @@ class Source
     public function read(): string
     {
         fseek($this->source, 0);
-        return stream_get_contents($this->source);
+        return (string) stream_get_contents($this->source);
     }
 
     /**
@@ -76,7 +80,7 @@ class Source
      *
      * @return $this
      */
-    public function write(...$strings): self
+    public function write(string ...$strings): self
     {
         if (count($strings) === 0) {
             $this->raw(PHP_EOL);
@@ -96,7 +100,7 @@ class Source
      *
      * @return $this
      */
-    public function lines(...$strings): self
+    public function lines(string ...$strings): self
     {
         foreach ($strings as $line) {
             $this->write($line);

@@ -38,5 +38,5 @@ abstract class Export
 
     abstract public function compileSetup(int $index, ModuleCompiler $module, Source $src): void;
 
-    abstract public function compile(ModuleCompiler $module, Source $src);
+    abstract public function compile(ModuleCompiler $module, Source $src): void;
 }
