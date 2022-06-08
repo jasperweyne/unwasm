@@ -23,83 +23,7 @@ namespace UnWasm\Compiler\Binary;
 use UnWasm\Compiler\BinaryParser;
 use UnWasm\Compiler\ExpressionCompiler;
 use UnWasm\Compiler\ModuleCompiler;
-use UnWasm\Compiler\Node\Code\Control\Block;
-use UnWasm\Compiler\Node\Code\Control\BranchCond;
-use UnWasm\Compiler\Node\Code\Control\BranchIndirect;
-use UnWasm\Compiler\Node\Code\Control\BranchUncond;
-use UnWasm\Compiler\Node\Code\Control\Call;
-use UnWasm\Compiler\Node\Code\Control\CallIndirect;
-use UnWasm\Compiler\Node\Code\Control\ElseStmt;
-use UnWasm\Compiler\Node\Code\Control\IfElse;
-use UnWasm\Compiler\Node\Code\Control\Loop;
-use UnWasm\Compiler\Node\Code\Control\Nop;
-use UnWasm\Compiler\Node\Code\Control\Unreachable;
-use UnWasm\Compiler\Node\Code\Func;
-use UnWasm\Compiler\Node\Code\Instruction;
-use UnWasm\Compiler\Node\Code\Memory\Copy;
-use UnWasm\Compiler\Node\Code\Memory\Drop as DataDrop;
-use UnWasm\Compiler\Node\Code\Memory\Fill;
-use UnWasm\Compiler\Node\Code\Memory\Grow;
-use UnWasm\Compiler\Node\Code\Memory\Init;
-use UnWasm\Compiler\Node\Code\Memory\Load;
-use UnWasm\Compiler\Node\Code\Memory\Size;
-use UnWasm\Compiler\Node\Code\Memory\Store;
-use UnWasm\Compiler\Node\Code\Numeric\Add;
-use UnWasm\Compiler\Node\Code\Numeric\ConstStmt;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\Cast;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\Extend;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\Promote;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\Reinterpret;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\SignExtend;
-use UnWasm\Compiler\Node\Code\Numeric\Conversion\Wrap;
-use UnWasm\Compiler\Node\Code\Numeric\Div;
-use UnWasm\Compiler\Node\Code\Numeric\Eq;
-use UnWasm\Compiler\Node\Code\Numeric\Eqz;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Abs;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Ceil;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Copysign;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Floor;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Max;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Min;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Nearest;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Neg;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Sqrt;
-use UnWasm\Compiler\Node\Code\Numeric\Float\Trunc;
-use UnWasm\Compiler\Node\Code\Numeric\Ge;
-use UnWasm\Compiler\Node\Code\Numeric\Gt;
-use UnWasm\Compiler\Node\Code\Numeric\Int\BitAnd;
-use UnWasm\Compiler\Node\Code\Numeric\Int\BitOr;
-use UnWasm\Compiler\Node\Code\Numeric\Int\BitShl;
-use UnWasm\Compiler\Node\Code\Numeric\Int\BitShr;
-use UnWasm\Compiler\Node\Code\Numeric\Int\BitXor;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Clz;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Ctz;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Popcnt;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Rem;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Rotl;
-use UnWasm\Compiler\Node\Code\Numeric\Int\Rotr;
-use UnWasm\Compiler\Node\Code\Numeric\Le;
-use UnWasm\Compiler\Node\Code\Numeric\Lt;
-use UnWasm\Compiler\Node\Code\Numeric\Mul;
-use UnWasm\Compiler\Node\Code\Numeric\Neq;
-use UnWasm\Compiler\Node\Code\Numeric\Sub;
-use UnWasm\Compiler\Node\Code\Parametric\Drop;
-use UnWasm\Compiler\Node\Code\Parametric\Select;
-use UnWasm\Compiler\Node\Code\Reference\Func as RefFunc;
-use UnWasm\Compiler\Node\Code\Reference\IsNull;
-use UnWasm\Compiler\Node\Code\Reference\NullRef;
-use UnWasm\Compiler\Node\Code\Table\Copy as TableCopy;
-use UnWasm\Compiler\Node\Code\Table\Drop as ElemDrop;
-use UnWasm\Compiler\Node\Code\Table\Fill as TableFill;
-use UnWasm\Compiler\Node\Code\Table\Get as TableGet;
-use UnWasm\Compiler\Node\Code\Table\Grow as TableGrow;
-use UnWasm\Compiler\Node\Code\Table\Init as TableInit;
-use UnWasm\Compiler\Node\Code\Table\Set as TableSet;
-use UnWasm\Compiler\Node\Code\Table\Size as TableSize;
-use UnWasm\Compiler\Node\Code\Variable\GlobalGet;
-use UnWasm\Compiler\Node\Code\Variable\GlobalSet;
-use UnWasm\Compiler\Node\Code\Variable\LocalGet;
-use UnWasm\Compiler\Node\Code\Variable\LocalSet;
+use UnWasm\Compiler\Node\Code;
 use UnWasm\Compiler\Node\Type\FuncType;
 use UnWasm\Compiler\Node\Type\ValueType;
 use UnWasm\Exception\ParsingException;
@@ -140,7 +64,7 @@ class FuncsBuilder implements BuilderInterface
 
                     $expr = self::expression($parser);
 
-                    return new Func($this->funcTypes[$index], array_merge([], ...$locals), $expr, $pos);
+                    return new Code\Func($this->funcTypes[$index], array_merge([], ...$locals), $expr, $pos);
                 });
             });
             echo 'Scanned '.count($compiler->funcs)." funcs\n";
@@ -148,7 +72,7 @@ class FuncsBuilder implements BuilderInterface
     }
 
     /**
-     * @return Instruction[] The (ordered) list of parsed instructions.
+     * @return Code\Instruction[] The (ordered) list of parsed instructions.
      */
     public static function expression(BinaryParser $parser, bool $constExpr = false, int $termOpcode = 0x0B): array
     {
@@ -194,116 +118,116 @@ class FuncsBuilder implements BuilderInterface
         throw new \InvalidArgumentException('Invalid block type');
     }
 
-    private static function controlInstr(int $opcode, BinaryParser $parser, bool $constExpr, int $termOpcode): ?Instruction
+    private static function controlInstr(int $opcode, BinaryParser $parser, bool $constExpr, int $termOpcode): ?Code\Instruction
     {
         $instruction = null;
         switch ($opcode) {
             case 0x00:
-                $instruction = new Unreachable();
+                $instruction = new Code\Control\Unreachable();
                 break;
             case 0x01:
-                $instruction = new Nop($parser->position() - 1);
+                $instruction = new Code\Control\Nop($parser->position() - 1);
                 break;
             case 0x02:
                 list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new Block($inner, $functype, $typeIdx);
+                $instruction = new Code\Control\Block($inner, $functype, $typeIdx);
                 break;
             case 0x03:
                 list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new Loop($inner, $functype, $typeIdx);
+                $instruction = new Code\Control\Loop($inner, $functype, $typeIdx);
                 break;
             case 0x04:
                 list($functype, $typeIdx) = self::parseBlocktype($parser);
                 $inner = self::expression($parser, $constExpr, $termOpcode);
-                $instruction = new IfElse($inner, $functype, $typeIdx);
+                $instruction = new Code\Control\IfElse($inner, $functype, $typeIdx);
                 break;
             case 0x05:
-                $instruction = new ElseStmt();
+                $instruction = new Code\Control\ElseStmt();
                 break;
             case 0x0C:
                 $depth = $parser->expectInt(true);
-                $instruction = new BranchUncond($depth);
+                $instruction = new Code\Control\BranchUncond($depth);
                 break;
             case 0x0D:
                 $depth = $parser->expectInt(true);
-                $instruction = new BranchCond($depth);
+                $instruction = new Code\Control\BranchCond($depth);
                 break;
             case 0x0E:
                 $options = $parser->expectVector(function (BinaryParser $parser) {
                     return $parser->expectInt(true);
                 });
                 $default = $parser->expectInt(true);
-                $instruction = new BranchIndirect($options, $default);
+                $instruction = new Code\Control\BranchIndirect($options, $default);
                 break;
             case 0x0F:
-                $instruction = new BranchUncond();
+                $instruction = new Code\Control\BranchUncond();
                 break;
             case 0x10:
                 $funcIdx = $parser->expectInt(true);
-                $instruction = new Call($funcIdx);
+                $instruction = new Code\Control\Call($funcIdx);
                 break;
             case 0x11:
                 $typeIdx = $parser->expectInt(true);
                 $tableIdx = $parser->expectInt(true);
-                $instruction = new CallIndirect($tableIdx, $typeIdx);
+                $instruction = new Code\Control\CallIndirect($tableIdx, $typeIdx);
                 break;
             case 0x1A:
-                $instruction = new Drop();
+                $instruction = new Code\Parametric\Drop();
                 break;
             case 0x1B:
-                $instruction = new Select();
+                $instruction = new Code\Parametric\Select();
                 break;
             case 0x1C:
                 $type = $parser->expectVector(function (BinaryParser $parser) {
                     return TypesBuilder::valuetype($parser);
                 });
-                $instruction = new Select($type);
+                $instruction = new Code\Parametric\Select($type);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function varInstr(int $opcode, BinaryParser $parser): ?Instruction
+    private static function varInstr(int $opcode, BinaryParser $parser): ?Code\Instruction
     {
         $instruction = null;
         switch ($opcode) {
             case 0x20:
                 $local = $parser->expectInt(true);
-                $instruction = new LocalGet($local);
+                $instruction = new Code\Variable\LocalGet($local);
                 break;
             case 0x21:
                 $local = $parser->expectInt(true);
-                $instruction = new LocalSet($local);
+                $instruction = new Code\Variable\LocalSet($local);
                 break;
             case 0x22:
                 $local = $parser->expectInt(true);
-                $instruction = new LocalSet($local, true);
+                $instruction = new Code\Variable\LocalSet($local, true);
                 break;
             case 0x23:
                 $global = $parser->expectInt(true);
-                $instruction = new GlobalGet($global);
+                $instruction = new Code\Variable\GlobalGet($global);
                 break;
             case 0x24:
                 $global = $parser->expectInt(true);
-                $instruction = new GlobalSet($global);
+                $instruction = new Code\Variable\GlobalSet($global);
                 break;
             case 0x25:
                 $table = $parser->expectInt(true);
-                $instruction = new TableGet($table);
+                $instruction = new Code\Table\Get($table);
                 break;
             case 0x26:
                 $table = $parser->expectInt(true);
-                $instruction = new TableSet($table);
+                $instruction = new Code\Table\Set($table);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function memoryInstr(int $opcode, BinaryParser $parser): ?Instruction
+    private static function memoryInstr(int $opcode, BinaryParser $parser): ?Code\Instruction
     {
         $i32 = new ValueType(ExpressionCompiler::I32);
         $i64 = new ValueType(ExpressionCompiler::I64);
@@ -315,132 +239,132 @@ class FuncsBuilder implements BuilderInterface
             case 0x28:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i32, $offset);
+                $instruction = new Code\Memory\Load($i32, $offset);
                 break;
             case 0x29:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset);
+                $instruction = new Code\Memory\Load($i64, $offset);
                 break;
             case 0x2A:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($f32, $offset);
+                $instruction = new Code\Memory\Load($f32, $offset);
                 break;
             case 0x2B:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($f64, $offset);
+                $instruction = new Code\Memory\Load($f64, $offset);
                 break;
             case 0x2C:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i32, $offset, 8, true);
+                $instruction = new Code\Memory\Load($i32, $offset, 8, true);
                 break;
             case 0x2D:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i32, $offset, 8, false);
+                $instruction = new Code\Memory\Load($i32, $offset, 8, false);
                 break;
             case 0x2E:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i32, $offset, 16, true);
+                $instruction = new Code\Memory\Load($i32, $offset, 16, true);
                 break;
             case 0x2F:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i32, $offset, 16, false);
+                $instruction = new Code\Memory\Load($i32, $offset, 16, false);
                 break;
             case 0x30:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 8, true);
+                $instruction = new Code\Memory\Load($i64, $offset, 8, true);
                 break;
             case 0x31:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 8, false);
+                $instruction = new Code\Memory\Load($i64, $offset, 8, false);
                 break;
             case 0x32:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 16, true);
+                $instruction = new Code\Memory\Load($i64, $offset, 16, true);
                 break;
             case 0x33:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 16, false);
+                $instruction = new Code\Memory\Load($i64, $offset, 16, false);
                 break;
             case 0x34:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 32, true);
+                $instruction = new Code\Memory\Load($i64, $offset, 32, true);
                 break;
             case 0x35:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Load($i64, $offset, 32, false);
+                $instruction = new Code\Memory\Load($i64, $offset, 32, false);
                 break;
             case 0x36:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i32, $offset);
+                $instruction = new Code\Memory\Store($i32, $offset);
                 break;
             case 0x37:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i64, $offset);
+                $instruction = new Code\Memory\Store($i64, $offset);
                 break;
             case 0x38:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($f32, $offset);
+                $instruction = new Code\Memory\Store($f32, $offset);
                 break;
             case 0x39:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($f64, $offset);
+                $instruction = new Code\Memory\Store($f64, $offset);
                 break;
             case 0x3A:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i32, $offset, 8);
+                $instruction = new Code\Memory\Store($i32, $offset, 8);
                 break;
             case 0x3B:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i32, $offset, 16);
+                $instruction = new Code\Memory\Store($i32, $offset, 16);
                 break;
             case 0x3C:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i64, $offset, 8);
+                $instruction = new Code\Memory\Store($i64, $offset, 8);
                 break;
             case 0x3D:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i64, $offset, 16);
+                $instruction = new Code\Memory\Store($i64, $offset, 16);
                 break;
             case 0x3E:
                 /* $align = */ $parser->expectInt(true);
                 $offset = $parser->expectInt(true);
-                $instruction = new Store($i64, $offset, 32);
+                $instruction = new Code\Memory\Store($i64, $offset, 32);
                 break;
             case 0x3F:
                 $parser->expectByte(0x00);
-                $instruction = new Size();
+                $instruction = new Code\Memory\Size();
                 break;
             case 0x40:
                 $parser->expectByte(0x00);
-                $instruction = new Grow();
+                $instruction = new Code\Memory\Grow();
                 break;
         }
 
         return $instruction;
     }
 
-    private static function constInstr(int $opcode, BinaryParser $parser): ?Instruction
+    private static function constInstr(int $opcode, BinaryParser $parser): ?Code\Instruction
     {
         $i32 = new ValueType(ExpressionCompiler::I32);
         $i64 = new ValueType(ExpressionCompiler::I64);
@@ -451,26 +375,26 @@ class FuncsBuilder implements BuilderInterface
         switch ($opcode) {
             case 0x41:
                 $value = $parser->expectInt();
-                $instruction = new ConstStmt($i32, $value);
+                $instruction = new Code\Numeric\ConstStmt($i32, $value);
                 break;
             case 0x42:
                 $value = $parser->expectInt(false, 64);
-                $instruction = new ConstStmt($i64, $value);
+                $instruction = new Code\Numeric\ConstStmt($i64, $value);
                 break;
             case 0x43:
                 $value = $parser->expectFloat();
-                $instruction = new ConstStmt($f32, $value);
+                $instruction = new Code\Numeric\ConstStmt($f32, $value);
                 break;
             case 0x44:
                 $value = $parser->expectFloat(64);
-                $instruction = new ConstStmt($f64, $value);
+                $instruction = new Code\Numeric\ConstStmt($f64, $value);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function compInstr(int $opcode): ?Instruction
+    private static function compInstr(int $opcode): ?Code\Instruction
     {
         $i32 = new ValueType(ExpressionCompiler::I32);
         $i64 = new ValueType(ExpressionCompiler::I64);
@@ -480,97 +404,97 @@ class FuncsBuilder implements BuilderInterface
         $instruction = null;
         switch ($opcode) {
             case 0x45:
-                $instruction = new Eqz($i32);
+                $instruction = new Code\Numeric\Eqz($i32);
                 break;
             case 0x46:
-                $instruction = new Eq($i32);
+                $instruction = new Code\Numeric\Eq($i32);
                 break;
             case 0x47:
-                $instruction = new Neq($i32);
+                $instruction = new Code\Numeric\Neq($i32);
                 break;
             case 0x48:
             case 0x49: // todo: differ signed/unsigned
-                $instruction = new Lt($i32);
+                $instruction = new Code\Numeric\Lt($i32);
                 break;
             case 0x4A:
             case 0x4B: // todo: differ signed/unsigned
-                $instruction = new Gt($i32);
+                $instruction = new Code\Numeric\Gt($i32);
                 break;
             case 0x4C:
             case 0x4D: // todo: differ signed/unsigned
-                $instruction = new Le($i32);
+                $instruction = new Code\Numeric\Le($i32);
                 break;
             case 0x4E:
             case 0x4F: // todo: differ signed/unsigned
-                $instruction = new Ge($i32);
+                $instruction = new Code\Numeric\Ge($i32);
                 break;
             case 0x50:
-                $instruction = new Eqz($i64);
+                $instruction = new Code\Numeric\Eqz($i64);
                 break;
             case 0x51:
-                $instruction = new Eq($i64);
+                $instruction = new Code\Numeric\Eq($i64);
                 break;
             case 0x52:
-                $instruction = new Neq($i64);
+                $instruction = new Code\Numeric\Neq($i64);
                 break;
             case 0x53:
             case 0x54: // todo: differ signed/unsigned
-                $instruction = new Lt($i64);
+                $instruction = new Code\Numeric\Lt($i64);
                 break;
             case 0x55:
             case 0x56: // todo: differ signed/unsigned
-                $instruction = new Gt($i64);
+                $instruction = new Code\Numeric\Gt($i64);
                 break;
             case 0x57:
             case 0x58: // todo: differ signed/unsigned
-                $instruction = new Le($i64);
+                $instruction = new Code\Numeric\Le($i64);
                 break;
             case 0x59:
             case 0x5A: // todo: differ signed/unsigned
-                $instruction = new Ge($i64);
+                $instruction = new Code\Numeric\Ge($i64);
                 break;
             case 0x5B:
-                $instruction = new Eq($f32);
+                $instruction = new Code\Numeric\Eq($f32);
                 break;
             case 0x5C:
-                $instruction = new Neq($f32);
+                $instruction = new Code\Numeric\Neq($f32);
                 break;
             case 0x5D:
-                $instruction = new Lt($f32);
+                $instruction = new Code\Numeric\Lt($f32);
                 break;
             case 0x5E:
-                $instruction = new Gt($f32);
+                $instruction = new Code\Numeric\Gt($f32);
                 break;
             case 0x5F:
-                $instruction = new Le($f32);
+                $instruction = new Code\Numeric\Le($f32);
                 break;
             case 0x60:
-                $instruction = new Ge($f32);
+                $instruction = new Code\Numeric\Ge($f32);
                 break;
             case 0x61:
-                $instruction = new Eq($f64);
+                $instruction = new Code\Numeric\Eq($f64);
                 break;
             case 0x62:
-                $instruction = new Neq($f64);
+                $instruction = new Code\Numeric\Neq($f64);
                 break;
             case 0x63:
-                $instruction = new Lt($f64);
+                $instruction = new Code\Numeric\Lt($f64);
                 break;
             case 0x64:
-                $instruction = new Gt($f64);
+                $instruction = new Code\Numeric\Gt($f64);
                 break;
             case 0x65:
-                $instruction = new Le($f64);
+                $instruction = new Code\Numeric\Le($f64);
                 break;
             case 0x66:
-                $instruction = new Ge($f64);
+                $instruction = new Code\Numeric\Ge($f64);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function computeInstr(int $opcode): ?Instruction
+    private static function computeInstr(int $opcode): ?Code\Instruction
     {
         $i32 = new ValueType(ExpressionCompiler::I32);
         $i64 = new ValueType(ExpressionCompiler::I64);
@@ -580,191 +504,191 @@ class FuncsBuilder implements BuilderInterface
         $instruction = null;
         switch ($opcode) {
             case 0x67:
-                $instruction = new Clz($i32);
+                $instruction = new Code\Numeric\Int\Clz($i32);
                 break;
             case 0x68:
-                $instruction = new Ctz($i32);
+                $instruction = new Code\Numeric\Int\Ctz($i32);
                 break;
             case 0x69:
-                $instruction = new Popcnt($i32);
+                $instruction = new Code\Numeric\Int\Popcnt($i32);
                 break;
             case 0x6A:
-                $instruction = new Add($i32);
+                $instruction = new Code\Numeric\Add($i32);
                 break;
             case 0x6B:
-                $instruction = new Sub($i32);
+                $instruction = new Code\Numeric\Sub($i32);
                 break;
             case 0x6C:
-                $instruction = new Mul($i32);
+                $instruction = new Code\Numeric\Mul($i32);
                 break;
             case 0x6D:
             case 0x6E: // todo: differ signed/unsigned
-                $instruction = new Div($i32);
+                $instruction = new Code\Numeric\Div($i32);
                 break;
             case 0x6F:
             case 0x70: // todo: differ signed/unsigned
-                $instruction = new Rem($i32);
+                $instruction = new Code\Numeric\Int\Rem($i32);
                 break;
             case 0x71:
-                $instruction = new BitAnd($i32);
+                $instruction = new Code\Numeric\Int\BitAnd($i32);
                 break;
             case 0x72:
-                $instruction = new BitOr($i32);
+                $instruction = new Code\Numeric\Int\BitOr($i32);
                 break;
             case 0x73:
-                $instruction = new BitXor($i32);
+                $instruction = new Code\Numeric\Int\BitXor($i32);
                 break;
             case 0x74:
-                $instruction = new BitShl($i32);
+                $instruction = new Code\Numeric\Int\BitShl($i32);
                 break;
             case 0x75:
             case 0x76: // todo: differ signed/unsigned
-                $instruction = new BitShr($i32);
+                $instruction = new Code\Numeric\Int\BitShr($i32);
                 break;
             case 0x77:
-                $instruction = new Rotl($i32);
+                $instruction = new Code\Numeric\Int\Rotl($i32);
                 break;
             case 0x78:
-                $instruction = new Rotr($i32);
+                $instruction = new Code\Numeric\Int\Rotr($i32);
                 break;
             case 0x79:
-                $instruction = new Clz($i64);
+                $instruction = new Code\Numeric\Int\Clz($i64);
                 break;
             case 0x7A:
-                $instruction = new Ctz($i64);
+                $instruction = new Code\Numeric\Int\Ctz($i64);
                 break;
             case 0x7B:
-                $instruction = new Popcnt($i64);
+                $instruction = new Code\Numeric\Int\Popcnt($i64);
                 break;
             case 0x7C:
-                $instruction = new Add($i64);
+                $instruction = new Code\Numeric\Add($i64);
                 break;
             case 0x7D:
-                $instruction = new Sub($i64);
+                $instruction = new Code\Numeric\Sub($i64);
                 break;
             case 0x7E:
-                $instruction = new Mul($i64);
+                $instruction = new Code\Numeric\Mul($i64);
                 break;
             case 0x7F:
             case 0x80: // todo: differ signed/unsigned
-                $instruction = new Div($i64);
+                $instruction = new Code\Numeric\Div($i64);
                 break;
             case 0x81:
             case 0x82: // todo: differ signed/unsigned
-                $instruction = new Rem($i64);
+                $instruction = new Code\Numeric\Int\Rem($i64);
                 break;
             case 0x83:
-                $instruction = new BitAnd($i64);
+                $instruction = new Code\Numeric\Int\BitAnd($i64);
                 break;
             case 0x84:
-                $instruction = new BitOr($i64);
+                $instruction = new Code\Numeric\Int\BitOr($i64);
                 break;
             case 0x85:
-                $instruction = new BitXor($i64);
+                $instruction = new Code\Numeric\Int\BitXor($i64);
                 break;
             case 0x86:
-                $instruction = new BitShl($i64);
+                $instruction = new Code\Numeric\Int\BitShl($i64);
                 break;
             case 0x87:
             case 0x88: // todo: differ signed/unsigned
-                $instruction = new BitShr($i64);
+                $instruction = new Code\Numeric\Int\BitShr($i64);
                 break;
             case 0x89:
-                $instruction = new Rotl($i64);
+                $instruction = new Code\Numeric\Int\Rotl($i64);
                 break;
             case 0x8A:
-                $instruction = new Rotr($i64);
+                $instruction = new Code\Numeric\Int\Rotr($i64);
                 break;
             case 0x8B:
-                $instruction = new Abs($f32);
+                $instruction = new Code\Numeric\Float\Abs($f32);
                 break;
             case 0x8C:
-                $instruction = new Neg($f32);
+                $instruction = new Code\Numeric\Float\Neg($f32);
                 break;
             case 0x8D:
-                $instruction = new Ceil($f32);
+                $instruction = new Code\Numeric\Float\Ceil($f32);
                 break;
             case 0x8E:
-                $instruction = new Floor($f32);
+                $instruction = new Code\Numeric\Float\Floor($f32);
                 break;
             case 0x8F:
-                $instruction = new Trunc($f32);
+                $instruction = new Code\Numeric\Float\Trunc($f32);
                 break;
             case 0x90:
-                $instruction = new Nearest($f32);
+                $instruction = new Code\Numeric\Float\Nearest($f32);
                 break;
             case 0x91:
-                $instruction = new Sqrt($f32);
+                $instruction = new Code\Numeric\Float\Sqrt($f32);
                 break;
             case 0x92:
-                $instruction = new Add($f32);
+                $instruction = new Code\Numeric\Add($f32);
                 break;
             case 0x93:
-                $instruction = new Sub($f32);
+                $instruction = new Code\Numeric\Sub($f32);
                 break;
             case 0x94:
-                $instruction = new Mul($f32);
+                $instruction = new Code\Numeric\Mul($f32);
                 break;
             case 0x95:
-                $instruction = new Div($f32);
+                $instruction = new Code\Numeric\Div($f32);
                 break;
             case 0x96:
-                $instruction = new Min($f32);
+                $instruction = new Code\Numeric\Float\Min($f32);
                 break;
             case 0x97:
-                $instruction = new Max($f32);
+                $instruction = new Code\Numeric\Float\Max($f32);
                 break;
             case 0x98:
-                $instruction = new Copysign($f32);
+                $instruction = new Code\Numeric\Float\Copysign($f32);
                 break;
             case 0x99:
-                $instruction = new Abs($f64);
+                $instruction = new Code\Numeric\Float\Abs($f64);
                 break;
             case 0x9A:
-                $instruction = new Neg($f64);
+                $instruction = new Code\Numeric\Float\Neg($f64);
                 break;
             case 0x9B:
-                $instruction = new Ceil($f64);
+                $instruction = new Code\Numeric\Float\Ceil($f64);
                 break;
             case 0x9C:
-                $instruction = new Floor($f64);
+                $instruction = new Code\Numeric\Float\Floor($f64);
                 break;
             case 0x9D:
-                $instruction = new Trunc($f64);
+                $instruction = new Code\Numeric\Float\Trunc($f64);
                 break;
             case 0x9E:
-                $instruction = new Nearest($f64);
+                $instruction = new Code\Numeric\Float\Nearest($f64);
                 break;
             case 0x9F:
-                $instruction = new Sqrt($f64);
+                $instruction = new Code\Numeric\Float\Sqrt($f64);
                 break;
             case 0xA0:
-                $instruction = new Add($f64);
+                $instruction = new Code\Numeric\Add($f64);
                 break;
             case 0xA1:
-                $instruction = new Sub($f64);
+                $instruction = new Code\Numeric\Sub($f64);
                 break;
             case 0xA2:
-                $instruction = new Mul($f64);
+                $instruction = new Code\Numeric\Mul($f64);
                 break;
             case 0xA3:
-                $instruction = new Div($f64);
+                $instruction = new Code\Numeric\Div($f64);
                 break;
             case 0xA4:
-                $instruction = new Min($f64);
+                $instruction = new Code\Numeric\Float\Min($f64);
                 break;
             case 0xA5:
-                $instruction = new Max($f64);
+                $instruction = new Code\Numeric\Float\Max($f64);
                 break;
             case 0xA6:
-                $instruction = new Copysign($f64);
+                $instruction = new Code\Numeric\Float\Copysign($f64);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function convertInstr(int $opcode): ?Instruction
+    private static function convertInstr(int $opcode): ?Code\Instruction
     {
         $i32 = new ValueType(ExpressionCompiler::I32);
         $i64 = new ValueType(ExpressionCompiler::I64);
@@ -774,113 +698,113 @@ class FuncsBuilder implements BuilderInterface
         $instruction = null;
         switch ($opcode) {
             case 0xA7:
-                $instruction = new Wrap();
+                $instruction = new Code\Numeric\Conversion\Wrap();
                 break;
             case 0xA8:
-                $instruction = new Cast($i32, $f32);
+                $instruction = new Code\Numeric\Conversion\Cast($i32, $f32);
                 break;
             case 0xA9:
-                $instruction = new Cast($i32, $f32, true);
+                $instruction = new Code\Numeric\Conversion\Cast($i32, $f32, true);
                 break;
             case 0xAA:
-                $instruction = new Cast($i32, $f64);
+                $instruction = new Code\Numeric\Conversion\Cast($i32, $f64);
                 break;
             case 0xAB:
-                $instruction = new Cast($i32, $f64, true);
+                $instruction = new Code\Numeric\Conversion\Cast($i32, $f64, true);
                 break;
             case 0xAC:
-                $instruction = new Extend();
+                $instruction = new Code\Numeric\Conversion\Extend();
                 break;
             case 0xAD:
-                $instruction = new Extend(true);
+                $instruction = new Code\Numeric\Conversion\Extend(true);
                 break;
             case 0xAE:
-                $instruction = new Cast($i64, $f32);
+                $instruction = new Code\Numeric\Conversion\Cast($i64, $f32);
                 break;
             case 0xAF:
-                $instruction = new Cast($i64, $f32, true);
+                $instruction = new Code\Numeric\Conversion\Cast($i64, $f32, true);
                 break;
             case 0xB0:
-                $instruction = new Cast($i64, $f64);
+                $instruction = new Code\Numeric\Conversion\Cast($i64, $f64);
                 break;
             case 0xB1:
-                $instruction = new Cast($i64, $f64, true);
+                $instruction = new Code\Numeric\Conversion\Cast($i64, $f64, true);
                 break;
             case 0xB2:
-                $instruction = new Cast($f32, $i32);
+                $instruction = new Code\Numeric\Conversion\Cast($f32, $i32);
                 break;
             case 0xB3:
-                $instruction = new Cast($f32, $i32, true);
+                $instruction = new Code\Numeric\Conversion\Cast($f32, $i32, true);
                 break;
             case 0xB4:
-                $instruction = new Cast($f32, $i64);
+                $instruction = new Code\Numeric\Conversion\Cast($f32, $i64);
                 break;
             case 0xB5:
-                $instruction = new Cast($f32, $i64, true);
+                $instruction = new Code\Numeric\Conversion\Cast($f32, $i64, true);
                 break;
             case 0xB6:
-                $instruction = new Promote($f32);
+                $instruction = new Code\Numeric\Conversion\Promote($f32);
                 break;
             case 0xB7:
-                $instruction = new Cast($f64, $i32);
+                $instruction = new Code\Numeric\Conversion\Cast($f64, $i32);
                 break;
             case 0xB8:
-                $instruction = new Cast($f64, $i32, true);
+                $instruction = new Code\Numeric\Conversion\Cast($f64, $i32, true);
                 break;
             case 0xB9:
-                $instruction = new Cast($f64, $i64);
+                $instruction = new Code\Numeric\Conversion\Cast($f64, $i64);
                 break;
             case 0xBA:
-                $instruction = new Cast($f64, $i64, true);
+                $instruction = new Code\Numeric\Conversion\Cast($f64, $i64, true);
                 break;
             case 0xBB:
-                $instruction = new Promote($f64);
+                $instruction = new Code\Numeric\Conversion\Promote($f64);
                 break;
             case 0xBC:
-                $instruction = new Reinterpret($i32);
+                $instruction = new Code\Numeric\Conversion\Reinterpret($i32);
                 break;
             case 0xBD:
-                $instruction = new Reinterpret($i64);
+                $instruction = new Code\Numeric\Conversion\Reinterpret($i64);
                 break;
             case 0xBE:
-                $instruction = new Reinterpret($f32);
+                $instruction = new Code\Numeric\Conversion\Reinterpret($f32);
                 break;
             case 0xBF:
-                $instruction = new Reinterpret($f64);
+                $instruction = new Code\Numeric\Conversion\Reinterpret($f64);
                 break;
             case 0xC0:
-                $instruction = new SignExtend($i32, 8);
+                $instruction = new Code\Numeric\Conversion\SignExtend($i32, 8);
                 break;
             case 0xC1:
-                $instruction = new SignExtend($i32, 16);
+                $instruction = new Code\Numeric\Conversion\SignExtend($i32, 16);
                 break;
             case 0xC2:
-                $instruction = new SignExtend($i64, 8);
+                $instruction = new Code\Numeric\Conversion\SignExtend($i64, 8);
                 break;
             case 0xC3:
-                $instruction = new SignExtend($i64, 16);
+                $instruction = new Code\Numeric\Conversion\SignExtend($i64, 16);
                 break;
             case 0xC4:
-                $instruction = new SignExtend($i64, 32);
+                $instruction = new Code\Numeric\Conversion\SignExtend($i64, 32);
                 break;
         }
 
         return $instruction;
     }
 
-    private static function miscInstr(int $opcode, BinaryParser $parser): Instruction
+    private static function miscInstr(int $opcode, BinaryParser $parser): Code\Instruction
     {
         switch ($opcode) {
             case 0xD0:
                 $type = TypesBuilder::reftype($parser);
-                $instruction = new NullRef($type);
+                $instruction = new Code\Reference\NullRef($type);
                 break;
             case 0xD1:
-                $instruction = new IsNull();
+                $instruction = new Code\Reference\IsNull();
                 break;
             case 0xD2:
                 $value = $parser->expectInt(true);
-                $instruction = new RefFunc($value);
+                $instruction = new Code\Reference\Func($value);
                 break;
             case 0xFC: // subswitch
                 $secondary = $parser->expectInt(true);
@@ -888,46 +812,46 @@ class FuncsBuilder implements BuilderInterface
                     case 8:
                         $dataIdx = $parser->expectInt(true);
                         $parser->expectByte(0x00);
-                        $instruction = new Init($dataIdx);
+                        $instruction = new Code\Memory\Init($dataIdx);
                         break;
                     case 9:
                         $dataIdx = $parser->expectInt(true);
-                        $instruction = new DataDrop($dataIdx);
+                        $instruction = new Code\Memory\Drop($dataIdx);
                         break;
                     case 10:
                         $parser->expectByte(0x00);
                         $parser->expectByte(0x00);
-                        $instruction = new Copy();
+                        $instruction = new Code\Memory\Copy();
                         break;
                     case 11:
                         $parser->expectByte(0x00);
-                        $instruction = new Fill();
+                        $instruction = new Code\Memory\Fill();
                         break;
                     case 12:
                         $elemIdx = $parser->expectInt(true);
                         $tableIdx = $parser->expectInt(true);
-                        $instruction = new TableInit($tableIdx, $elemIdx);
+                        $instruction = new Code\Table\Init($tableIdx, $elemIdx);
                         break;
                     case 13:
                         $dataIdx = $parser->expectInt(true);
-                        $instruction = new ElemDrop($dataIdx);
+                        $instruction = new Code\Table\Drop($dataIdx);
                         break;
                     case 14:
                         $x = $parser->expectInt(true);
                         $y = $parser->expectInt(true);
-                        $instruction = new TableCopy($x, $y);
+                        $instruction = new Code\Table\Copy($x, $y);
                         break;
                     case 15:
                         $tableIdx = $parser->expectInt(true);
-                        $instruction = new TableGrow($tableIdx);
+                        $instruction = new Code\Table\Grow($tableIdx);
                         break;
                     case 16:
                         $tableIdx = $parser->expectInt(true);
-                        $instruction = new TableSize($tableIdx);
+                        $instruction = new Code\Table\Size($tableIdx);
                         break;
                     case 17:
                         $tableIdx = $parser->expectInt(true);
-                        $instruction = new TableFill($tableIdx);
+                        $instruction = new Code\Table\Fill($tableIdx);
                         break;
                     default:
                         throw new ParsingException('Unknown secondary opcode ' . strval($secondary));
