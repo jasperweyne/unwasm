@@ -21,6 +21,15 @@ declare(strict_types=1);
 namespace UnWasm\Compiler;
 
 use UnWasm\Compiler\Text\BuilderInterface;
+use UnWasm\Compiler\Text\DatasBuilder;
+use UnWasm\Compiler\Text\ElemsBuilder;
+use UnWasm\Compiler\Text\ExportsBuilder;
+use UnWasm\Compiler\Text\FuncsBuilder;
+use UnWasm\Compiler\Text\GlobalsBuilder;
+use UnWasm\Compiler\Text\ImportsBuilder;
+use UnWasm\Compiler\Text\MemsBuilder;
+use UnWasm\Compiler\Text\StartBuilder;
+use UnWasm\Compiler\Text\TablesBuilder;
 use UnWasm\Compiler\Text\TypesBuilder;
 use UnWasm\Exception\CompilationException;
 use UnWasm\Exception\CompilerException;
@@ -55,31 +64,27 @@ class TextParser implements ParserInterface
         $this->offset = 0;
 
         // intialise builders
-        $this->builders = array();
-        foreach ([
+        $this->builders = [
             new TypesBuilder(),
-        ] as $builder) {
-            $this->builders[$builder->supported()] = $builder;
-        }
+            new ImportsBuilder(),
+        ];
     }
 
     /**
      * Scan the stream passed during construction and result its contents in a structured ModuleCompiler object
      */
-    public function scan(): ModuleCompiler
+    public function scan(ModuleCompiler $compiler = null): ModuleCompiler
     {
         echo "Begin scanning text\n";
-        $compiler = new ModuleCompiler();
+        $compiler = $compiler ?? new ModuleCompiler();
 
         // module parser function
         $parseModule = function () use ($compiler) {
-            $this->parenthesised(function () use ($compiler) {
-                $ctx = $this->expectKeyword();
-                if (!isset($this->builders[$ctx])) {
-                    throw new CompilationException("Unknown item '$ctx' in .wat");
-                }
-                $this->builders[$ctx]->scan($this, $compiler);
-            });
+            foreach ($this->builders as $builder) {
+                $this->vec(function (self $parser) use ($builder, $compiler) {
+                    $builder->scan($parser, $compiler);
+                });
+            }
         };
 
         // scan start of the module
@@ -101,9 +106,9 @@ class TextParser implements ParserInterface
     }
 
     /**
-     * @template T
-     * @return T[]
-     * @param callable(TextParser): T $func
+     * @phpstan-template T
+     * @phpstan-param callable(TextParser): T $func
+     * @phpstan-return T[]
      */
     public function vec(callable $func): array
     {
@@ -119,23 +124,28 @@ class TextParser implements ParserInterface
         }
     }
 
-    public function maybe(callable $func): bool
+    /**
+     * @phpstan-template T
+     * @phpstan-param callable(TextParser): T $func
+     * @phpstan-param T $default
+     * @phpstan-return T
+     */
+    public function maybe(callable $func, $default = null)
     {
         $origOffset = $this->offset;
         try {
-            ($func)($this);
-            return true;
+            return ($func)($this);
         } catch (CompilerException $e) {
             // continue to next item
+            $this->offset = $origOffset;
+            return $default;
         }
-        $this->offset = $origOffset;
-        return false;
     }
 
     /**
-     * @template T
-     * @return T
-     * @param callable(TextParser): T $funcs
+     * @phpstan-template T
+     * @phpstan-param callable(TextParser): T $funcs
+     * @phpstan-return T
      */
     public function oneOf(callable ...$funcs)
     {
@@ -153,9 +163,9 @@ class TextParser implements ParserInterface
     }
 
     /**
-     * @template T
-     * @return T
-     * @param callable(TextParser): T $func
+     * @phpstan-template T
+     * @phpstan-param callable(TextParser): T $func
+     * @phpstan-return T
      */
     public function parenthesised(callable $func)
     {

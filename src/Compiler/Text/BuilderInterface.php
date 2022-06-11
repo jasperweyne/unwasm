@@ -28,6 +28,5 @@ use UnWasm\Compiler\ModuleCompiler;
  */
 interface BuilderInterface
 {
-    public function supported(): string;
     public function scan(TextParser $parser, ModuleCompiler $compiler): void;
 }
